@@ -1,0 +1,10 @@
+package ch.furchert.iotapp.repository;
+
+import ch.furchert.iotapp.model.User;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+import java.util.Optional;
+
+public interface UserRepository extends JpaRepository<User, Long> {
+    Optional<User> findByUsername(String username);
+}

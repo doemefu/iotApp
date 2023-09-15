@@ -17,7 +17,7 @@ import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import static org.springframework.security.config.Customizer.withDefaults;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class WebSecurityConfig {
 
     /*
@@ -43,12 +43,16 @@ public class WebSecurityConfig {
                 .cors(withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeRequests((requests) -> requests
-                        .requestMatchers("/login", "/register").permitAll()
-                       // .anyRequest().authenticated()
+                        .requestMatchers( "/register").permitAll()
+                        .anyRequest().authenticated()
                 )
-                .formLogin(withDefaults())
+                .formLogin((form) -> form
+                        .loginPage("http://localhost:3000/login")
+                        .permitAll()
+                )
                 .logout((logout) -> logout
-                        .logoutSuccessUrl("/login")
+                        .logoutSuccessUrl("http://localhost:3000/home")
+                        .permitAll()
                 );
 
         return http.build();

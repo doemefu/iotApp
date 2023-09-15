@@ -1,0 +1,1 @@
+/*INSERT INTO user (`id`, `name`, `password`, `created_at`) VALUES (1, 'admin', 'admin', '2019-01-01 00:00:00');*/

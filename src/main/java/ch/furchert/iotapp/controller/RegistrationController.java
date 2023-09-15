@@ -25,6 +25,9 @@ public class RegistrationController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.setLocation(location);
 
+        System.out.println("Register-Daten erhalten:");
+        System.out.println("Benutzername: " + user.getUsername());
+        System.out.println("Passwort: " + user.getPassword());
 
         if (isRegistered) {
             return new ResponseEntity<>("Registration successful", responseHeaders, HttpStatus.OK);

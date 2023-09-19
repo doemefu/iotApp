@@ -2,6 +2,12 @@
 
 # Table of Contents
 
+# Documentation
+
+## Authentication-API
+
+[API documentation](documentation/authentication-api.yaml ':include :type=markdown')
+
 # Project Structure
 
 Gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)
@@ -37,7 +43,7 @@ For further information see: [spring documentation](https://docs.spring.io/sprin
 # Anleitungen
 
 - [Full tutorial](https://spring.io/guides/tutorials/react-and-spring-data-rest/)
-- [outdated but schematic tutorial](https://www.bezkoder.com/spring-boot-react-jwt-auth/)
+- [outdated but schematic tutorial (***Ehrenbre***)](https://www.bezkoder.com/spring-boot-react-jwt-auth/)
 
 ## Spring Security
 

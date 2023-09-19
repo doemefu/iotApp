@@ -1,7 +1,7 @@
 package ch.furchert.iotapp.controller;
-
+/*
 import ch.furchert.iotapp.model.User;
-import ch.furchert.iotapp.util.UserService;
+import ch.furchert.iotapp.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,3 +36,4 @@ public class RegistrationController {
         }
     }
 }
+*/

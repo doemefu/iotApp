@@ -1,5 +1,5 @@
 package ch.furchert.iotapp.controller;
-
+/*
 import ch.furchert.iotapp.model.User;
 import ch.furchert.iotapp.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,3 +42,4 @@ public class LoginController {
     }
 
 }
+ */

@@ -1,0 +1,106 @@
+
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testmoduser",
+  "email": "testmoduser@email.ch",
+  "password": "testmoduser",
+  "roles": ["mod","user"]
+}
+
+<> 2023-09-19T205600.200.json
+<> 2023-09-19T185111.400.txt
+<> 2023-09-19T184924.200.json
+<> 2023-09-19T183049.200.json
+<> 2023-09-19T183026.200.json
+<> 2023-09-19T182955.200.json
+<> 2023-09-19T182944.400.txt
+<> 2023-09-19T182925.400.txt
+<> 2023-09-19T182924.200.json
+<> 2023-09-19T173148.200.json
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testmod",
+  "email": "testmod@email.ch",
+  "password": "testmod",
+  "roles": ["mod"]
+}
+
+<> 2023-09-19T205600-1.200.json
+<> 2023-09-19T185111.200.json
+
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testuser",
+  "email": "testuser@email.ch",
+  "password": "testuser",
+  "roles": []
+}
+
+<> 2023-09-19T205600-2.200.json
+<> 2023-09-19T185111-1.200.json
+
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testuser2",
+  "email": "testuser2@email.ch",
+  "password": "testuser2",
+  "roles": ["user"]
+}
+
+<> 2023-09-19T205600-3.200.json
+<> 2023-09-19T185111-2.200.json
+###
+POST http://localhost:8080/api/auth/signup
+Content-Type: application/json
+
+{
+  "username": "testadmin",
+  "email": "testadmin@email.ch",
+  "password": "testadmin",
+  "roles": ["admin"]
+}
+
+<> 2023-09-19T205601.200.json
+<> 2023-09-19T205102.200.json
+<> 2023-09-19T205035.400.txt
+<> 2023-09-19T204836.200.json
+<> 2023-09-19T204657.200.json
+<> 2023-09-19T204542.200.json
+<> 2023-09-19T203129.200.json
+<> 2023-09-19T190039.200.json
+<> 2023-09-19T185112.200.json
+
+###
+GET http://localhost:8080/api/test/all
+
+<> 2023-09-19T205927.200.txt
+
+###
+GET http://localhost:8080/api/test/user
+
+###
+POST http://localhost:8080/api/auth/signin
+Content-Type: application/json
+
+{
+  "username": "testuser", "password": "testuser"
+}
+
+<> 2023-09-19T211125.200.json
+<> 2023-09-19T211039.200.json
+
+###
+GET http://localhost:8080/api/test/user
+

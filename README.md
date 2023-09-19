@@ -1,5 +1,12 @@
 <h1>IoT-App Backend</h1>
 
+# Table of Contents
+
+# Project Structure
+
+Gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)
+
+
 # Progress
 
 ## Issues
@@ -27,6 +34,22 @@ So, in the context of a RESTful service, it's common to disable the form-based l
 
 For further information see: [spring documentation](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/form.html)
 
-https://docs.spring.io/spring-security/site/docs/5.5.x/guides/form-javaconfig.html
+# Anleitungen
 
-[Full tutorial](https://spring.io/blog/2015/10/28/react-js-and-spring-data-rest-part-5-security)
+- [Full tutorial](https://spring.io/guides/tutorials/react-and-spring-data-rest/)
+- [outdated but schematic tutorial](https://www.bezkoder.com/spring-boot-react-jwt-auth/)
+
+## Spring Security
+
+See class `WebSecurityConfig` for the configuration of the security filter chain.
+
+- [The Security Filter Chain](https://kasunprageethdissanayake.medium.com/spring-security-the-security-filter-chain-2e399a1cb8e3)
+- [Request Authorization](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html) 
+- https://docs.spring.io/spring-security/site/docs/5.5.x/guides/form-javaconfig.html
+
+
+## Spring MVC
+
+- [Request Mapping](https://www.baeldung.com/spring-requestmapping)
+- [Redirect after Login or Registration](https://www.baeldung.com/spring-redirect-after-login)
+

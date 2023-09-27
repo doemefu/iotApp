@@ -15,6 +15,22 @@ Gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-pro
 
 # Progress
 
+## Versions
+
+## Version 1.0
+
+- JWT authentication
+
+sources:
+[Concept](https://www.bezkoder.com/spring-boot-react-jwt-auth/#Spring_Boot_038_Spring_Security_for_Back-end)
+[Backend](https://www.bezkoder.com/spring-boot-jwt-authentication/)
+[Frontend](https://www.bezkoder.com/react-hooks-jwt-auth/#Setup_Reactjs_Project)
+
+## Version 2.0
+
+add Refresh Token
+https://www.bezkoder.com/react-refresh-token/
+
 ## Issues
 
 ### Login Umleitung
@@ -59,3 +75,6 @@ See class `WebSecurityConfig` for the configuration of the security filter chain
 - [Request Mapping](https://www.baeldung.com/spring-requestmapping)
 - [Redirect after Login or Registration](https://www.baeldung.com/spring-redirect-after-login)
 
+## React
+
+- [From validation](https://www.bezkoder.com/react-form-validation-hooks/)

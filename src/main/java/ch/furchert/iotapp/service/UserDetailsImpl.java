@@ -1,4 +1,4 @@
-package ch.furchert.iotapp.security.service;
+package ch.furchert.iotapp.service;
 
 import ch.furchert.iotapp.model.User;
 import com.fasterxml.jackson.annotation.JsonIgnore;

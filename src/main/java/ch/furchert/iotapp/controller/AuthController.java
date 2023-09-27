@@ -1,19 +1,18 @@
 package ch.furchert.iotapp.controller;
 
-
 import ch.furchert.iotapp.model.ERole;
 import ch.furchert.iotapp.model.Role;
 import ch.furchert.iotapp.model.User;
 import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
-import ch.furchert.iotapp.security.service.UserDetailsImpl;
+import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
 import ch.furchert.iotapp.util.payload.response.JwtResponse;
-import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,7 +22,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -72,14 +70,18 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest){
         if(userRepository.existsByUsername(registerRequest.getUsername())){
             return ResponseEntity
-                    .badRequest()
-                    .body("Error: Username is already taken!");
+                    .status(HttpStatus.CONFLICT) //aka 409
+                    .header("ResponseMessage", "Error: Username is already taken!")
+                    .build();
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())){
             return ResponseEntity
-                    .badRequest()
-                    .body("Error: Email is already in use!");
+                    .status(HttpStatus.CONFLICT) //aka 409
+                    .header("ResponseMessage", "Error: Email is already in use!")
+                    .build();
         }
+
+        //ups hehe System.out.println("RegisterRequest: " + registerRequest.getPassword());
 
         //Create new user's account
         User user = new User(registerRequest.getUsername(),
@@ -116,6 +118,9 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
-        return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+        return ResponseEntity
+                .ok()
+                .header("ResponseMessage", "User registered successfully!")
+                .build();
     }
 }

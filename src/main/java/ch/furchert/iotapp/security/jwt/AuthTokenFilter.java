@@ -1,6 +1,6 @@
 package ch.furchert.iotapp.security.jwt;
 
-import ch.furchert.iotapp.security.service.UserDetailsServiceImpl;
+import ch.furchert.iotapp.service.UserDetailsServiceImpl;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

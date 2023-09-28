@@ -4,6 +4,86 @@
 
 # Documentation
 
+## Inhalt
+
+---
+
+- [Table of Contents](#table-of-contents)
+- [Documentation](#documentation)
+  - [Inhalt](#inhalt)
+  - [Einleitung](#einleitung)
+    - [Projektbeschreibung](#projektbeschreibung)
+    - [Anforderungsanalyse](#anforderungsanalyse)
+    - [Nutzwertanalyse](#nutzwertanalyse)
+  - [Authentication-API](#authentication-api)
+- [Project Structure](#project-structure)
+- [Progress](#progress)
+  - [Versions](#versions)
+  - [Version 1.0](#version-10)
+  - [Version 2.0](#version-20)
+  - [Issues](#issues)
+    - [Login Umleitung](#login-umleitung)
+- [Anleitungen](#anleitungen)
+  - [Spring Security](#spring-security)
+  - [Spring MVC](#spring-mvc)
+  - [React](#react)
+
+
+## Einleitung
+
+---
+
+Dieses Projekt ist Teil der Leistungsbeurteilung des Mudules 133. 
+
+
+### Projektbeschreibung
+
+<h3> Zielsetzung </h3>
+
+Die Applikation sollte Datenbestand, Formularüberprüfung, Usability, Login für Benutzer-Accounts, 
+Registrierung und Sessionhandling beinhalten. Des weiteren soll sie eine klare 3-Tier Architektur aufweisen, bestehend aus Presentations, Business und Data Layer.
+
+- Der Presentation Layer sollte gut strukturiert und mittels CSS formatiert sein. Ausserdem muss eine Überprüfung der User Eingaben implementiert sein.
+
+- Der Business Layer zeigt eine sinnvolle Struktur auf und wird nach den Standards der Programmierung implementiert und dokumentiert.
+
+- Der Data Layer muss eine Datenbank aufweisen, die nach rationalen Richtlinien definiert und implementiert wird.
+
+Ausserdem beinhaltet die Applikation ein konzeptionelles GUI Design, welches responsiv reagieren soll.
+
+<h3> Funktionsweise </h3>
+
+
+
+### Anforderungsanalyse
+
+Aufgrund der vorgegebenen Eckdaten haben wir folgende Anforderungen abgeleitet:
+
+1. **Bestandteile des Webauftrittes:** Der Webauftritt besteht aus mehreren einzelnen Websiten.
+Eine dieser ist die Startseite, welche für alle Benutzer zugänglich ist. Dabei spielt es keine Rolle, ob bereits ein Useraccount vorhanden ist oder nicht.
+Die zweite Seite ist nur für den eingeloggten User ersichtlich und zugänglich.
+Für die Registrierung und das Einloggen wird ebanfalls eine eigene Website benötigt, welche sich aber lediglich auf diese Funktionen beschränkt sind und ansonnsten keinerlei Content beinhalten.
+2. **Registrierung neuer User:** Es kann ein neuer User im Registrierungsfenster erstellt werden, dies geschieht mittels Eingabe eines Usernamens, einer Mailadresse und eines Passwortes.
+Bevor die Registrierung abgeschlossen werden kann, wird einerseits überprüft, ob all diese Felder ausgefüllt sind, andererseits aber ach wie sei aisgefüllt sind. 
+Es wird mit den bereits vorhandenen Datenbankeinträgen abgeglichen, ob der eingegebene Username und die Mailadresse bereits erfasst wurden. 
+Die Mailadresse wird zudem auf ihre Richtigkeit überprüft, sprich ob sie der Norm einer solchen entspricht.
+Ist dies der Fall, wird im Registrierungsfenster eine Fehlermeldung angegeben.
+Ein unausgefülltes Feld, dies impliziert diesmal auch das Passwort, wird ebenfalle eine Fehlermeldung zurückgegeben.
+Sobald ein gültige Eingabe abgesendet ist, wird ein User erstellt und der Benutzer gelange direkt in den Login Screen.
+3. **Login eines registrierten Users:** Im Loginfenster kann ein User via Usernamen und Passwort angemeldet werden.
+Hier gibt es ebanfalls eine Überprüfung der eingegebenen Werte. Einerseits, ob die Felder überhaupt ausgefüllt sind, andererseits aber auch ob in der Datenbank ein solches Wertepaar vorhanden ist.
+Ist alles korrekt vorhanden wird der User angemeldet und gelangt direkt in sein Userprofil. Des weiteren wird ab dem Moment des erfolgreichen Loggins, ein Logout Button ersichtlich für ein simples Logout aus dem Userprofil.
+4. **Sessionhandling:** Das Sessionhandling wird mittels JWT (JSON Web Token) gehandhabt. Sobald ein User seine Loginrequest ansendet, wird serverseitig ein JWT erstellt und zurückgesendet.
+Dieser Token wird zurück an den Client gesendet und von ihm gespeichert.
+Sobald der User eine neue Request an den Server sendet, bspw. beim Wechsel von seinem Userprofil zur Startseite, wird nun dieser JWT mitgegeben.
+Anschliessend wird dieser vom Server validiert und die Respons wird zurück an den Client gesendet.
+
+### Nutzwertanalyse
+
+
+
+
+
 ## Authentication-API
 
 [API documentation](documentation/authentication-api.yaml ':include :type=markdown')

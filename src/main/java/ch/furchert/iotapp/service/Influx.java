@@ -51,7 +51,7 @@ public class Influx {
 
         queryApi.query(flux, (cancellable, fluxRecord) -> {
             records.add(fluxRecord);
-            System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
+            //System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
         }, throwable -> {
             System.out.println("Error occurred: " + throwable.getMessage());
             done.set(true);

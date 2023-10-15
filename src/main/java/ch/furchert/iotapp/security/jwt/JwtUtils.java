@@ -55,7 +55,7 @@ public class JwtUtils {
     }
 
     public String getJwtRefreshFromCookies(HttpServletRequest request){
-        return getCookieValueByName(request, jwtCookie);
+        return getCookieValueByName(request, jwtRefreshCookie);
     }
 
     public ResponseCookie getCleanJwtCookie(){
@@ -99,14 +99,22 @@ public class JwtUtils {
     }
 
     private ResponseCookie generateCookie(String name, String value, String path){
-        return ResponseCookie.from(name, value).path(path).maxAge(24*60*60).httpOnly(true).build();
+        return ResponseCookie
+                .from(name, value)
+                .path(path)
+                .maxAge(24*60*60)
+                .httpOnly(true)
+                .secure(true)
+                .build();
     }
 
     private String getCookieValueByName(HttpServletRequest request, String name){
         Cookie cookie = WebUtils.getCookie(request, name);
         if (cookie != null){
+            System.out.println("cookie: " + cookie.toString());
             return cookie.getValue();
         } else {
+            System.out.println("cookie is null");
             return null;
         }
     }

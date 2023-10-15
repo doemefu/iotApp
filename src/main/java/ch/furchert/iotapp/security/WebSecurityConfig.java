@@ -88,13 +88,13 @@ public class WebSecurityConfig {
                 )
                 */
                 .formLogin((form) -> form
-                        .loginPage("http://localhost:3000/login")
+                        .loginPage("https://localhost:3000/login")
                         // https://www.baeldung.com/spring-redirect-after-login
                         .defaultSuccessUrl("http://localhost:3000/home", true)
                         .permitAll()
                 )
                 .logout((logout) -> logout
-                        .logoutSuccessUrl("http://localhost:3000/home")
+                        .logoutSuccessUrl("https://localhost:3000/home")
                         .permitAll()
                 )
         ;
@@ -109,7 +109,7 @@ public class WebSecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage"));

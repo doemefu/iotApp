@@ -14,6 +14,7 @@ import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
+import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +30,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -63,6 +65,10 @@ public class AuthController {
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println("principle: " + principle.toString());
+
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
@@ -144,11 +150,18 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser() {
-        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        if (principle.toString() != "anonymousUser") {
-            Long userId = ((UserDetailsImpl) principle).getId();
-            refreshTokenService.deleteByUserId(userId);
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        System.out.println("request: " + request.toString());
+
+        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+
+        System.out.println("refreshToken: " + refreshToken);
+
+        if ((refreshToken != null) && (!refreshToken.isEmpty())) {
+            refreshTokenService.findByToken(refreshToken)
+                    .map(refreshTokenService::deleteByToken)
+                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
+                            "Refresh token is not in database!"));
         }
 
         ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
@@ -158,6 +171,17 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
+
+        /*
+                Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        System.out.println("principle: " + principle.toString());
+
+        if (principle.toString() != "anonymousUser") {
+            Long userId = ((UserDetailsImpl) principle).getId();
+            System.out.println(refreshTokenService.deleteByUserId(userId)+ "RefreshTokens deleted!");
+        }
+        */
     }
 
     @PostMapping("/refreshtoken")

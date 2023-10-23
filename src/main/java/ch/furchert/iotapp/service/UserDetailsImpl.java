@@ -1,6 +1,7 @@
 package ch.furchert.iotapp.service;
 
 import ch.furchert.iotapp.model.User;
+import ch.furchert.iotapp.model.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.util.Collection;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -23,18 +25,27 @@ public class UserDetailsImpl implements UserDetails {
     @JsonIgnore
     private String password;
     private Collection<? extends GrantedAuthority> authorities;
+    private UserStatus userStatus;
+    private Date createdAt;
+    private Date changedAt;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
-                           Collection<? extends GrantedAuthority> authorities){
+                           Collection<? extends GrantedAuthority> authorities,
+                           UserStatus userStatus, Date createdAt, Date changedAt){
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
+        this.userStatus = userStatus;
+        this.createdAt = createdAt;
+        this.changedAt = changedAt;
     }
 
     public static UserDetailsImpl build(User user) {
-        List<GrantedAuthority> authorities = user.getRoles().stream()
+        List<GrantedAuthority> authorities = user
+                .getRoles()
+                .stream()
                 .map(role -> new SimpleGrantedAuthority(role.getName().name()))
                 .collect(Collectors.toList());
 
@@ -43,7 +54,11 @@ public class UserDetailsImpl implements UserDetails {
                 user.getUsername(),
                 user.getEmail(),
                 user.getPassword(),
-                authorities);
+                authorities,
+                user.getUserStatus(),
+                user.getCreatedAt(),
+                user.getChangedAt()
+        );
     }
 
     @Override
@@ -69,6 +84,18 @@ public class UserDetailsImpl implements UserDetails {
         return password;
     }
 
+    public UserStatus getUserStatus() {
+        return userStatus;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public Date getChangedAt() {
+        return changedAt;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -88,6 +115,8 @@ public class UserDetailsImpl implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+
 
     @Override
     public boolean equals(Object o){

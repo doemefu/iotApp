@@ -46,6 +46,11 @@ public class WebSecurityConfig {
     UserDetailsServiceImpl userDetailsService;
 
     @Bean
+    public AuthTokenFilter authenticationJwtTokenFilter() {
+        return new AuthTokenFilter();
+    }
+
+    @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
@@ -58,10 +63,6 @@ public class WebSecurityConfig {
         authProvider.setPasswordEncoder(passwordEncoder());
 
         return authProvider;
-    }
-    @Bean
-    public AuthTokenFilter authenticationJwtTokenFilter() {
-        return new AuthTokenFilter();
     }
 
     @Bean
@@ -86,17 +87,17 @@ public class WebSecurityConfig {
                         .requestMatchers( "/register").permitAll()
                         .anyRequest().authenticated()
                 )
-                */
                 .formLogin((form) -> form
                         .loginPage("https://localhost:3000/login")
                         // https://www.baeldung.com/spring-redirect-after-login
-                        .defaultSuccessUrl("http://localhost:3000/home", true)
+                        .defaultSuccessUrl("https://localhost:3000/home", true)
                         .permitAll()
                 )
                 .logout((logout) -> logout
                         .logoutSuccessUrl("https://localhost:3000/home")
                         .permitAll()
                 )
+                */
         ;
 
         http.authenticationProvider(authenticationProvider());
@@ -106,11 +107,12 @@ public class WebSecurityConfig {
         return http.build();
     }
 
+    //not quite clear what's needed here
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST"));
+        configuration.setAllowedMethods(Arrays.asList("GET","POST","OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage"));
 
@@ -119,6 +121,7 @@ public class WebSecurityConfig {
         return source;
     }
 
+    //is this needed?
     @Bean
     public UserDetailsService userDetailsService() {
 

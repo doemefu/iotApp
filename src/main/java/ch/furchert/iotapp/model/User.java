@@ -42,10 +42,8 @@ public class User {
 
     //oder @OneToMany ?
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinTable(	name = "user_status",
-            joinColumns = @JoinColumn(name = "user_id"),
-            inverseJoinColumns = @JoinColumn(name = "status_id"))
-    private Status status = new Status();
+    @JoinColumn(name = "status_id") // Foreign key to status table
+    private UserStatus userStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
     @Column(name = "created_at")
@@ -62,8 +60,6 @@ public class User {
         this.email = email;
         this.password = password;
     }
-
-    // Getters and Setters
 
     @PrePersist
     protected void onCreate() {
@@ -132,11 +128,11 @@ public class User {
         this.changedAt = changedAt;
     }
 
-    public Status getUserStatus() {
-        return status;
+    public UserStatus getUserStatus() {
+        return userStatus;
     }
 
-    public void setUserStatus(Status status) {
-        this.status = status;
+    public void setUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 }

@@ -1,20 +1,22 @@
 package ch.furchert.iotapp.util.payload.response;
 
+import java.util.Date;
 import java.util.List;
 
-//most probably this class is not needed
-
 public class JwtResponse {
-    private String token;
+    private String accessToken;
     private String type = "Bearer";
     private String refreshToken;
     private Long id;
     private String username;
     private String email;
     private List<String> roles;
+    private String userStatus;
+    private Date createdAt;
+    private Date changedAt;
 
     public JwtResponse(String accessToken, String refreshToken, Long id, String username, String email, List<String> roles) {
-        this.token = accessToken;
+        this.accessToken = accessToken;
         this.refreshToken = refreshToken;
         this.id = id;
         this.username = username;
@@ -24,12 +26,12 @@ public class JwtResponse {
 
     // getters and setters
 
-    public String getToken() {
-        return token;
+    public String getAccessToken() {
+        return accessToken;
     }
 
-    public void setToken(String token) {
-        this.token = token;
+    public void setAccessToken(String accessToken) {
+        this.accessToken = accessToken;
     }
 
     public String getType() {
@@ -78,5 +80,29 @@ public class JwtResponse {
 
     public void setRoles(List<String> roles) {
         this.roles = roles;
+    }
+
+    public String getUserStatus() {
+        return userStatus;
+    }
+
+    public void setUserStatus(String userStatus) {
+        this.userStatus = userStatus;
+    }
+
+    public Date getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(Date createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public Date getChangedAt() {
+        return changedAt;
+    }
+
+    public void setChangedAt(Date changedAt) {
+        this.changedAt = changedAt;
     }
 }

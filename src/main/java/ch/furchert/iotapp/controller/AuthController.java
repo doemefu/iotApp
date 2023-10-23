@@ -1,18 +1,19 @@
 package ch.furchert.iotapp.controller;
 
 import ch.furchert.iotapp.exception.TokenRefreshException;
-import ch.furchert.iotapp.model.ERole;
-import ch.furchert.iotapp.model.RefreshToken;
-import ch.furchert.iotapp.model.Role;
-import ch.furchert.iotapp.model.User;
+import ch.furchert.iotapp.model.*;
 import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
+import ch.furchert.iotapp.repository.UserStatusRepository;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
 import ch.furchert.iotapp.service.RefreshTokenService;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
+import ch.furchert.iotapp.util.payload.request.TokenRefreshRequest;
+import ch.furchert.iotapp.util.payload.response.JwtResponse;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
+import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
 import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
 import jakarta.servlet.ServletOutputStream;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -50,6 +52,9 @@ public class AuthController {
     RoleRepository roleRepository;
 
     @Autowired
+    UserStatusRepository userStatusRepository;
+
+    @Autowired
     PasswordEncoder encoder;
 
     @Autowired
@@ -59,47 +64,54 @@ public class AuthController {
     RefreshTokenService refreshTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest){
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        System.out.println("principle: " + principle.toString());
-
-
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        String jwt = jwtUtils.generateJwtToken(userDetails);
 
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toList());
+        List<String> roles = userDetails
+                                .getAuthorities()
+                                .stream()
+                                .map(GrantedAuthority::getAuthority)
+                                .collect(Collectors.toList());
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+        //ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getAccessToken());
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body(new UserInfoResponse(userDetails.getId(),
-                        userDetails.getUsername(),
-                        userDetails.getEmail(),
-                        roles));
+                //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                //.header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .body(
+                    //new UserInfoResponse(
+                    new JwtResponse(
+                            jwt,
+                            refreshToken.getToken(),
+                            userDetails.getId(),
+                            userDetails.getUsername(),
+                            userDetails.getEmail(),
+                            roles
+                    )
+                );
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest){
-        if(userRepository.existsByUsername(registerRequest.getUsername())){
+    public ResponseEntity<?> registerUser(@Valid @RequestBody RegisterRequest registerRequest) {
+        if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //aka 409
                     .header("ResponseMessage", "Error: Username is already taken!")
                     .build();
         }
-        if (userRepository.existsByEmail(registerRequest.getEmail())){
+        if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //aka 409
                     .header("ResponseMessage", "Error: Email is already in use!")
@@ -109,20 +121,27 @@ public class AuthController {
         //ups hehe System.out.println("RegisterRequest: " + registerRequest.getPassword());
 
         //Create new user's account
-        User user = new User(registerRequest.getUsername(),
+        User user = new User(
+                registerRequest.getUsername(),
                 registerRequest.getEmail(),
-                encoder.encode(registerRequest.getPassword()));
+                encoder.encode(registerRequest.getPassword())
+        );
+
+        //TODO: Include some kind of verification process
+        UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
+                .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
+        user.setUserStatus(userStatus);
 
         Set<String> strRoles = registerRequest.getRoles();
         Set<Role> roles = new HashSet<>();
 
-        if(strRoles == null){
+        if (strRoles == null) {
             Role userRole = roleRepository.findByName(ERole.ROLE_USER)
                     .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
             roles.add(userRole);
-        }else {
+        } else {
             strRoles.forEach(role -> {
-                switch (role){
+                switch (role) {
                     case "admin":
                         Role adminRole = roleRepository.findByName(ERole.ROLE_ADMIN)
                                 .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
@@ -148,7 +167,7 @@ public class AuthController {
                 .header("ResponseMessage", "User registered successfully!")
                 .build();
     }
-
+/*
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
         System.out.println("request: " + request.toString());
@@ -171,38 +190,44 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
+    }
+*/
 
-        /*
-                Object principle = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-
-        System.out.println("principle: " + principle.toString());
-
-        if (principle.toString() != "anonymousUser") {
-            Long userId = ((UserDetailsImpl) principle).getId();
-            System.out.println(refreshTokenService.deleteByUserId(userId)+ "RefreshTokens deleted!");
-        }
-        */
+    @PostMapping("/logout")
+    public ResponseEntity<?> logoutUser(){
+        System.out.println("logoutUser");
+        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Long userId = userDetails.getId();
+        refreshTokenService.deleteByUserId(userId);
+        return ResponseEntity
+                .ok()
+                .body(new MessageResponse("You've been signed out!"));
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
-        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+        //String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+        String requestRefreshToken = request.getRefreshToken();
 
-        if ((refreshToken != null) && (!refreshToken.isEmpty())) {
-            return refreshTokenService.findByToken(refreshToken)
+        if ((requestRefreshToken != null) && (!requestRefreshToken.isEmpty())) {
+            return refreshTokenService.findByToken(requestRefreshToken)
                     .map(refreshTokenService::verifyExpiration)
                     .map(RefreshToken::getUser)
                     .map(user -> {
-                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
-
-                        return ResponseEntity.ok()
-                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                                .body(new MessageResponse("Token is refreshed successfully!"));
+                        //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+                        String newToken = jwtUtils.generateTokenFromUsername(user.getUsername());
+                        return ResponseEntity
+                                .ok()
+                                //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .body(
+                                        //TODO: issue new refresh token
+                                        new TokenRefreshResponse(newToken, requestRefreshToken)
+                                        //new MessageResponse("Token is refreshed successfully!")
+                        );
                     })
-                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
+                    .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                             "Refresh token is not in database!"));
         }
-
         return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
     }
 }

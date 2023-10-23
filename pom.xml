@@ -12,9 +12,10 @@
 	<artifactId>iotapp</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>iotapp</name>
-	<description>Demo project for Spring Boot</description>
+	<description>IoTApp Backend for the corresponding React frontend to controll the iot devices</description>
 	<properties>
 		<java.version>17</java.version>
+		<!-- <start-class>ch.furchert.ssl.HttpsEnabledApplication</start-class> -->
 	</properties>
 	<dependencies>
 		<dependency>

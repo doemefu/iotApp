@@ -8,18 +8,18 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 
 <!-- TOC -->
 * [Inhalt](#inhalt)
-  * [Einleitung](#einleitung)
-    * [Projektbeschreibung](#projektbeschreibung)
-    * [Anforderungsanalyse](#anforderungsanalyse)
-    * [Nutzwertanalyse](#nutzwertanalyse)
-  * [Authentication-API](#authentication-api)
+* [Einleitung](#einleitung)
+  * [Projektbeschreibung](#projektbeschreibung)
+  * [Anforderungsanalyse](#anforderungsanalyse)
+  * [Nutzwertanalyse](#nutzwertanalyse)
+* [Authentication-API](#authentication-api)
 * [Project Structure](#project-structure)
 * [Progress](#progress)
-  * [Versions](#versions)
   * [Version 1.0](#version-10)
   * [Version 2.0](#version-20)
-  * [Issues](#issues)
-    * [Login Umleitung](#login-umleitung)
+* [Issues](#issues)
+  * [JWT is not meant for authentication](#jwt-is-not-meant-for-authentication)
+  * [Login Umleitung](#login-umleitung)
 * [Anleitungen](#anleitungen)
   * [Spring Security](#spring-security)
   * [Spring MVC](#spring-mvc)
@@ -91,23 +91,56 @@ Anschliessend wird dieser vom Server validiert und die Respons wird zurück an d
 Gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)
 
 
-# Progress
 
-## Versions
+# Progress
 
 ## Version 1.0
 
-- JWT authentication
+JWT authentication without refresh token
 
 sources:
-[Concept](https://www.bezkoder.com/spring-boot-react-jwt-auth/#Spring_Boot_038_Spring_Security_for_Back-end)
-[Backend](https://www.bezkoder.com/spring-boot-jwt-authentication/)
-[Frontend](https://www.bezkoder.com/react-hooks-jwt-auth/#Setup_Reactjs_Project)
+- [Concept](https://www.bezkoder.com/spring-boot-react-jwt-auth/#Spring_Boot_038_Spring_Security_for_Back-end)
+- [Backend](https://www.bezkoder.com/spring-boot-jwt-authentication/)
+- [Frontend](https://www.bezkoder.com/react-hooks-jwt-auth/#Setup_Reactjs_Project)
 
 ## Version 2.0
 
-add Refresh Token
-https://www.bezkoder.com/react-refresh-accessToken/
+JWT authentication with refresh token and cookie ready
+
+**Backend**: Spring Boot</br>
+- [GitHub Pull Request](https://github.com/doemefu/iotApp/pull/3)
+- [Tutorial](https://www.bezkoder.com/spring-boot-refresh-token-jwt/)
+
+[Repo]: <> (https://github.com/bezkoder/spring-boot-refresh-token-jwt/tree/master)
+
+**Frontend**: React
+- [GitHub Pull Request](https://github.com/doemefu/frontIotApp/pull/3)
+- [Tutorial](https://www.bezkoder.com/react-refresh-token/)
+
+[Repo]: <> (https://github.com/bezkoder/react-refresh-token-hooks/tree/master)
+
+### now working:
+
+- [x] Register
+- [x] Login
+- [x] Logout
+- [x] (Semi) stateless Sessionhandling
+- [x] Role based authenticated endpoints
+- [x] Influx data connection
+
+### TODO:
+
+- [ ] Forgot password
+- [ ] Admin userhandling
+- [ ] Delete account
+- [ ] Responsive
+- [ ] MQTT connection
+- [ ] User status handling
+
+#### Cookies
+
+Cookies did not work out. They didn't get stored in the browser even though they were correctly sent and received on the client. After quite some research it turns out, browsers have a hard time handling self-signed certificates, cors http(s) requests and especially setting cookies on localhost. Once those issues get resolved we might start a new attempt.
+For the time being, the functions and methods are just commented out, and localstorage of the browser is used despite the security issues. There just isn't a different option.
 
 # Issues
 

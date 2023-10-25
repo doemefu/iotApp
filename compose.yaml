@@ -8,6 +8,6 @@ services:
       - 'MYSQL_USER=myuser@%'
       - 'MYSQL_ROOT_HOST=%'
     ports:
-      - '3306:3306'
+      - '33020:3306'
     expose:
       - '3306'

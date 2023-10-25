@@ -1,10 +1,8 @@
 <h1>IoT-App Backend</h1>
 
-# Table of Contents
+Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie die Dokumentation des Projektes.
 
-# Documentation
-
-## Inhalt
+# Inhalt
 
 ---
 
@@ -37,14 +35,14 @@
   - [React](#react)
 
 
-## Einleitung
+# Einleitung
 
 ---
 
 Dieses Projekt ist Teil der Leistungsbeurteilung des Mudules 133. 
 
 
-### Projektbeschreibung
+## Projektbeschreibung
 
 <h3> Zielsetzung </h3>
 
@@ -63,7 +61,7 @@ Ausserdem beinhaltet die Applikation ein konzeptionelles GUI Design, welches res
 
 
 
-### Anforderungsanalyse
+## Anforderungsanalyse
 
 Aufgrund der vorgegebenen Eckdaten haben wir folgende Anforderungen abgeleitet:
 
@@ -149,7 +147,7 @@ Das Repository enthält UserRepository und RoleRepository, um mit der Datenbank 
 
 
 
-## Authentication-API
+# Authentication-API
 
 [API documentation](documentation/authentication-api.yaml ':include :type=markdown')
 
@@ -174,11 +172,15 @@ sources:
 ## Version 2.0
 
 add Refresh Token
-https://www.bezkoder.com/react-refresh-token/
+https://www.bezkoder.com/react-refresh-accessToken/
 
-## Issues
+# Issues
 
-### Login Umleitung
+## JWT is not meant for authentication
+
+https://stackoverflow.com/questions/39909419/why-use-jwt-for-authentication
+
+## Login Umleitung
 
 The `.formLogin(withDefaults())` method in Spring Security's configuration chain is used for configuring form-based authentication. When you include `.formLogin(withDefaults())`, Spring Security automatically provides a default form-based login page for authentication, which is found under localhost:8080/login.
 Contrary to that my own loginPage is found under localhost:3000/login as it's a React component.

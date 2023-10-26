@@ -29,6 +29,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import java.security.SecureRandom;
 import java.util.Arrays;
 
 
@@ -50,9 +51,18 @@ public class WebSecurityConfig {
         return new AuthTokenFilter();
     }
 
+    //version 2y is the most secure
+    //strength 10 is standard and means 2^10 rounds
+    //SecureRandom is used to generate a salt for the hash
+    //Custom RNG: By providing your own SecureRandom instance, you have control over the random number generator (RNG)
+    // used for salt generation. This can be useful if you have specific requirements for the RNG, such as using a
+    // hardware-based RNG or a specific algorithm.
+    //BCrypt hash string will look like: $2<a/b/x/y>$[strength]$[22 character salt][31 character hash]
+    //peppers won't be implemented as it is not recommended for todays algorithms
+    //source: https://stackoverflow.com/questions/16891729/best-practices-salting-peppering-passwords
     @Bean
     public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
+        return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y, 10, new SecureRandom());
     }
 
     @Bean
@@ -73,13 +83,17 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                .cors(withDefaults())
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception-> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
-                            .requestMatchers("/api/test/**").permitAll()
+                                .requestMatchers("/api/auth/register").permitAll()
+                                .requestMatchers("/api/auth/verifyEmail").permitAll()
+                                .requestMatchers("/api/auth/login").permitAll()
+                                .requestMatchers("/api/auth/logout").permitAll()
+                                .requestMatchers("/api/get/**").permitAll()
                             .anyRequest().authenticated()
                 )
                 /*old
@@ -109,12 +123,12 @@ public class WebSecurityConfig {
 
     //not quite clear what's needed here
     @Bean
-    CorsConfigurationSource corsConfigurationSource() {
+    public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://127.0.0.1:3000"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type"));
-        configuration.setExposedHeaders(Arrays.asList("ResponseMessage"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
+        configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

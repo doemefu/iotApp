@@ -6,11 +6,14 @@ import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.repository.UserStatusRepository;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
+import ch.furchert.iotapp.service.EmailServiceImpl;
+import ch.furchert.iotapp.service.EmailVerificationTokenService;
 import ch.furchert.iotapp.service.RefreshTokenService;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
 import ch.furchert.iotapp.util.payload.request.TokenRefreshRequest;
+import ch.furchert.iotapp.util.payload.request.VerifyRequest;
 import ch.furchert.iotapp.util.payload.response.JwtResponse;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
@@ -23,6 +26,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.mail.SimpleMailMessage;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,10 +36,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -62,6 +63,12 @@ public class AuthController {
 
     @Autowired
     RefreshTokenService refreshTokenService;
+
+    @Autowired
+    EmailServiceImpl emailService;
+
+    @Autowired
+    private EmailVerificationTokenService emailVerificationTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
@@ -128,7 +135,7 @@ public class AuthController {
         );
 
         //TODO: Include some kind of verification process
-        UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
+        UserStatus userStatus = userStatusRepository.findByName(EUserStatus.UNVERIFIED)
                 .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
         user.setUserStatus(userStatus);
 
@@ -162,11 +169,51 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
+        String token = UUID.randomUUID().toString();
+
+        // Save the token and user's email in the database
+        emailVerificationTokenService.createEmailVerificationTokenForUser(user, token);
+
+        emailService.sendSimpleMessage(user.getEmail(), "To verify your email, click the link below:\n" +
+                "https://localhost:3000/verifyEmail?token=" + token, "Hello, " + user.getUsername() + " please verify your email address here: <link>");
+
         return ResponseEntity
                 .ok()
                 .header("ResponseMessage", "User registered successfully!")
                 .build();
     }
+
+
+    @PostMapping("/verifyEmail")
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest) {
+        String token = verifyRequest.getToken();
+        System.out.println("verifyEmail: " + token);
+        User user = emailVerificationTokenService.validateEmailVerificationToken(token);
+        if (user != null) {
+            System.out.println("from user: " + user.toString());
+            UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
+                    .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
+            user.setUserStatus(userStatus);
+
+            emailVerificationTokenService.deleteTokenByValue(token);
+
+            userRepository.save(user);
+            return ResponseEntity.ok(new MessageResponse("Email verified successfully"));
+        } else {
+            System.out.println("unable to map user or invalid/expired token");
+            return ResponseEntity.badRequest().body(new MessageResponse("Invalid or expired token"));
+        }
+    }
+/*
+    @PostMapping("/verifyEmail")
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest) {
+        String token = verifyRequest.getToken();
+        System.out.println("Verifying Email" + token);
+        return ResponseEntity.ok(new MessageResponse("Email verified successfully"));
+
+    }
+
+ */
 /*
     @PostMapping("/logout")
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {

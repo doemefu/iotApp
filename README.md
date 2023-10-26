@@ -10,13 +10,18 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 * [Inhalt](#inhalt)
 * [Einleitung](#einleitung)
   * [Projektbeschreibung](#projektbeschreibung)
+    * [Zielsetzung](#zielsetzung)
   * [Anforderungsanalyse](#anforderungsanalyse)
   * [Nutzwertanalyse](#nutzwertanalyse)
-* [Authentication-API](#authentication-api)
-* [Project Structure](#project-structure)
+* [Umsetzung](#umsetzung)
+  * [Authentication-API](#authentication-api)
+  * [Project Structure](#project-structure)
 * [Progress](#progress)
   * [Version 1.0](#version-10)
   * [Version 2.0](#version-20)
+    * [now working:](#now-working)
+    * [TODO:](#todo)
+    * [Cookies](#cookies)
 * [Issues](#issues)
   * [JWT is not meant for authentication](#jwt-is-not-meant-for-authentication)
   * [Login Umleitung](#login-umleitung)
@@ -31,27 +36,23 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 
 ---
 
-Dieses Projekt ist Teil der Leistungsbeurteilung des Mudules 133. 
+Dieses Projekt ist Teil der Leistungsbeurteilung des Modules 133. 
 
 
 ## Projektbeschreibung
 
-<h3> Zielsetzung </h3>
+### Zielsetzung
 
 Die Applikation sollte Datenbestand, Formularüberprüfung, Usability, Login für Benutzer-Accounts, 
-Registrierung und Sessionhandling beinhalten. Des weiteren soll sie eine klare 3-Tier Architektur aufweisen, bestehend aus Presentations, Business und Data Layer.
+Registrierung und Session handling beinhalten. Des Weiteren soll sie eine klare 3-Tier Architektur aufweisen, bestehend aus Presentations, Business und Data Layer.
 
-- Der Presentation Layer sollte gut strukturiert und mittels CSS formatiert sein. Ausserdem muss eine Überprüfung der User Eingaben implementiert sein.
+- Der Presentation-Layer sollte gut strukturiert und mittels CSS formatiert sein. Ausserdem muss eine Überprüfung der User Eingaben implementiert sein.
 
-- Der Business Layer zeigt eine sinnvolle Struktur auf und wird nach den Standards der Programmierung implementiert und dokumentiert.
+- Der Business-Layer zeigt eine sinnvolle Struktur auf und wird nach den Standards der Programmierung implementiert und dokumentiert.
 
-- Der Data Layer muss eine Datenbank aufweisen, die nach rationalen Richtlinien definiert und implementiert wird.
+- Der Data-Layer muss eine Datenbank aufweisen, die nach rationalen Richtlinien definiert und implementiert wird.
 
 Ausserdem beinhaltet die Applikation ein konzeptionelles GUI Design, welches responsiv reagieren soll.
-
-<h3> Funktionsweise </h3>
-
-
 
 ## Anforderungsanalyse
 
@@ -67,7 +68,7 @@ Es wird mit den bereits vorhandenen Datenbankeinträgen abgeglichen, ob der eing
 Die Mailadresse wird zudem auf ihre Richtigkeit überprüft, sprich ob sie der Norm einer solchen entspricht.
 Ist dies der Fall, wird im Registrierungsfenster eine Fehlermeldung angegeben.
 Ein unausgefülltes Feld, dies impliziert diesmal auch das Passwort, wird ebenfalle eine Fehlermeldung zurückgegeben.
-Sobald ein gültige Eingabe abgesendet ist, wird ein User erstellt und der Benutzer gelange direkt in den Login Screen.
+Sobald eine gültige Eingabe abgesendet ist, wird ein User erstellt und der Benutzer gelange direkt in den Login Screen.
 3. **Login eines registrierten Users:** Im Loginfenster kann ein User via Usernamen und Passwort angemeldet werden.
 Hier gibt es ebanfalls eine Überprüfung der eingegebenen Werte. Einerseits, ob die Felder überhaupt ausgefüllt sind, andererseits aber auch ob in der Datenbank ein solches Wertepaar vorhanden ist.
 Ist alles korrekt vorhanden wird der User angemeldet und gelangt direkt in sein Userprofil. Des weiteren wird ab dem Moment des erfolgreichen Loggins, ein Logout Button ersichtlich für ein simples Logout aus dem Userprofil.
@@ -78,19 +79,93 @@ Anschliessend wird dieser vom Server validiert und die Respons wird zurück an d
 
 ## Nutzwertanalyse
 
+# Umsetzung
 
+Die Applikation ist als 4 Tier Architektur aufgebaut. Sie besteht aus einer Client-, Presentation-, Application- und Data-Storage-Schicht.
 
+**Client-Schicht** (Client Layer):</br>
+Der Browser, der die React-Anwendung ausführt und auf Port 3000 läuft. Diese Schicht ist für die Darstellung der Benutzeroberfläche und die Interaktion mit dem Benutzer verantwortlich.
 
+**Präsentationsschicht** (Presentation Layer):</br>
+Die React-Anwendung selbst, die API-Aufrufe an das Spring Boot-Programm macht. Sie dient als Frontend und stellt die Benutzeroberfläche bereit.
 
-# Authentication-API
+**Anwendungsschicht** (Application Layer):</br>
+Das Spring Boot-Programm auf Port 8080. Diese Schicht handhabt die Geschäftslogik und koordiniert die Daten zwischen der MariaDB und der InfluxDB.
+
+**Datenspeicherschicht** (Data Storage Layer):</br>
+Hier haben Sie zwei Datenbanken - MariaDB auf Port 3306 für die Speicherung von Anmeldedaten und eine externe InfluxDB für andere Daten. Beide werden über die Spring Boot-Anwendung abgerufen.
+
+## Authentication-API
 
 [API documentation](documentation/authentication-api.yaml ':include :type=markdown')
 
-# Project Structure
+```
++--------+                                           +---------------+
+|        |--(A)------- Authorization Grant --------->|               |
+|        |                                           |               |
+|        |<-(B)----------- Access Token -------------|               |
+|        |               & Refresh Token             |               |
+|        |                                           |               |
+|        |                            +----------+   |               |
+|        |--(C)---- Access Token ---->|          |   |               |
+|        |                            |          |   |               |
+|        |<-(D)- Protected Resource --| Resource |   | Authorization |
+| Client |                            |  Server  |   |     Server    |
+|        |--(E)---- Access Token ---->|          |   |               |
+|        |                            |          |   |               |
+|        |<-(F)- Invalid Token Error -|          |   |               |
+|        |                            +----------+   |               |
+|        |                                           |               |
+|        |--(G)----------- Refresh Token ----------->|               |
+|        |                                           |               |
+|        |<-(H)----------- Access Token -------------|               |
++--------+           & Optional Refresh Token        +---------------+
+```
+(A) The client requests an access token by authenticating with the authorization server and presenting an authorization grant.
 
-Gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)
+(B) The authorization server authenticates the client and validates the authorization grant, and if valid, issues an access token and a refresh token.
+
+(C) The client makes a protected resource request to the resource server by presenting the access token.
+
+(D) The resource server validates the access token, and if valid, serves the request.
+
+(E) Steps (C) and (D) repeat until the access token expires. If the client knows the access token expired, it skips to step (G); otherwise, it makes another protected resource request.
+
+(F) Since the access token is invalid, the resource server returns an invalid token error.
+
+(G) The client requests a new access token by authenticating with the authorization server and presenting the refresh token. The client authentication requirements are based on the client type and on the authorization server policies.
+
+(H) The authorization server authenticates the client and validates the refresh token, and if valid, issues a new access token (and, optionally, a new refresh token).
+
+### Password Security
+
+Version 2y is the most secure
+
+Strength 10 is standard and means 2^10 rounds
+
+`SecureRandom` is used to generate a salt for the hash
+
+Custom RNG: By providing your own SecureRandom instance, you have control over the random number generator (RNG) 
+used for salt generation. This can be useful if you have specific requirements for the RNG, such as using a
+hardware-based RNG or a specific algorithm.
+
+Peppers won't be implemented as it is not recommended for todays algorithms
+[source](https://stackoverflow.com/questions/16891729/best-practices-salting-peppering-passwords)
+
+BCrypt hash string will look like: $2<a/b/x/y>$[strength]$[22 character salt][31 character hash]
 
 
+
+```java
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y, 10, new SecureRandom());
+    }
+```
+
+## Project Structure
+
+Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>
 
 # Progress
 
@@ -137,7 +212,7 @@ JWT authentication with refresh token and cookie ready
 - [ ] MQTT connection
 - [ ] User status handling
 
-#### Cookies
+### Cookies
 
 Cookies did not work out. They didn't get stored in the browser even though they were correctly sent and received on the client. After quite some research it turns out, browsers have a hard time handling self-signed certificates, cors http(s) requests and especially setting cookies on localhost. Once those issues get resolved we might start a new attempt.
 For the time being, the functions and methods are just commented out, and localstorage of the browser is used despite the security issues. There just isn't a different option.

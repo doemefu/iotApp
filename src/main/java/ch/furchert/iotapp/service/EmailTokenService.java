@@ -33,21 +33,21 @@ public class EmailTokenService {
         tokenRepository.save(myToken);
     }
 
-    public User validateEmailToken(String token) {
+    public Optional<User> validateEmailToken(String token) {
         List<EmailToken> storedTokens = tokenRepository.findAll(); // Fetch all tokens
 
         for (EmailToken storedToken : storedTokens) {
             if (encoder.matches(token, storedToken.getToken())) {
                 if (storedToken.getUsed()) {
                     System.out.println("token already used");
-                    return null;
+                    return Optional.empty();
                 }
                 if (storedToken.getExpiryDate().isBefore(LocalDateTime.now())) {
                     System.out.println("token expired");
-                    return null;
+                    return Optional.empty();
                 }
                 storedToken.setUsed(true);
-                return storedToken.getUser();
+                return Optional.ofNullable(storedToken.getUser());
             }
         }
 

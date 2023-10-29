@@ -95,6 +95,7 @@ public class WebSecurityConfig {
                                 //.requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/api/get/**").permitAll()
                                 .requestMatchers("/api/user-management/forgotPassword").permitAll()
+                                .requestMatchers("/api/user-management/resetPassword").permitAll()
                             .anyRequest().authenticated()
                 )
                 /*old

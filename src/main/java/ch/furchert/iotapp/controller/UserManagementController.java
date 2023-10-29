@@ -124,7 +124,7 @@ public class UserManagementController {
         emailService.sendSimpleMessage(
                 existingUser.getEmail(),
                 "Password Reset",
-                "Hello, " + existingUser.getUsername() + " \\n please reset your password here: http://localhost:3000/resetPassword?token=" + token);
+                "Hello, " + existingUser.getUsername() + " \\n please reset your password here: https://localhost:3000/auth/resetPassword?token=" + token);
 
         return ResponseEntity
                 .ok()
@@ -133,24 +133,38 @@ public class UserManagementController {
 
     @PostMapping("/resetPassword")
     public ResponseEntity<?> resetPassword(@Valid @RequestBody ResetPasswordRequest request) {
+        Optional<User> userOptional;
         User user;
 
         if (request.getToken() != null) {
-            user = emailTokenService.validateEmailToken(request.getToken());
+            userOptional = emailTokenService.validateEmailToken(request.getToken());
 
         } else {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
 
-            user = userRepository.findByUsername(userDetails.getUsername()).get();
-        }
-        if (user == null) {
-            return ResponseEntity
-                    .badRequest()
-                    .body(new MessageResponse("Invalid token!"));
+            userOptional = userRepository.findByUsername(userDetails.getUsername());
         }
 
+        if (userOptional.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                    .body(new MessageResponse("User or token not found!")
+            );
+        }
+        user = userOptional.get();
+
+        if (request.getToken() == null) {
+            if (!encoder.matches(request.getOldPassword(), user.getPassword())) {
+                return ResponseEntity
+                        .status(HttpStatus.UNAUTHORIZED)
+                        .body(new MessageResponse("Old password is incorrect!"));
+            }
+        }
+
+        System.out.println("old password: " + user.getPassword());
         user.setPassword(encoder.encode(request.getNewPassword()));
+        System.out.println("new password: " + user.getPassword());
         userRepository.save(user);
 
         return ResponseEntity
@@ -159,7 +173,6 @@ public class UserManagementController {
     }
 
 
-    //TODO: Admin can show all users
     @GetMapping("/allUsers")
     @PreAuthorize("hasRole('ADMIN') or hasRole('MODERATOR')")
     public ResponseEntity<List<User>> getAllUsers() {

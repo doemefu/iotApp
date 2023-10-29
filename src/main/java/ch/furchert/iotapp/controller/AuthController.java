@@ -66,8 +66,24 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+
+        // If user not found by username, try by email
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findByEmail(loginRequest.getUsername());
+        }
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not found"));
+        }
+
+        User user = userOptional.get();
+
+        // Authenticate
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(user.getUsername(), loginRequest.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -181,9 +197,14 @@ public class AuthController {
     public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest) {
         String token = verifyRequest.getToken();
         System.out.println("verifyEmail: " + token);
-        User user = emailTokenService.validateEmailToken(token);
-        if (user != null) {
+
+        User user;
+        Optional<User> optionalUser = emailTokenService.validateEmailToken(token);
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
             System.out.println("from user: " + user.toString());
+
             UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
                     .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
             user.setUserStatus(userStatus);

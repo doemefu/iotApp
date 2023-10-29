@@ -58,21 +58,24 @@ Ausserdem beinhaltet die Applikation ein konzeptionelles GUI Design, welches res
 
 Aufgrund der vorgegebenen Eckdaten haben wir folgende Anforderungen abgeleitet:
 
-1. **Bestandteile des Webauftrittes:** Der Webauftritt besteht aus mehreren einzelnen Websiten.
+**Bestandteile des Webauftrittes:** Der Webauftritt besteht aus mehreren einzelnen Websiten.
 Eine dieser ist die Startseite, welche für alle Benutzer zugänglich ist. Dabei spielt es keine Rolle, ob bereits ein Useraccount vorhanden ist oder nicht.
 Die zweite Seite ist nur für den eingeloggten User ersichtlich und zugänglich.
 Für die Registrierung und das Einloggen wird ebanfalls eine eigene Website benötigt, welche sich aber lediglich auf diese Funktionen beschränkt sind und ansonnsten keinerlei Content beinhalten.
-2. **Registrierung neuer User:** Es kann ein neuer User im Registrierungsfenster erstellt werden, dies geschieht mittels Eingabe eines Usernamens, einer Mailadresse und eines Passwortes.
+
+**Registrierung neuer User:** Es kann ein neuer User im Registrierungsfenster erstellt werden, dies geschieht mittels Eingabe eines Usernamens, einer Mailadresse und eines Passwortes.
 Bevor die Registrierung abgeschlossen werden kann, wird einerseits überprüft, ob all diese Felder ausgefüllt sind, andererseits aber ach wie sei aisgefüllt sind. 
 Es wird mit den bereits vorhandenen Datenbankeinträgen abgeglichen, ob der eingegebene Username und die Mailadresse bereits erfasst wurden. 
 Die Mailadresse wird zudem auf ihre Richtigkeit überprüft, sprich ob sie der Norm einer solchen entspricht.
 Ist dies der Fall, wird im Registrierungsfenster eine Fehlermeldung angegeben.
 Ein unausgefülltes Feld, dies impliziert diesmal auch das Passwort, wird ebenfalle eine Fehlermeldung zurückgegeben.
 Sobald eine gültige Eingabe abgesendet ist, wird ein User erstellt und der Benutzer gelange direkt in den Login Screen.
-3. **Login eines registrierten Users:** Im Loginfenster kann ein User via Usernamen und Passwort angemeldet werden.
+
+**Login eines registrierten Users:** Im Loginfenster kann ein User via Usernamen und Passwort angemeldet werden.
 Hier gibt es ebanfalls eine Überprüfung der eingegebenen Werte. Einerseits, ob die Felder überhaupt ausgefüllt sind, andererseits aber auch ob in der Datenbank ein solches Wertepaar vorhanden ist.
 Ist alles korrekt vorhanden wird der User angemeldet und gelangt direkt in sein Userprofil. Des weiteren wird ab dem Moment des erfolgreichen Loggins, ein Logout Button ersichtlich für ein simples Logout aus dem Userprofil.
-4. **Sessionhandling:** Das Sessionhandling wird mittels JWT (JSON Web Token) gehandhabt. Sobald ein User seine Loginrequest ansendet, wird serverseitig ein JWT erstellt und zurückgesendet.
+
+**Sessionhandling:** Das Sessionhandling wird mittels JWT (JSON Web Token) gehandhabt. Sobald ein User seine Loginrequest ansendet, wird serverseitig ein JWT erstellt und zurückgesendet.
 Dieser Token wird zurück an den Client gesendet und von ihm gespeichert.
 Sobald der User eine neue Request an den Server sendet, bspw. beim Wechsel von seinem Userprofil zur Startseite, wird nun dieser JWT mitgegeben.
 Anschliessend wird dieser vom Server validiert und die Respons wird zurück an den Client gesendet.
@@ -97,7 +100,9 @@ Hier haben Sie zwei Datenbanken - MariaDB auf Port 3306 für die Speicherung von
 
 ## Authentication-API
 
+<!---
 [API documentation](documentation/authentication-api.yaml ':include :type=markdown')
+--->
 
 ```
 +--------+                                           +---------------+
@@ -121,38 +126,36 @@ Hier haben Sie zwei Datenbanken - MariaDB auf Port 3306 für die Speicherung von
 |        |<-(H)----------- Access Token -------------|               |
 +--------+           & Optional Refresh Token        +---------------+
 ```
-(A) The client requests an access token by authenticating with the authorization server and presenting an authorization grant.
+(A) Der Client fordert ein Zugriffstoken an, indem er sich beim Autorisierungsserver authentifiziert und eine Autorisierungszusage vorlegt.
 
-(B) The authorization server authenticates the client and validates the authorization grant, and if valid, issues an access token and a refresh token.
+(B) Der Autorisierungsserver authentifiziert den Client und überprüft die Autorisierungszusage. Bei erfolgreicher Validierung stellt er ein Zugriffstoken und ein Auffrischungstoken aus.
 
-(C) The client makes a protected resource request to the resource server by presenting the access token.
+(C) Der Client stellt eine geschützte Ressourcenanfrage an den Ressourcenserver, indem er das Zugriffstoken vorlegt.
 
-(D) The resource server validates the access token, and if valid, serves the request.
+(D) Der Ressourcenserver validiert das Zugriffstoken und, wenn es gültig ist, bedient er die Anfrage.
 
-(E) Steps (C) and (D) repeat until the access token expires. If the client knows the access token expired, it skips to step (G); otherwise, it makes another protected resource request.
+(E) Die Schritte (C) und (D) wiederholen sich, bis das Zugriffstoken abläuft. Wenn der Client weiss, dass das Zugriffstoken abgelaufen ist, überspringt er Schritt (G); andernfalls stellt er eine weitere geschützte Ressourcenanfrage.
 
-(F) Since the access token is invalid, the resource server returns an invalid token error.
+(F) Da das Zugriffstoken ungültig ist, gibt der Ressourcenserver einen Fehler für ungültiges Token zurück.
 
-(G) The client requests a new access token by authenticating with the authorization server and presenting the refresh token. The client authentication requirements are based on the client type and on the authorization server policies.
+(G) Der Client fordert ein neues Zugriffstoken an, indem er sich beim Autorisierungsserver authentifiziert und das Auffrischungstoken vorlegt. Die Authentifizierungsanforderungen des Clients basieren auf dem Clienttyp und den Richtlinien des Autorisierungsservers.
 
-(H) The authorization server authenticates the client and validates the refresh token, and if valid, issues a new access token (and, optionally, a new refresh token).
+(H) Der Autorisierungsserver authentifiziert den Client und überprüft das Auffrischungstoken. Bei erfolgreicher Validierung stellt er ein neues Zugriffstoken aus (und optional ein neues Auffrischungstoken).
 
 ### Password Security
 
-Version 2y is the most secure
+Version 2y ist am sichersten.
 
-Strength 10 is standard and means 2^10 rounds
+Stärke 10 ist der Standard und bedeutet 2^10 Runden.
 
-`SecureRandom` is used to generate a salt for the hash
+`SecureRandom` wird verwendet, um ein Salz für den Hash zu generieren.
 
-Custom RNG: By providing your own SecureRandom instance, you have control over the random number generator (RNG) 
-used for salt generation. This can be useful if you have specific requirements for the RNG, such as using a
-hardware-based RNG or a specific algorithm.
+Benutzerdefinierte Zufallszahlengeneratoren (RNG): Durch Bereitstellen Ihrer eigenen SecureRandom-Instanz haben Sie die Kontrolle über den Zufallszahlengenerator (RNG), der für die Salzgenerierung verwendet wird. Dies kann nützlich sein, wenn Sie spezielle Anforderungen an den RNG haben, wie die Verwendung eines hardwarebasierten RNG oder eines bestimmten Algorithmus.
 
-Peppers won't be implemented as it is not recommended for todays algorithms
-[source](https://stackoverflow.com/questions/16891729/best-practices-salting-peppering-passwords)
+Peppers (Zusatzsalze) werden nicht implementiert, da sie für moderne Algorithmen nicht empfohlen werden. 
+[Quelle](https://stackoverflow.com/questions/16891729/best-practices-salting-peppering-passwords)
 
-BCrypt hash string will look like: $2<a/b/x/y>$[strength]$[22 character salt][31 character hash]
+Ein BCrypt-Hash-String sieht folgendermassen aus: $2<a/b/x/y>$[strenght]$[22 character salt][31 character hash]
 
 
 
@@ -163,6 +166,72 @@ BCrypt hash string will look like: $2<a/b/x/y>$[strength]$[22 character salt][31
     }
 ```
 
+## React Refresh Token
+
+– Ein Refreshtoken wird dem Benutzer beim Einloggen zur Verfügung gestellt.
+
+– Ein gültiges JWT muss dem HTTP-Header hinzugefügt werden, wenn der Client auf geschützte Ressourcen zugreift.
+
+– Mit Hilfe von Axios-Interceptoren kann die React-App überprüfen, ob der Zugriffstoken (JWT) abgelaufen ist (Statuscode 401). In diesem Fall sendet sie eine Anfrage zum Erhalten eines neuen Zugriffstokens (/refreshToken) und verwendet diesen für neue Ressourcenanfragen.
+
+### Axios
+
+In React ist Axios ein häufig verwendetes JavaScript-Modul, das für das Senden von HTTP-Anfragen an Server verwendet wird. Axios Interceptoren sind Funktionen, die von Axios bereitgestellt werden und es ermöglichen, Anfragen und Antworten zu überwachen und zu bearbeiten, bevor sie an den Server gesendet bzw. von ihm empfangen werden. Sie sind äuerssst nützlich, um bestimmte Aufgaben und Anforderungen an HTTP-Anfragen und -Antworten zu implementieren, insbesondere wenn mit Authentifizierung, Autorisierung und Fehlerbehandlung umgegangen werden muss.
+
+Die Kombination aus Axios Interceptoren und React ermöglicht eine zentrale und effiziente Steuerung der Netzwerkkommunikation. Dadurch können wiederkehrende Aufgaben automatisiert werden. Interzeptoren sind hierbei besonders nützlich fpr die Handhabung von Authentifizierung und Autorisierung.
+
+**Authentifizierung und Token-Handling:** Wir verwenden einen Request-Interceptor, um sicherzustellen, dass ein Authentifizierungs-Token (JWT) zu jeder Anfrage hinzugefügt wird, um auf geschützte Ressourcen zuzugreifen. Dies geschieht im `instance.interceptors.request.use-Block`, wo wir den Token dem Anforderungs-Header hinzufügen.
+
+**Fehlerbehandlung:** Wir verwenden Response-Interceptoren, um Fehler global zu behandeln. Wenn ein Statuscode 401 (unautorisiert) empfangen wird, versuchen wir im Response-Interceptor automatisch, ein neues Authentifizierungstoken zu erhalten und die ursprüngliche Anfrage erneut auszuführen. Dies hilft bei der Behandlung von abgelaufenen Tokens oder ungültigen Authentifizierungen.
+
+Auf Grund dessen ist in `api.js` eine API für die Handhabung der Authentifizierung der User enthalten. Diese überprüft, ob ein User eingeloggt werden kann oder nicht. Des weiteren könne neue Tokens für eine weiterführende Authentifizierung ausgestellt werden.
+
+Im Front-end werden innerhalb der beiden Klassen `UserService`und `AuthService` die Antworten der API gehandhabt. Auf der einen Seite kann unterschieden werden um welche Aktion des Users es sich handelt, beispielsweise ein Login oder ein Logout. Andererseits kann aber auch bestummen werden, um welche Art Usere es sich handelt und desswegen die korrekte Userseite anzeigen, je nach Klassifizierung des Users.
+
+
+
+## Spring Security
+
+Mittels Spring Security kann die Form von Authentifizierung gehandhabt werden. Standardmässig verlangt Spring Security eine Authentifizierung für jede einzelne Request. Desswegen wird bei jeder Verwendung von `HttpSecurity` vorausgesetzt, dass gewisse Authentifizierungsrichtlinien angewendet werden.
+
+
+### HttpServletRequest
+
+```java
+http
+.authorizeHttpRequests((authorize) -> authorize
+.anyRequest().authenticated()
+)
+```
+
+Dies setzt voraus, dass bei jedem Endpoint in der Applikation im Punkt Sicherheit mindestens eine Authentifizierung benötigt wird. Jedoch wird in der Applikation auch zwischen verscheidenen Stufen bzw. Arten von Authentifizierung unterschieden. 
+
+### AuthorizationFilter
+
+Der AuthorizationFilter befindet sich standardmässig am Ende der Spring Security-Filterkette. Das bedeutet, dass die Authentifizierungsfilter, Schutzmechanismen gegen Exploits und andere Filterintegrationen von Spring Security keine zusätzliche Autorisierung erfordern. Wenn Sie eigene Filter vor dem Autorisierungsfilter hinzufügen, erfordern diese ebenfalls keine separate Autorisierung. Andernfalls benötigen sie diese.
+
+Ein Ort, an dem dies in der Regel wichtig wird, ist die Hinzufügung von Spring MVC-Endpunkten. Da diese von der DispatcherServlet ausgeführt werden und dies nach dem Autorisierungsfilter erfolgt, müssen die Endpunkte in `authorizeHttpRequests` aufgenommen werden, um zugelassen zu werden.
+
+`authorizeHttpRequests` ist der zentrale Punkt, an dem die Anforderungen für die Autorisierung der HTTP-Anfragen definiert werden. Hier wird angegeben, welche Pfade (Endpunkte) von welchen Benutzern aufgerufen werden dürfen. Einige Endpunkte, wie "/api/auth/login", "/api/auth/register" usw., werden für alle Benutzer (permitAll) zugänglich gemacht, während anyRequest().authenticated() sicherstellt, dass alle anderen Anfragen eine Authentifizierung erfordern.
+
+## Datenbank
+
+In dieser Applikation sind zwei verschiedene Datenbanken angebunden. Zum einen eine für die Sicherung der Anmeldedaten, welche die Website betrifft, anderereits eine extern angebundene, welche unabhängig Daten speichert. Beide Datenbanken werden mittels der Spring Boot-Anwendung angerufen.
+
+### MariaDB
+
+Wie bereits erwähnt beinhalter diese Datenbank die Anmeldedaten, welche erforderlich für die Funktionalität der Website sind. Sie steht im ständigen Austausch mit den Anfragen der Website. Standardmässig sind alle Besucher der Website automatisch teilsberechtigt für gewisse Aktionen, wie beispielsweise der zugriff auf die Home Seite.
+
+Bei der Anmeldung oder Regitstierung eines Users wird die DB angefragt. Bei der Anmeldung wird überprüft, ob ein User mit den eingegebenen Parametern existiert und falls dies eintrifft, wird dieser eingeloggt. Es werden im gleichen Zug aber noch weitere Daten zurückgegeben, wie beispielsweise die Berechtigungen des Users bzw. welchen Rang dieser besitzt. Des Weiteren wird ebenfalls der AccessToken des Users gesendet. Diese Daten sind unter dem persönlichen Profil des Users ersichtlich, welches erst ersichtlich wird, sofern ein User vorhandne ist.
+
+![website_user_profile.jpeg](documentation%2Fwebsite_user_profile.jpeg)
+
+### InfluxDB
+
+Diese Datenbank ist, wie bereits erwähnt, extern angeschlossen. Sie agiert sälbstständig und die gespeicherten Daten werden ebenfalls eigenständig erhoben und gewartet. Sprich diese DB kann nicht in oder von der Website verändert werden. Sie dient lediglich als Darstellung dieser Daten. 
+In diesem Fall handelt es sich um einen Datensatz von verschiedenen Zeitpunkten, welche die Temperatur und die Feuchtigkeit einer Messstelle beinhalten. Mittels Formatierung können diese Daten in einem Graphen ersichtlich dargestellet werden. Dies geschieht auf der Seite Data View, welche ebenfalls nur durch einen authentifizierten User zugänglich ist.
+
+![website_data_view.jpeg](documentation%2Fwebsite_data_view.jpeg)
 ## Project Structure
 
 Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>
@@ -251,7 +320,8 @@ For further information see: [spring documentation](https://docs.spring.io/sprin
 - [Full tutorial](https://spring.io/guides/tutorials/react-and-spring-data-rest/)
 - [outdated but schematic tutorial (***Ehrenbre***)](https://www.bezkoder.com/spring-boot-react-jwt-auth/)
 
-## Spring Security
+
+
 
 See class `WebSecurityConfig` for the configuration of the security filter chain.
 

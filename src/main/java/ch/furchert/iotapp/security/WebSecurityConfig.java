@@ -89,11 +89,12 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/api/auth/register").permitAll()
-                                .requestMatchers("/api/auth/verifyEmail").permitAll()
-                                .requestMatchers("/api/auth/login").permitAll()
-                                .requestMatchers("/api/auth/logout").permitAll()
+                                //.requestMatchers("/api/auth/register").permitAll()
+                                //.requestMatchers("/api/auth/verifyEmail").permitAll()
+                                //.requestMatchers("/api/auth/login").permitAll()
+                                //.requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/api/get/**").permitAll()
+                                .requestMatchers("/api/user-management/forgotPassword").permitAll()
                             .anyRequest().authenticated()
                 )
                 /*old
@@ -125,7 +126,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("https://localhost:3000", "https://127.0.0.1:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("*"));
         configuration.setAllowedMethods(Arrays.asList("GET","POST","OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));

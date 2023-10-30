@@ -2,11 +2,10 @@ package ch.furchert.iotapp.model;
 
 import jakarta.persistence.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 
 @Entity
-public class EmailVerificationToken {
+public class EmailToken {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -14,9 +13,11 @@ public class EmailVerificationToken {
     private String token;
     private LocalDateTime expiryDate;
 
-    @OneToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(nullable = false, name = "user_id")
     private User user;
+
+    private Boolean used;
 
     public void setId(Long id) {
         this.id = id;
@@ -50,5 +51,11 @@ public class EmailVerificationToken {
         this.user = user;
     }
 
-// Getters and setters
+    public Boolean getUsed() {
+        return used;
+    }
+
+    public void setUsed(Boolean used) {
+        this.used = used;
+    }
 }

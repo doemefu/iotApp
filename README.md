@@ -239,6 +239,16 @@ Ein Ort, an dem dies in der Regel wichtig wird, ist die Hinzufügung von Spring 
 
 `authorizeHttpRequests` ist der zentrale Punkt, an dem die Anforderungen für die Autorisierung der HTTP-Anfragen definiert werden. Hier wird angegeben, welche Pfade (Endpunkte) von welchen Benutzern aufgerufen werden dürfen. Einige Endpunkte, wie "/api/auth/login", "/api/auth/register" usw., werden für alle Benutzer (permitAll) zugänglich gemacht, während anyRequest().authenticated() sicherstellt, dass alle anderen Anfragen eine Authentifizierung erfordern.
 
+### Loggin
+
+Logging ist ein nützliches Instrument, um die Leistung und das Verhalten Ihrer Anwendung zu überwachen, Fehler zu diagnostizieren und zu beheben sowie Sicherheitsbedenken anzugehen.
+
+`LoggingAspect` ist ein Aspekt, der die Protokollierung von Methodenaufrufen ermöglicht. Dieser Aspekt verwendet Spring AOP und definiert einen "Advice", der nach einem erfolgreichen Methodenaufruf in den Controllern ausgeführt wird. Dieser Advice ruft `logMethodCall` auf für die Informationserfassung. Diese Informationen werden dann in der Datenbank gespeichert, indem ein Eintrag in `LogEntry` erstellt und über das `LogEntryRepository` persistiert wird.
+
+`LogEntry` wird verwendet, um die Informationen für jeden Protokolleintrag darzustellen. Sie beinhaltet Attribute wie den Benutzernamen, den Endpunkt, den Zeitstempel und den Namen der aufgerufenen Methode.
+
+`LogEntryRepository` ist ein Spring Data JPA-Repository, das die Kommunikation mit der Datenbank für Log-Einträge erleichtert. Mit diesem Repositories können leicht Log-Einträge erstellt, abgerufen, aktualisiert und gelöscht.
+
 ## Datenbank
 
 In dieser Applikation sind zwei verschiedene Datenbanken angebunden. Zum einen eine für die Sicherung der Anmeldedaten, welche die Website betrifft, anderereits eine extern angebundene, welche unabhängig Daten speichert. Beide Datenbanken werden mittels der Spring Boot-Anwendung angerufen.
@@ -270,7 +280,7 @@ Die Verwendung von react-responsive in diesem Projekt dient dazu, das Verhalten 
 
 In unserem Projekt werden zwei Media Queries definiert: isDesktopOrLaptop und isTabletOrMobile, um zwischen Desktop- und Tablet/Mobilansichten zu unterscheiden. Abhängig von der erkannten Gerätekategorie wird die Navigation und das Layout der Anwendung angepasst. Zum Beispiel wird in der Desktop-Ansicht eine Standard-Navigationsleiste mit Links zu verschiedenen Seiten angezeigt, während in der Tablet/Mobilansicht ein mobiles Menü angezeigt wird, das sich bei Bedarf ausklappen lässt.
 Benutzerabhängige Anzeigen: Je nach Benutzerrolle (Moderator, Administrator) werden spezifische Navigationslinks angezeigt oder ausgeblendet.
-Die Applikation verfügt über verschiedene Seiten, die über eine Ract-Route definiert sind und je nach gewähltem Pfad gerendert werden.
+Die Applikation verfügt über verschiedene Seiten, die über eine React-Route definiert sind und je nach gewähltem Pfad gerendert werden.
 Es gibt ein Logout-Feature, das den Benutzer ausloggt und die Benutzeroberfläche entsprechend anpasst.
 
 # Progress

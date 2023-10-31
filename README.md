@@ -165,6 +165,11 @@ Ein BCrypt-Hash-String sieht folgendermassen aus: $2<a/b/x/y>$[strenght]$[22 cha
         return new BCryptPasswordEncoder(BCryptPasswordEncoder.BCryptVersion.$2Y, 10, new SecureRandom());
     }
 ```
+### Email-Verifizierung
+
+Der `EmailTokenService` handhabt die Verwaltung des Email-Verifizierungstokens. Sie bietet Methoden zur Erstellung, Validierung und Löschung dieser Email-Verifizierungstoken. Mit der Methode `createEmailTokenForUser` wird ein Verifizierungstoken für einen bestimmten User erstellt und speichert diesen in der Datenbank. Der Token beinhaltet ein Ablaufdatum, welches normalerweise 24 stunden nach der Erstellung als "nicht verwendet" markiert wird.
+
+Mit `validateEmailToken` wird der Validierungstoken validiert, indem der empfangene Token mit dem in der DB gespeicherten verglichen wird. Hierbei wird überprüft, ob der Token abgelaufen idt oder bereits verwendet wurde. Wenn dieser gültig ist, gibt die Methode den Benutzer zurück welcher ihm zugehört.
 
 ## React Refresh Token
 
@@ -188,7 +193,11 @@ Auf Grund dessen ist in `api.js` eine API für die Handhabung der Authentifizier
 
 Im Front-end werden innerhalb der beiden Klassen `UserService`und `AuthService` die Antworten der API gehandhabt. Auf der einen Seite kann unterschieden werden um welche Aktion des Users es sich handelt, beispielsweise ein Login oder ein Logout. Andererseits kann aber auch bestummen werden, um welche Art Usere es sich handelt und desswegen die korrekte Userseite anzeigen, je nach Klassifizierung des Users.
 
+## JWT
 
+Der JSON Web Token ist ein kompaktes Format für den sicheren Datenaustausch zwischen Parteien. Er wird unteranderem für die Authentifizierung und die Authorisierung in Webanwendungen verwendet. Zusammengesetzt ist er aus einer Zeichenkette, bestehend aus den Teilen Header, Payload und Signatur.
+
+Im Header werden Metadaten über den Token selbst gesichert, beispielsweise den Signaturalgorithmus. In unserer Applikation beinhalter er
 
 ## Spring Security
 

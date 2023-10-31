@@ -4,6 +4,7 @@ import ch.furchert.iotapp.model.LogEntry;
 import ch.furchert.iotapp.model.User;
 import ch.furchert.iotapp.repository.LogEntryRepository;
 import ch.furchert.iotapp.repository.UserRepository;
+import ch.furchert.iotapp.security.jwt.JwtUtils;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import org.aspectj.lang.JoinPoint;
@@ -29,6 +30,8 @@ import java.util.Optional;
 @Component
 public class LoggingAspect {
 
+    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
+
     @Autowired
     private LogEntryRepository logEntryRepository;
 
@@ -44,15 +47,16 @@ public class LoggingAspect {
     public void logMethodCall(JoinPoint joinPoint, Object result) {
 
         LogEntry logEntry = new LogEntry();
+        UserDetailsImpl userDetails = null;
 
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        UserDetailsImpl userDetails = (UserDetailsImpl) auth.getPrincipal();
+        Object principal = auth.getPrincipal();
 
-
-        if (userDetails != null) {
+        if (principal instanceof UserDetailsImpl) {
+            userDetails = (UserDetailsImpl) principal;
             logEntry.setUsername(userDetails.getUsername());
         } else {
-            logEntry.setUsername("anonymous"); // Replace with actual username if available
+            logEntry.setUsername("anonymous");
         }
 
         HttpServletRequest request =

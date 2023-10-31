@@ -34,15 +34,16 @@ public class User {
     @Size(max = 120)
     private String password;
 
-    @ManyToMany(fetch = FetchType.LAZY)
+    //TODO: Check fetch type
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(	name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
 
-    //oder @OneToMany ?
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "status_id") // Foreign key to status table
+    //TODO: Check fetch type
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "status_id")
     private UserStatus userStatus;
 
     @Temporal(TemporalType.TIMESTAMP)

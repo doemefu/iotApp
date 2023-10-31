@@ -171,6 +171,14 @@ Der `EmailTokenService` handhabt die Verwaltung des Email-Verifizierungstokens. 
 
 Mit `validateEmailToken` wird der Validierungstoken validiert, indem der empfangene Token mit dem in der DB gespeicherten verglichen wird. Hierbei wird überprüft, ob der Token abgelaufen idt oder bereits verwendet wurde. Wenn dieser gültig ist, gibt die Methode den Benutzer zurück welcher ihm zugehört.
 
+`deleteToken` und `deleteTokenByValue` löschen den Validierungstoken aus der Datebbank, entweder durch die direkte Übergabe des Tokens oder durch den Token-Wert.
+
+Sobald eine Email-Verifizierung initialisiert ist, beispielsweise durch den Registrierungsprozess, wird eine automatisch generierte Email an die angegebene Usermail gesendet. in `EmailConfiguration` wird diese Mail angefertigt, inklusive einem Link zur Verifizierung. Dieser führt zurück auf die Website, wo eine Erfolgsmeldung beim erfolgreichen Abschluss erscheint.
+
+### Passwort ändern
+
+
+
 ## React Refresh Token
 
 – Ein Refreshtoken wird dem Benutzer beim Einloggen zur Verfügung gestellt.
@@ -196,6 +204,13 @@ Im Front-end werden innerhalb der beiden Klassen `UserService`und `AuthService` 
 ## JWT
 
 Der JSON Web Token ist ein kompaktes Format für den sicheren Datenaustausch zwischen Parteien. Er wird unteranderem für die Authentifizierung und die Authorisierung in Webanwendungen verwendet. Zusammengesetzt ist er aus einer Zeichenkette, bestehend aus den Teilen Header, Payload und Signatur.
+
+### Authorisierung
+
+In `AuthEntryPointJwt` befindet sich der `AuthentificationEntryPoint`, welcher unbefugte Anfroderungen von Usern oder anderen behandelt. Will ein User ohne gültigen JWT auf geschützte Ressourcen zugreiffen wirdd `AuthEntryPointJwt` aufgerufen, um die Antwort zu konfigurieren und eine Fehlermeldung zurückzugeben.
+
+`AuthTokenFilter` ist ein `OncePerRequestFilter`, der jede eingehendeAnforderung überprüft, ob ein gültiger JWT im Header vorhanden ist. Ist ein gültiger Token vorhanden, wird der User authentifizuert und seine Identität wird im Spring Security-Kontext gespeichert. Die Filterkette konfiguriert die Zugriffsberechtigungen für die jeweiligen Endpunkte, beispielsweise können Seiten wie 
+`WebSecurityConfig` definiert die Sicherheitsrichtlinien für unsere Anwendungen. In diesem Zusammenhang konfiguriert sie den `AuthEntryPointJwt` als Eintrittspunkt für die unbefugten Anforderungen. 
 
 Im Header werden Metadaten über den Token selbst gesichert, beispielsweise den Signaturalgorithmus. In unserer Applikation beinhalter er
 
@@ -241,6 +256,10 @@ Diese Datenbank ist, wie bereits erwähnt, extern angeschlossen. Sie agiert säl
 In diesem Fall handelt es sich um einen Datensatz von verschiedenen Zeitpunkten, welche die Temperatur und die Feuchtigkeit einer Messstelle beinhalten. Mittels Formatierung können diese Daten in einem Graphen ersichtlich dargestellet werden. Dies geschieht auf der Seite Data View, welche ebenfalls nur durch einen authentifizierten User zugänglich ist.
 
 ![website_data_view.jpeg](documentation%2Fwebsite_data_view.jpeg)
+
+## TestCases
+
+
 ## Project Structure
 
 Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>

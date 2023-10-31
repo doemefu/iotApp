@@ -43,7 +43,7 @@ public class User {
 
     //TODO: Check fetch type
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "status_id") // Foreign key to status table
+    @JoinColumn(name = "status_id")
     private UserStatus userStatus;
 
     @Temporal(TemporalType.TIMESTAMP)

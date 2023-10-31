@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-//TODO: Forgot password
 //TODO: Admin userhandling
 //TODO: Delete account
 //TODO: User status handling
@@ -45,10 +44,6 @@ public class UserManagementController {
     @Autowired
     PasswordEncoder encoder;
 
-    //TODO: would it make more sense to send only few attributes in the get/allUsers method
-    // and show the rest here?
-    //Pro: less traffic because you dont send all attributes
-    //Contra: more requests and you cant sort or filter by attributes
     @GetMapping("/showUser/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
         Optional<User> userOptional = userRepository.findById(id);
@@ -87,7 +82,6 @@ public class UserManagementController {
             existingUser.setEmail(updatedUser.getEmail());
             existingUser.setRoles(updatedUser.getRoles());
 
-            // Save the updated user
             userRepository.save(existingUser);
 
             return new ResponseEntity<>(existingUser, HttpStatus.OK);
@@ -111,14 +105,13 @@ public class UserManagementController {
         if (userOptional.isEmpty()) {
             return ResponseEntity
                     .status(HttpStatus.NO_CONTENT) //aka 204: processed successfully but no content to return
-                    //.body(new MessageResponse("User not found!")); //The 204 response MUST NOT include a message-body and thus is always terminated by the first empty line after the header fields.
                     .build();
         }
 
         User existingUser = userOptional.get();
 
         String token = UUID.randomUUID().toString();
-        // Save the token and user's email in the database
+
         emailTokenService.createEmailTokenForUser(existingUser, token);
 
         emailService.sendSimpleMessage(

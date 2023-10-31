@@ -16,6 +16,7 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 * [Umsetzung](#umsetzung)
   * [Authentication-API](#authentication-api)
   * [Project Structure](#project-structure)
+  * [React-Responsive] (#react-responsive)
 * [Progress](#progress)
   * [Version 1.0](#version-10)
   * [Version 2.0](#version-20)
@@ -263,6 +264,14 @@ In diesem Fall handelt es sich um einen Datensatz von verschiedenen Zeitpunkten,
 ## Project Structure
 
 Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>
+
+## React-Responsive
+Die Verwendung von react-responsive in diesem Projekt dient dazu, das Verhalten der Webapplikation basierend auf dem Gerät anzupassen, auf dem sie ausgeführt wird. Genauer gesagt, ermöglicht react-responsive die Erkennung von verschiedenen Gerätetypen, wie Desktops, Tablets und mobile Geräte, indem es Media Queries verwendet. Dies ist wichtig, um sicherzustellen, dass die Benutzeroberfläche und das Layout der Applikation auf unterschiedlichen Geräten gut funktionieren und die Benutzerfreundlichkeit optimiert wird.
+
+In unserem Projekt werden zwei Media Queries definiert: isDesktopOrLaptop und isTabletOrMobile, um zwischen Desktop- und Tablet/Mobilansichten zu unterscheiden. Abhängig von der erkannten Gerätekategorie wird die Navigation und das Layout der Anwendung angepasst. Zum Beispiel wird in der Desktop-Ansicht eine Standard-Navigationsleiste mit Links zu verschiedenen Seiten angezeigt, während in der Tablet/Mobilansicht ein mobiles Menü angezeigt wird, das sich bei Bedarf ausklappen lässt.
+Benutzerabhängige Anzeigen: Je nach Benutzerrolle (Moderator, Administrator) werden spezifische Navigationslinks angezeigt oder ausgeblendet.
+Die Applikation verfügt über verschiedene Seiten, die über eine Ract-Route definiert sind und je nach gewähltem Pfad gerendert werden.
+Es gibt ein Logout-Feature, das den Benutzer ausloggt und die Benutzeroberfläche entsprechend anpasst.
 
 # Progress
 

@@ -16,7 +16,7 @@ import java.util.Optional;
 public class EmailTokenService {
 
     @Autowired
-    private EmailTokenRepository tokenRepository;
+    private EmailTokenRepository emailTokenRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -30,11 +30,11 @@ public class EmailTokenService {
         myToken.setExpiryDate(LocalDateTime.now().plusHours(24)); // Token expires after 24 hours
         myToken.setUser(user);
         myToken.setUsed(false);
-        tokenRepository.save(myToken);
+        emailTokenRepository.save(myToken);
     }
 
     public Optional<User> validateEmailToken(String token) {
-        List<EmailToken> storedTokens = tokenRepository.findAll(); // Fetch all tokens
+        List<EmailToken> storedTokens = emailTokenRepository.findAll(); // Fetch all tokens
 
         for (EmailToken storedToken : storedTokens) {
             if (encoder.matches(token, storedToken.getToken())) {
@@ -46,7 +46,10 @@ public class EmailTokenService {
                     System.out.println("token expired");
                     return Optional.empty();
                 }
+
                 storedToken.setUsed(true);
+                emailTokenRepository.save(storedToken);
+                System.out.println(storedToken.getUsed());
                 return Optional.ofNullable(storedToken.getUser());
             }
         }
@@ -56,12 +59,12 @@ public class EmailTokenService {
     }
 
     public void deleteToken(EmailToken token) {
-        tokenRepository.delete(token);
+        emailTokenRepository.delete(token);
     }
 
     public void deleteTokenByValue(String tokenValue) {
-        Optional<EmailToken> optToken = tokenRepository.findByToken(tokenValue);
-        optToken.ifPresent(tokenRepository::delete);
+        Optional<EmailToken> optToken = emailTokenRepository.findByToken(tokenValue);
+        optToken.ifPresent(emailTokenRepository::delete);
     }
 
 }

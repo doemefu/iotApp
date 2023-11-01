@@ -81,6 +81,12 @@ public class AuthController {
 
         User user = userOptional.get();
 
+        if(user.getUserStatus().getName().equals(EUserStatus.UNVERIFIED)) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Verify your email first"));
+        }
+
         // Authenticate
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(user.getUsername(), loginRequest.getPassword())

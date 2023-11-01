@@ -1,0 +1,79 @@
+openapi: 3.0.3
+info:
+  description: iotApp API
+  title: iotApp API
+  version: 1.0.0
+servers:
+- url: https://iotApp
+paths:
+  /api/auth/signin:
+    post:
+      operationId: authenticateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/signin
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/auth/signup:
+    post:
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/signup
+      x-content-type: application/json
+      x-accepts: '*/*'
+components:
+  schemas:
+    LoginRequest:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      type: object
+    RegisterRequest:
+      example:
+        password: password
+        roles:
+        - roles
+        - roles
+        email: email
+        username: username
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          items:
+            type: string
+          type: array
+        password:
+          type: string
+      type: object
+

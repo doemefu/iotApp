@@ -2,7 +2,7 @@
 
 iotApp API
 - API version: 1.0.0
-  - Build date: 2023-11-01T20:46:15.350697+01:00[Europe/Zurich]
+  - Build date: 2023-11-01T23:25:35.887123+01:00[Europe/Zurich]
 
 iotApp API
 
@@ -92,12 +92,11 @@ public class Example {
     defaultClient.setBasePath("https://iotApp");
 
     DefaultApi apiInstance = new DefaultApi(defaultClient);
-    LoginRequest loginRequest = new LoginRequest(); // LoginRequest | 
     try {
-      Object result = apiInstance.authenticateUser(loginRequest);
+      String result = apiInstance.adminAccess();
       System.out.println(result);
     } catch (ApiException e) {
-      System.err.println("Exception when calling DefaultApi#authenticateUser");
+      System.err.println("Exception when calling DefaultApi#adminAccess");
       System.err.println("Status code: " + e.getCode());
       System.err.println("Reason: " + e.getResponseBody());
       System.err.println("Response headers: " + e.getResponseHeaders());
@@ -114,14 +113,37 @@ All URIs are relative to *https://iotApp*
 
 Class | Method | HTTP request | Description
 ------------ | ------------- | ------------- | -------------
-*DefaultApi* | [**authenticateUser**](docs/DefaultApi.md#authenticateUser) | **POST** /api/auth/signin | POST api/auth/signin
-*DefaultApi* | [**registerUser**](docs/DefaultApi.md#registerUser) | **POST** /api/auth/signup | POST api/auth/signup
+*DefaultApi* | [**adminAccess**](docs/DefaultApi.md#adminAccess) | **GET** /api/get/admin | GET api/get/admin
+*DefaultApi* | [**allAccess**](docs/DefaultApi.md#allAccess) | **GET** /api/get/all | GET api/get/all
+*DefaultApi* | [**authenticateUser**](docs/DefaultApi.md#authenticateUser) | **POST** /api/auth/login | POST api/auth/login
+*DefaultApi* | [**deleteUser**](docs/DefaultApi.md#deleteUser) | **DELETE** /api/user-management/deleteUser/{id} | DELETE api/user-management/deleteUser/{id}
+*DefaultApi* | [**forgotPassword**](docs/DefaultApi.md#forgotPassword) | **POST** /api/user-management/forgotPassword | POST api/user-management/forgotPassword
+*DefaultApi* | [**getAllUsers**](docs/DefaultApi.md#getAllUsers) | **GET** /api/user-management/allUsers | GET api/user-management/allUsers
+*DefaultApi* | [**getInfluxData**](docs/DefaultApi.md#getInfluxData) | **GET** /api/data/influxData | GET api/data/influxData
+*DefaultApi* | [**getUserById**](docs/DefaultApi.md#getUserById) | **GET** /api/user-management/showUser/{id} | GET api/user-management/showUser/{id}
+*DefaultApi* | [**logoutUser**](docs/DefaultApi.md#logoutUser) | **POST** /api/auth/logout | POST api/auth/logout
+*DefaultApi* | [**moderatorAccess**](docs/DefaultApi.md#moderatorAccess) | **GET** /api/get/mod | GET api/get/mod
+*DefaultApi* | [**refreshtoken**](docs/DefaultApi.md#refreshtoken) | **POST** /api/auth/refreshtoken | POST api/auth/refreshtoken
+*DefaultApi* | [**registerUser**](docs/DefaultApi.md#registerUser) | **POST** /api/auth/register | POST api/auth/register
+*DefaultApi* | [**resetPassword**](docs/DefaultApi.md#resetPassword) | **POST** /api/user-management/resetPassword | POST api/user-management/resetPassword
+*DefaultApi* | [**showAllRoles**](docs/DefaultApi.md#showAllRoles) | **GET** /api/user-management/showRoles | GET api/user-management/showRoles
+*DefaultApi* | [**updateUser**](docs/DefaultApi.md#updateUser) | **PUT** /api/user-management/updateUser/{id} | PUT api/user-management/updateUser/{id}
+*DefaultApi* | [**userAccess**](docs/DefaultApi.md#userAccess) | **GET** /api/get/user | GET api/get/user
+*DefaultApi* | [**verifyEmail**](docs/DefaultApi.md#verifyEmail) | **POST** /api/auth/verifyEmail | POST api/auth/verifyEmail
 
 
 ## Documentation for Models
 
+ - [FluxRecord](docs/FluxRecord.md)
+ - [ForgotPasswordRequest](docs/ForgotPasswordRequest.md)
  - [LoginRequest](docs/LoginRequest.md)
  - [RegisterRequest](docs/RegisterRequest.md)
+ - [ResetPasswordRequest](docs/ResetPasswordRequest.md)
+ - [Role](docs/Role.md)
+ - [TokenRefreshRequest](docs/TokenRefreshRequest.md)
+ - [User](docs/User.md)
+ - [UserStatus](docs/UserStatus.md)
+ - [VerifyRequest](docs/VerifyRequest.md)
 
 
 ## Documentation for Authorization

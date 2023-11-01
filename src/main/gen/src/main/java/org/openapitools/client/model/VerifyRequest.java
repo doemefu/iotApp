@@ -45,64 +45,37 @@ import java.util.Set;
 import org.openapitools.client.JSON;
 
 /**
- * LoginRequest
+ * VerifyRequest
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-11-01T23:25:35.887123+01:00[Europe/Zurich]")
-public class LoginRequest {
-  public static final String SERIALIZED_NAME_USERNAME = "username";
-  @SerializedName(SERIALIZED_NAME_USERNAME)
-  private String username;
+public class VerifyRequest {
+  public static final String SERIALIZED_NAME_TOKEN = "token";
+  @SerializedName(SERIALIZED_NAME_TOKEN)
+  private String token;
 
-  public static final String SERIALIZED_NAME_PASSWORD = "password";
-  @SerializedName(SERIALIZED_NAME_PASSWORD)
-  private String password;
-
-  public LoginRequest() {
+  public VerifyRequest() {
   }
 
-  public LoginRequest username(String username) {
+  public VerifyRequest token(String token) {
     
-    this.username = username;
+    this.token = token;
     return this;
   }
 
    /**
-   * Get username
-   * @return username
+   * Get token
+   * @return token
   **/
   @javax.annotation.Nullable
   @ApiModelProperty(value = "")
 
-  public String getUsername() {
-    return username;
+  public String getToken() {
+    return token;
   }
 
 
-  public void setUsername(String username) {
-    this.username = username;
-  }
-
-
-  public LoginRequest password(String password) {
-    
-    this.password = password;
-    return this;
-  }
-
-   /**
-   * Get password
-   * @return password
-  **/
-  @javax.annotation.Nullable
-  @ApiModelProperty(value = "")
-
-  public String getPassword() {
-    return password;
-  }
-
-
-  public void setPassword(String password) {
-    this.password = password;
+  public void setToken(String token) {
+    this.token = token;
   }
 
 
@@ -115,22 +88,20 @@ public class LoginRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LoginRequest loginRequest = (LoginRequest) o;
-    return Objects.equals(this.username, loginRequest.username) &&
-        Objects.equals(this.password, loginRequest.password);
+    VerifyRequest verifyRequest = (VerifyRequest) o;
+    return Objects.equals(this.token, verifyRequest.token);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, password);
+    return Objects.hash(token);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LoginRequest {\n");
-    sb.append("    username: ").append(toIndentedString(username)).append("\n");
-    sb.append("    password: ").append(toIndentedString(password)).append("\n");
+    sb.append("class VerifyRequest {\n");
+    sb.append("    token: ").append(toIndentedString(token)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -153,8 +124,7 @@ public class LoginRequest {
   static {
     // a set of all properties/fields (JSON key names)
     openapiFields = new HashSet<String>();
-    openapiFields.add("username");
-    openapiFields.add("password");
+    openapiFields.add("token");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
@@ -164,29 +134,26 @@ public class LoginRequest {
   * Validates the JSON Object and throws an exception if issues found
   *
   * @param jsonObj JSON Object
-  * @throws IOException if the JSON Object is invalid with respect to LoginRequest
+  * @throws IOException if the JSON Object is invalid with respect to VerifyRequest
   */
   public static void validateJsonObject(JsonObject jsonObj) throws IOException {
       if (jsonObj == null) {
-        if (LoginRequest.openapiRequiredFields.isEmpty()) {
+        if (VerifyRequest.openapiRequiredFields.isEmpty()) {
           return;
         } else { // has required fields
-          throw new IllegalArgumentException(String.format("The required field(s) %s in LoginRequest is not found in the empty JSON string", LoginRequest.openapiRequiredFields.toString()));
+          throw new IllegalArgumentException(String.format("The required field(s) %s in VerifyRequest is not found in the empty JSON string", VerifyRequest.openapiRequiredFields.toString()));
         }
       }
 
       Set<Entry<String, JsonElement>> entries = jsonObj.entrySet();
       // check to see if the JSON string contains additional fields
       for (Entry<String, JsonElement> entry : entries) {
-        if (!LoginRequest.openapiFields.contains(entry.getKey())) {
-          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `LoginRequest` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
+        if (!VerifyRequest.openapiFields.contains(entry.getKey())) {
+          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `VerifyRequest` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
         }
       }
-      if ((jsonObj.get("username") != null && !jsonObj.get("username").isJsonNull()) && !jsonObj.get("username").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `username` to be a primitive type in the JSON string but got `%s`", jsonObj.get("username").toString()));
-      }
-      if ((jsonObj.get("password") != null && !jsonObj.get("password").isJsonNull()) && !jsonObj.get("password").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `password` to be a primitive type in the JSON string but got `%s`", jsonObj.get("password").toString()));
+      if ((jsonObj.get("token") != null && !jsonObj.get("token").isJsonNull()) && !jsonObj.get("token").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format("Expected the field `token` to be a primitive type in the JSON string but got `%s`", jsonObj.get("token").toString()));
       }
   }
 
@@ -194,22 +161,22 @@ public class LoginRequest {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!LoginRequest.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'LoginRequest' and its subtypes
+       if (!VerifyRequest.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'VerifyRequest' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<LoginRequest> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(LoginRequest.class));
+       final TypeAdapter<VerifyRequest> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(VerifyRequest.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<LoginRequest>() {
+       return (TypeAdapter<T>) new TypeAdapter<VerifyRequest>() {
            @Override
-           public void write(JsonWriter out, LoginRequest value) throws IOException {
+           public void write(JsonWriter out, VerifyRequest value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              elementAdapter.write(out, obj);
            }
 
            @Override
-           public LoginRequest read(JsonReader in) throws IOException {
+           public VerifyRequest read(JsonReader in) throws IOException {
              JsonObject jsonObj = elementAdapter.read(in).getAsJsonObject();
              validateJsonObject(jsonObj);
              return thisAdapter.fromJsonTree(jsonObj);
@@ -220,18 +187,18 @@ public class LoginRequest {
   }
 
  /**
-  * Create an instance of LoginRequest given an JSON string
+  * Create an instance of VerifyRequest given an JSON string
   *
   * @param jsonString JSON string
-  * @return An instance of LoginRequest
-  * @throws IOException if the JSON string is invalid with respect to LoginRequest
+  * @return An instance of VerifyRequest
+  * @throws IOException if the JSON string is invalid with respect to VerifyRequest
   */
-  public static LoginRequest fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, LoginRequest.class);
+  public static VerifyRequest fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, VerifyRequest.class);
   }
 
  /**
-  * Convert an instance of LoginRequest to an JSON string
+  * Convert an instance of VerifyRequest to an JSON string
   *
   * @return JSON string
   */

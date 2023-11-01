@@ -45,64 +45,113 @@ import java.util.Set;
 import org.openapitools.client.JSON;
 
 /**
- * LoginRequest
+ * Role
  */
 @javax.annotation.Generated(value = "org.openapitools.codegen.languages.JavaClientCodegen", date = "2023-11-01T23:25:35.887123+01:00[Europe/Zurich]")
-public class LoginRequest {
-  public static final String SERIALIZED_NAME_USERNAME = "username";
-  @SerializedName(SERIALIZED_NAME_USERNAME)
-  private String username;
+public class Role {
+  public static final String SERIALIZED_NAME_ID = "id";
+  @SerializedName(SERIALIZED_NAME_ID)
+  private Integer id;
 
-  public static final String SERIALIZED_NAME_PASSWORD = "password";
-  @SerializedName(SERIALIZED_NAME_PASSWORD)
-  private String password;
+  /**
+   * Gets or Sets name
+   */
+  @JsonAdapter(NameEnum.Adapter.class)
+  public enum NameEnum {
+    USER("ROLE_USER"),
+    
+    MODERATOR("ROLE_MODERATOR"),
+    
+    ADMIN("ROLE_ADMIN");
 
-  public LoginRequest() {
+    private String value;
+
+    NameEnum(String value) {
+      this.value = value;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    @Override
+    public String toString() {
+      return String.valueOf(value);
+    }
+
+    public static NameEnum fromValue(String value) {
+      for (NameEnum b : NameEnum.values()) {
+        if (b.value.equals(value)) {
+          return b;
+        }
+      }
+      throw new IllegalArgumentException("Unexpected value '" + value + "'");
+    }
+
+    public static class Adapter extends TypeAdapter<NameEnum> {
+      @Override
+      public void write(final JsonWriter jsonWriter, final NameEnum enumeration) throws IOException {
+        jsonWriter.value(enumeration.getValue());
+      }
+
+      @Override
+      public NameEnum read(final JsonReader jsonReader) throws IOException {
+        String value =  jsonReader.nextString();
+        return NameEnum.fromValue(value);
+      }
+    }
   }
 
-  public LoginRequest username(String username) {
+  public static final String SERIALIZED_NAME_NAME = "name";
+  @SerializedName(SERIALIZED_NAME_NAME)
+  private NameEnum name;
+
+  public Role() {
+  }
+
+  public Role id(Integer id) {
     
-    this.username = username;
+    this.id = id;
     return this;
   }
 
    /**
-   * Get username
-   * @return username
+   * Get id
+   * @return id
   **/
   @javax.annotation.Nullable
   @ApiModelProperty(value = "")
 
-  public String getUsername() {
-    return username;
+  public Integer getId() {
+    return id;
   }
 
 
-  public void setUsername(String username) {
-    this.username = username;
+  public void setId(Integer id) {
+    this.id = id;
   }
 
 
-  public LoginRequest password(String password) {
+  public Role name(NameEnum name) {
     
-    this.password = password;
+    this.name = name;
     return this;
   }
 
    /**
-   * Get password
-   * @return password
+   * Get name
+   * @return name
   **/
   @javax.annotation.Nullable
   @ApiModelProperty(value = "")
 
-  public String getPassword() {
-    return password;
+  public NameEnum getName() {
+    return name;
   }
 
 
-  public void setPassword(String password) {
-    this.password = password;
+  public void setName(NameEnum name) {
+    this.name = name;
   }
 
 
@@ -115,22 +164,22 @@ public class LoginRequest {
     if (o == null || getClass() != o.getClass()) {
       return false;
     }
-    LoginRequest loginRequest = (LoginRequest) o;
-    return Objects.equals(this.username, loginRequest.username) &&
-        Objects.equals(this.password, loginRequest.password);
+    Role role = (Role) o;
+    return Objects.equals(this.id, role.id) &&
+        Objects.equals(this.name, role.name);
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(username, password);
+    return Objects.hash(id, name);
   }
 
   @Override
   public String toString() {
     StringBuilder sb = new StringBuilder();
-    sb.append("class LoginRequest {\n");
-    sb.append("    username: ").append(toIndentedString(username)).append("\n");
-    sb.append("    password: ").append(toIndentedString(password)).append("\n");
+    sb.append("class Role {\n");
+    sb.append("    id: ").append(toIndentedString(id)).append("\n");
+    sb.append("    name: ").append(toIndentedString(name)).append("\n");
     sb.append("}");
     return sb.toString();
   }
@@ -153,8 +202,8 @@ public class LoginRequest {
   static {
     // a set of all properties/fields (JSON key names)
     openapiFields = new HashSet<String>();
-    openapiFields.add("username");
-    openapiFields.add("password");
+    openapiFields.add("id");
+    openapiFields.add("name");
 
     // a set of required properties/fields (JSON key names)
     openapiRequiredFields = new HashSet<String>();
@@ -164,29 +213,26 @@ public class LoginRequest {
   * Validates the JSON Object and throws an exception if issues found
   *
   * @param jsonObj JSON Object
-  * @throws IOException if the JSON Object is invalid with respect to LoginRequest
+  * @throws IOException if the JSON Object is invalid with respect to Role
   */
   public static void validateJsonObject(JsonObject jsonObj) throws IOException {
       if (jsonObj == null) {
-        if (LoginRequest.openapiRequiredFields.isEmpty()) {
+        if (Role.openapiRequiredFields.isEmpty()) {
           return;
         } else { // has required fields
-          throw new IllegalArgumentException(String.format("The required field(s) %s in LoginRequest is not found in the empty JSON string", LoginRequest.openapiRequiredFields.toString()));
+          throw new IllegalArgumentException(String.format("The required field(s) %s in Role is not found in the empty JSON string", Role.openapiRequiredFields.toString()));
         }
       }
 
       Set<Entry<String, JsonElement>> entries = jsonObj.entrySet();
       // check to see if the JSON string contains additional fields
       for (Entry<String, JsonElement> entry : entries) {
-        if (!LoginRequest.openapiFields.contains(entry.getKey())) {
-          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `LoginRequest` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
+        if (!Role.openapiFields.contains(entry.getKey())) {
+          throw new IllegalArgumentException(String.format("The field `%s` in the JSON string is not defined in the `Role` properties. JSON: %s", entry.getKey(), jsonObj.toString()));
         }
       }
-      if ((jsonObj.get("username") != null && !jsonObj.get("username").isJsonNull()) && !jsonObj.get("username").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `username` to be a primitive type in the JSON string but got `%s`", jsonObj.get("username").toString()));
-      }
-      if ((jsonObj.get("password") != null && !jsonObj.get("password").isJsonNull()) && !jsonObj.get("password").isJsonPrimitive()) {
-        throw new IllegalArgumentException(String.format("Expected the field `password` to be a primitive type in the JSON string but got `%s`", jsonObj.get("password").toString()));
+      if ((jsonObj.get("name") != null && !jsonObj.get("name").isJsonNull()) && !jsonObj.get("name").isJsonPrimitive()) {
+        throw new IllegalArgumentException(String.format("Expected the field `name` to be a primitive type in the JSON string but got `%s`", jsonObj.get("name").toString()));
       }
   }
 
@@ -194,22 +240,22 @@ public class LoginRequest {
     @SuppressWarnings("unchecked")
     @Override
     public <T> TypeAdapter<T> create(Gson gson, TypeToken<T> type) {
-       if (!LoginRequest.class.isAssignableFrom(type.getRawType())) {
-         return null; // this class only serializes 'LoginRequest' and its subtypes
+       if (!Role.class.isAssignableFrom(type.getRawType())) {
+         return null; // this class only serializes 'Role' and its subtypes
        }
        final TypeAdapter<JsonElement> elementAdapter = gson.getAdapter(JsonElement.class);
-       final TypeAdapter<LoginRequest> thisAdapter
-                        = gson.getDelegateAdapter(this, TypeToken.get(LoginRequest.class));
+       final TypeAdapter<Role> thisAdapter
+                        = gson.getDelegateAdapter(this, TypeToken.get(Role.class));
 
-       return (TypeAdapter<T>) new TypeAdapter<LoginRequest>() {
+       return (TypeAdapter<T>) new TypeAdapter<Role>() {
            @Override
-           public void write(JsonWriter out, LoginRequest value) throws IOException {
+           public void write(JsonWriter out, Role value) throws IOException {
              JsonObject obj = thisAdapter.toJsonTree(value).getAsJsonObject();
              elementAdapter.write(out, obj);
            }
 
            @Override
-           public LoginRequest read(JsonReader in) throws IOException {
+           public Role read(JsonReader in) throws IOException {
              JsonObject jsonObj = elementAdapter.read(in).getAsJsonObject();
              validateJsonObject(jsonObj);
              return thisAdapter.fromJsonTree(jsonObj);
@@ -220,18 +266,18 @@ public class LoginRequest {
   }
 
  /**
-  * Create an instance of LoginRequest given an JSON string
+  * Create an instance of Role given an JSON string
   *
   * @param jsonString JSON string
-  * @return An instance of LoginRequest
-  * @throws IOException if the JSON string is invalid with respect to LoginRequest
+  * @return An instance of Role
+  * @throws IOException if the JSON string is invalid with respect to Role
   */
-  public static LoginRequest fromJson(String jsonString) throws IOException {
-    return JSON.getGson().fromJson(jsonString, LoginRequest.class);
+  public static Role fromJson(String jsonString) throws IOException {
+    return JSON.getGson().fromJson(jsonString, Role.class);
   }
 
  /**
-  * Convert an instance of LoginRequest to an JSON string
+  * Convert an instance of Role to an JSON string
   *
   * @return JSON string
   */

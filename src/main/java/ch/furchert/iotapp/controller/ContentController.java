@@ -1,15 +1,26 @@
 package ch.furchert.iotapp.controller;
 
+import ch.furchert.iotapp.model.User;
+import ch.furchert.iotapp.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api/test")
-public class TestController {
+@RequestMapping("/api/get")
+public class ContentController {
+
+    @Autowired
+    UserRepository userRepository;
+
     @GetMapping("/all")
     public String allAccess() {
         return "Public Content.";
@@ -18,18 +29,19 @@ public class TestController {
     @GetMapping("/user")
     @PreAuthorize("hasRole('ROLE_USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
     public String userAccess() {
-        return "User Content.";
+        return "Content that is only for logged in users.";
     }
 
     @GetMapping("/mod")
     @PreAuthorize("hasRole('MODERATOR')")
     public String moderatorAccess() {
-        return "Moderator Content.";
+        return "Content that is only for moderators";
     }
 
     @GetMapping("/admin")
     @PreAuthorize("hasRole('ADMIN')")
     public String adminAccess() {
-        return "Admin Content.";
+        return "Content that is only for admins";
     }
+
 }

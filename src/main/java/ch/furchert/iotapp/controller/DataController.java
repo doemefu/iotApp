@@ -16,12 +16,12 @@ import java.util.List;
 public class DataController {
 
     @Autowired
-    private Influx influxService;  // Assume you have created this as a Spring service
+    private Influx influxService;
 
     @GetMapping("/influxData")
     public ResponseEntity<List<FluxRecord>> getInfluxData() {
         System.out.println("Getting data from InfluxDB");
-        List<FluxRecord> records = influxService.query();  // Create this method to return data
+        List<FluxRecord> records = influxService.query();
         System.out.println("die records: " + records);
         return new ResponseEntity<>(records, HttpStatus.OK);
     }

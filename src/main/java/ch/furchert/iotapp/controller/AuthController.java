@@ -6,24 +6,21 @@ import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.repository.UserStatusRepository;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
+import ch.furchert.iotapp.service.EmailServiceImpl;
+import ch.furchert.iotapp.service.EmailTokenService;
 import ch.furchert.iotapp.service.RefreshTokenService;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
 import ch.furchert.iotapp.util.payload.request.TokenRefreshRequest;
+import ch.furchert.iotapp.util.payload.request.VerifyRequest;
 import ch.furchert.iotapp.util.payload.response.JwtResponse;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
-import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
-import jakarta.servlet.ServletOutputStream;
-import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -32,10 +29,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -63,11 +57,39 @@ public class AuthController {
     @Autowired
     RefreshTokenService refreshTokenService;
 
+    @Autowired
+    EmailServiceImpl emailService;
+
+    @Autowired
+    private EmailTokenService emailTokenService;
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
+        Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
+
+        // If user not found by username, try by email
+        if (userOptional.isEmpty()) {
+            userOptional = userRepository.findByEmail(loginRequest.getUsername());
+        }
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("User not found"));
+        }
+
+        User user = userOptional.get();
+
+        if(user.getUserStatus().getName().equals(EUserStatus.UNVERIFIED)) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(new MessageResponse("Verify your email first"));
+        }
+
+        // Authenticate
         Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword())
+                new UsernamePasswordAuthenticationToken(user.getUsername(), loginRequest.getPassword())
         );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -108,14 +130,12 @@ public class AuthController {
         if (userRepository.existsByUsername(registerRequest.getUsername())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //aka 409
-                    .header("ResponseMessage", "Error: Username is already taken!")
-                    .build();
+                    .body(new MessageResponse("Error: Username is already taken!"));
         }
         if (userRepository.existsByEmail(registerRequest.getEmail())) {
             return ResponseEntity
                     .status(HttpStatus.CONFLICT) //aka 409
-                    .header("ResponseMessage", "Error: Email is already in use!")
-                    .build();
+                    .body(new MessageResponse("Error: Email is already in use!"));
         }
 
         //ups hehe System.out.println("RegisterRequest: " + registerRequest.getPassword());
@@ -127,8 +147,7 @@ public class AuthController {
                 encoder.encode(registerRequest.getPassword())
         );
 
-        //TODO: Include some kind of verification process
-        UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
+        UserStatus userStatus = userStatusRepository.findByName(EUserStatus.UNVERIFIED)
                 .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
         user.setUserStatus(userStatus);
 
@@ -162,40 +181,51 @@ public class AuthController {
         user.setRoles(roles);
         userRepository.save(user);
 
+        String token = UUID.randomUUID().toString();
+
+        // Save the token and user's email in the database
+        emailTokenService.createEmailTokenForUser(user, token);
+
+        emailService.sendSimpleMessage(
+                user.getEmail(),
+                "Verify email",
+                "Hello, " + user.getUsername() + " \\n To verify your email, click the link below:\\n" +
+                "https://localhost:3000/auth/verifyEmail?token=" + token
+        );
+
         return ResponseEntity
                 .ok()
-                .header("ResponseMessage", "User registered successfully!")
-                .build();
+                .body(new MessageResponse("User registered successfully!"));
     }
-/*
-    @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        System.out.println("request: " + request.toString());
 
-        String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
 
-        System.out.println("refreshToken: " + refreshToken);
+    @PostMapping("/verifyEmail")
+    public ResponseEntity<?> verifyEmail(@Valid @RequestBody VerifyRequest verifyRequest) {
+        String token = verifyRequest.getToken();
+        System.out.println("verifyEmail: " + token);
 
-        if ((refreshToken != null) && (!refreshToken.isEmpty())) {
-            refreshTokenService.findByToken(refreshToken)
-                    .map(refreshTokenService::deleteByToken)
-                    .orElseThrow(() -> new TokenRefreshException(refreshToken,
-                            "Refresh token is not in database!"));
+        User user;
+        Optional<User> optionalUser = emailTokenService.validateEmailToken(token);
+
+        if (optionalUser.isPresent()) {
+            user = optionalUser.get();
+            System.out.println("from user: " + user.toString());
+
+            UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
+                    .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
+            user.setUserStatus(userStatus);
+
+            userRepository.save(user);
+            return ResponseEntity.ok(new MessageResponse("Email successfully verified"));
+        } else {
+            System.out.println("unable to map user or invalid/expired token");
+            return ResponseEntity.badRequest().body(new MessageResponse("Invalid or expired token"));
         }
-
-        ResponseCookie jwtCookie = jwtUtils.getCleanJwtCookie();
-        ResponseCookie jwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
-                .body(new MessageResponse("You've been signed out!"));
     }
-*/
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(){
-        System.out.println("logoutUser");
+    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
+        System.out.println("logoutUser" + authorizationHeader);
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);

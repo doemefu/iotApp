@@ -1,0 +1,459 @@
+openapi: 3.0.3
+info:
+  description: iotApp API
+  title: iotApp API
+  version: 1.0.0
+servers:
+- url: https://iotApp
+paths:
+  /api/auth/login:
+    post:
+      operationId: authenticateUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/login
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/auth/register:
+    post:
+      operationId: registerUser
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/register
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/auth/verifyEmail:
+    post:
+      operationId: verifyEmail
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/verifyEmail
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/auth/logout:
+    post:
+      operationId: logoutUser
+      parameters:
+      - explode: false
+        in: header
+        name: Authorization
+        required: true
+        schema:
+          type: string
+        style: simple
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/logout
+      x-accepts: '*/*'
+  /api/auth/refreshtoken:
+    post:
+      operationId: refreshtoken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TokenRefreshRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/auth/refreshtoken
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/get/all:
+    get:
+      operationId: allAccess
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+          description: OK
+      summary: GET api/get/all
+      x-accepts: '*/*'
+  /api/get/user:
+    get:
+      operationId: userAccess
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+          description: OK
+      summary: GET api/get/user
+      x-accepts: '*/*'
+  /api/get/mod:
+    get:
+      operationId: moderatorAccess
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+          description: OK
+      summary: GET api/get/mod
+      x-accepts: '*/*'
+  /api/get/admin:
+    get:
+      operationId: adminAccess
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: string
+          description: OK
+      summary: GET api/get/admin
+      x-accepts: '*/*'
+  /api/data/influxData:
+    get:
+      operationId: getInfluxData
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/FluxRecord'
+                type: array
+          description: OK
+      summary: GET api/data/influxData
+      x-accepts: '*/*'
+  /api/user-management/showUser/{id}:
+    get:
+      operationId: getUserById
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: "GET api/user-management/showUser/{id}"
+      x-accepts: '*/*'
+  /api/user-management/deleteUser/{id}:
+    delete:
+      operationId: deleteUser
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: "DELETE api/user-management/deleteUser/{id}"
+      x-accepts: '*/*'
+  /api/user-management/updateUser/{id}:
+    put:
+      operationId: updateUser
+      parameters:
+      - explode: false
+        in: path
+        name: id
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/User'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: "PUT api/user-management/updateUser/{id}"
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/user-management/showRoles:
+    get:
+      operationId: showAllRoles
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: GET api/user-management/showRoles
+      x-accepts: '*/*'
+  /api/user-management/forgotPassword:
+    post:
+      operationId: forgotPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ForgotPasswordRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/user-management/forgotPassword
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/user-management/resetPassword:
+    post:
+      operationId: resetPassword
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResetPasswordRequest'
+        required: true
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                type: object
+          description: OK
+      summary: POST api/user-management/resetPassword
+      x-content-type: application/json
+      x-accepts: '*/*'
+  /api/user-management/allUsers:
+    get:
+      operationId: getAllUsers
+      responses:
+        "200":
+          content:
+            '*/*':
+              schema:
+                items:
+                  $ref: '#/components/schemas/User'
+                type: array
+          description: OK
+      summary: GET api/user-management/allUsers
+      x-accepts: '*/*'
+components:
+  schemas:
+    LoginRequest:
+      example:
+        password: password
+        username: username
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      type: object
+    RegisterRequest:
+      example:
+        password: password
+        roles:
+        - roles
+        - roles
+        email: email
+        username: username
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+        roles:
+          items:
+            type: string
+          type: array
+        password:
+          type: string
+      type: object
+    VerifyRequest:
+      example:
+        token: token
+      properties:
+        token:
+          type: string
+      type: object
+    TokenRefreshRequest:
+      example:
+        refreshToken: refreshToken
+      properties:
+        refreshToken:
+          type: string
+      type: object
+    Object:
+      example: {}
+      properties: {}
+      type: object
+    FluxRecord:
+      example:
+        values: values
+        row:
+        - {}
+        - {}
+        table: 0
+      properties:
+        table:
+          format: int32
+          type: integer
+        values:
+          type: string
+        row:
+          items:
+            $ref: '#/components/schemas/Object'
+          type: array
+      type: object
+    Role:
+      example:
+        name: ROLE_USER
+        id: 6
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          enum:
+          - ROLE_USER
+          - ROLE_MODERATOR
+          - ROLE_ADMIN
+          type: string
+      type: object
+    UserStatus:
+      example:
+        name: UNVERIFIED
+        id: 1
+      properties:
+        id:
+          format: int32
+          type: integer
+        name:
+          enum:
+          - UNVERIFIED
+          - ACTIVE
+          - INACTIVE
+          - BLOCKED
+          type: string
+      type: object
+    User:
+      example:
+        createdAt: 2000-01-23T04:56:07.000+00:00
+        password: password
+        userStatus:
+          name: UNVERIFIED
+          id: 1
+        roles:
+        - name: ROLE_USER
+          id: 6
+        - name: ROLE_USER
+          id: 6
+        changedAt: 2000-01-23T04:56:07.000+00:00
+        id: 0
+        email: email
+        username: username
+      properties:
+        id:
+          format: int64
+          type: integer
+        username:
+          type: string
+        email:
+          type: string
+        password:
+          type: string
+        roles:
+          items:
+            $ref: '#/components/schemas/Role'
+          type: array
+        userStatus:
+          $ref: '#/components/schemas/UserStatus'
+        createdAt:
+          format: date-time
+          type: string
+        changedAt:
+          format: date-time
+          type: string
+      type: object
+    ForgotPasswordRequest:
+      example:
+        email: email
+      properties:
+        email:
+          type: string
+      type: object
+    ResetPasswordRequest:
+      example:
+        oldPassword: oldPassword
+        newPassword: newPassword
+        token: token
+      properties:
+        newPassword:
+          type: string
+        token:
+          type: string
+        oldPassword:
+          type: string
+      type: object
+

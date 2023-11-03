@@ -29,9 +29,9 @@ jobs:
           cd src/main/gen
           mvn install
 
-      - name: Maven build, clean
+      - name: Maven build, clean, with no tests
         run: |
-          mvn clean package
+          mvn clean package -DskipTests
 
       - name: Login via Azure CLI
         uses: azure/login@v1

@@ -12,21 +12,34 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
   * [Projektbeschreibung](#projektbeschreibung)
     * [Zielsetzung](#zielsetzung)
   * [Anforderungsanalyse](#anforderungsanalyse)
-  * [Nutzwertanalyse](#nutzwertanalyse)
 * [Umsetzung](#umsetzung)
   * [Authentication-API](#authentication-api)
+    * [Password Security](#password-security)
+    * [Email-Verifizierung](#email-verifizierung)
+    * [Passwort ändern](#passwort-ändern)
+  * [React Refresh Token](#react-refresh-token)
+    * [Axios](#axios)
+  * [JWT](#jwt)
+    * [Authorisierung](#authorisierung)
+  * [Spring Security](#spring-security)
+    * [HttpServletRequest](#httpservletrequest)
+    * [AuthorizationFilter](#authorizationfilter)
+    * [Logging](#logging)
+  * [Datenbank](#datenbank)
+    * [MariaDB](#mariadb)
+    * [InfluxDB](#influxdb)
+  * [TestCases](#testcases)
+* [Issues](#issues)
+* [Work in Progress Notizen](#work-in-progress-notizen)
   * [Project Structure](#project-structure)
-* [Progress](#progress)
   * [Version 1.0](#version-10)
   * [Version 2.0](#version-20)
     * [now working:](#now-working)
     * [TODO:](#todo)
     * [Cookies](#cookies)
-* [Issues](#issues)
   * [JWT is not meant for authentication](#jwt-is-not-meant-for-authentication)
   * [Login Umleitung](#login-umleitung)
-* [Anleitungen](#anleitungen)
-  * [Spring Security](#spring-security)
+  * [Anleitungen](#anleitungen)
   * [Spring MVC](#spring-mvc)
   * [React](#react)
 <!-- TOC -->
@@ -34,16 +47,14 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 
 # Einleitung
 
----
-
-Dieses Projekt ist Teil der Leistungsbeurteilung des Modules 133. 
+Dieses Projekt ist Teil der Leistungsbeurteilung des Modules 133.
 
 
 ## Projektbeschreibung
 
 ### Zielsetzung
 
-Die Applikation sollte Datenbestand, Formularüberprüfung, Usability, Login für Benutzer-Accounts, 
+Die Applikation sollte Datenbestand, Formularüberprüfung, Usability, Login für Benutzer-Accounts,
 Registrierung und Session handling beinhalten. Des Weiteren soll sie eine klare 3-Tier Architektur aufweisen, bestehend aus Presentations, Business und Data Layer.
 
 - Der Presentation-Layer sollte gut strukturiert und mittels CSS formatiert sein. Ausserdem muss eine Überprüfung der User Eingaben implementiert sein.
@@ -64,8 +75,8 @@ Die zweite Seite ist nur für den eingeloggten User ersichtlich und zugänglich.
 Für die Registrierung und das Einloggen wird ebanfalls eine eigene Website benötigt, welche sich aber lediglich auf diese Funktionen beschränkt sind und ansonnsten keinerlei Content beinhalten.
 
 **Registrierung neuer User:** Es kann ein neuer User im Registrierungsfenster erstellt werden, dies geschieht mittels Eingabe eines Usernamens, einer Mailadresse und eines Passwortes.
-Bevor die Registrierung abgeschlossen werden kann, wird einerseits überprüft, ob all diese Felder ausgefüllt sind, andererseits aber ach wie sei aisgefüllt sind. 
-Es wird mit den bereits vorhandenen Datenbankeinträgen abgeglichen, ob der eingegebene Username und die Mailadresse bereits erfasst wurden. 
+Bevor die Registrierung abgeschlossen werden kann, wird einerseits überprüft, ob all diese Felder ausgefüllt sind, andererseits aber ach wie sei aisgefüllt sind.
+Es wird mit den bereits vorhandenen Datenbankeinträgen abgeglichen, ob der eingegebene Username und die Mailadresse bereits erfasst wurden.
 Die Mailadresse wird zudem auf ihre Richtigkeit überprüft, sprich ob sie der Norm einer solchen entspricht.
 Ist dies der Fall, wird im Registrierungsfenster eine Fehlermeldung angegeben.
 Ein unausgefülltes Feld, dies impliziert diesmal auch das Passwort, wird ebenfalle eine Fehlermeldung zurückgegeben.
@@ -79,8 +90,6 @@ Ist alles korrekt vorhanden wird der User angemeldet und gelangt direkt in sein 
 Dieser Token wird zurück an den Client gesendet und von ihm gespeichert.
 Sobald der User eine neue Request an den Server sendet, bspw. beim Wechsel von seinem Userprofil zur Startseite, wird nun dieser JWT mitgegeben.
 Anschliessend wird dieser vom Server validiert und die Respons wird zurück an den Client gesendet.
-
-## Nutzwertanalyse
 
 # Umsetzung
 
@@ -144,20 +153,15 @@ Hier haben Sie zwei Datenbanken - MariaDB auf Port 3306 für die Speicherung von
 
 ### Password Security
 
-Version 2y ist am sichersten.
-
-Stärke 10 ist der Standard und bedeutet 2^10 Runden.
-
 `SecureRandom` wird verwendet, um ein Salz für den Hash zu generieren.
 
 Benutzerdefinierte Zufallszahlengeneratoren (RNG): Durch Bereitstellen Ihrer eigenen SecureRandom-Instanz haben Sie die Kontrolle über den Zufallszahlengenerator (RNG), der für die Salzgenerierung verwendet wird. Dies kann nützlich sein, wenn Sie spezielle Anforderungen an den RNG haben, wie die Verwendung eines hardwarebasierten RNG oder eines bestimmten Algorithmus.
 
-Peppers (Zusatzsalze) werden nicht implementiert, da sie für moderne Algorithmen nicht empfohlen werden. 
-[Quelle](https://stackoverflow.com/questions/16891729/best-practices-salting-peppering-passwords)
+Peppers (Zusatzsalze) werden nicht implementiert, da sie für moderne Algorithmen nicht empfohlen werden.
 
 Ein BCrypt-Hash-String sieht folgendermassen aus: $2<a/b/x/y>$[strenght]$[22 character salt][31 character hash]
 
-
+Störke heisst in diesem Fall, wie viele Runden des Hashingprozesses durchgeführt werden. In unserer Applikation haben wir den normwert von Stärke 10 verwendet was bedeutet, dass 10^2 Runden durchlaufen werden.
 
 ```java
     @Bean
@@ -171,6 +175,20 @@ Der `EmailTokenService` handhabt die Verwaltung des Email-Verifizierungstokens. 
 
 Mit `validateEmailToken` wird der Validierungstoken validiert, indem der empfangene Token mit dem in der DB gespeicherten verglichen wird. Hierbei wird überprüft, ob der Token abgelaufen idt oder bereits verwendet wurde. Wenn dieser gültig ist, gibt die Methode den Benutzer zurück welcher ihm zugehört.
 
+`deleteToken` und `deleteTokenByValue` löschen den Validierungstoken aus der Datebbank, entweder durch die direkte Übergabe des Tokens oder durch den Token-Wert.
+
+Sobald eine Email-Verifizierung initialisiert ist, beispielsweise durch den Registrierungsprozess, wird eine automatisch generierte Email an die angegebene Usermail gesendet. in `EmailConfiguration` wird diese Mail angefertigt, inklusive einem Link zur Verifizierung. Dieser führt zurück auf die Website, wo eine Erfolgsmeldung beim erfolgreichen Abschluss erscheint.
+
+### Passwort ändern
+
+Die Passwortänderung kann in zwei verschiedenen Fällen auftreten. Einerseits als bewusste Aktion des bereits angemeldeten Userd, andererseits auch als Möglichkeit das vergessene Passwort eines unangemeldeten Users zurückzusetzen.
+
+**Angemeldeter User**<br>
+In `/user` kann über einen Button die Passwortänderung initialisiert werden. Der User gelangt auf `ResetPassword.js`, wo er ein Inputfeld für das alte und eines für das neue Passwort vorfindet. Stimmt das alte Passwort überein, so wird das neue Passwort als gültig anerkannt und in die Datenbank geschrieben, somit ist der Reset-Prozess abgeschlossen.
+
+**Unauthorisierter User**<br>
+In `/login` kann ebenfalls über einen Button die Passwortänderung initialisiert werden. Der User gelangt auf `ForgotPassword.js`. Auf dieser Seite findet der User ein Eingabefeld für die Mailadresse seines Accounts vor. Sofern die Mailadresse eines bekannten Users eingegeben wurde, wird an diese ein Link für das Resetten versendet. Mit diesem Link gelangt der User zurück auf `ForgotPassword.js` und kann das neue Passwort eingeben und den Prozess abschliessen. Ist dies gemacht, wird der gesendete Link invalid und kann nicht mehr verwendet werden, das dient als Absicherung gegen ungewolltes Entwenden des Links und präventiert das ungewollte Verwenden durch Drittpersonen.
+
 ## React Refresh Token
 
 – Ein Refreshtoken wird dem Benutzer beim Einloggen zur Verfügung gestellt.
@@ -179,7 +197,7 @@ Mit `validateEmailToken` wird der Validierungstoken validiert, indem der empfang
 
 – Mit Hilfe von Axios-Interceptoren kann die React-App überprüfen, ob der Zugriffstoken (JWT) abgelaufen ist (Statuscode 401). In diesem Fall sendet sie eine Anfrage zum Erhalten eines neuen Zugriffstokens (/refreshToken) und verwendet diesen für neue Ressourcenanfragen.
 
-### Axios
+### JWT und Axios
 
 In React ist Axios ein häufig verwendetes JavaScript-Modul, das für das Senden von HTTP-Anfragen an Server verwendet wird. Axios Interceptoren sind Funktionen, die von Axios bereitgestellt werden und es ermöglichen, Anfragen und Antworten zu überwachen und zu bearbeiten, bevor sie an den Server gesendet bzw. von ihm empfangen werden. Sie sind äuerssst nützlich, um bestimmte Aufgaben und Anforderungen an HTTP-Anfragen und -Antworten zu implementieren, insbesondere wenn mit Authentifizierung, Autorisierung und Fehlerbehandlung umgegangen werden muss.
 
@@ -193,9 +211,14 @@ Auf Grund dessen ist in `api.js` eine API für die Handhabung der Authentifizier
 
 Im Front-end werden innerhalb der beiden Klassen `UserService`und `AuthService` die Antworten der API gehandhabt. Auf der einen Seite kann unterschieden werden um welche Aktion des Users es sich handelt, beispielsweise ein Login oder ein Logout. Andererseits kann aber auch bestummen werden, um welche Art Usere es sich handelt und desswegen die korrekte Userseite anzeigen, je nach Klassifizierung des Users.
 
-## JWT
+![spring-security-refresh-token-jwt-spring-boot-flow.png](documentation%2Fspring-security-refresh-token-jwt-spring-boot-flow.png)
 
-Der JSON Web Token ist ein kompaktes Format für den sicheren Datenaustausch zwischen Parteien. Er wird unteranderem für die Authentifizierung und die Authorisierung in Webanwendungen verwendet. Zusammengesetzt ist er aus einer Zeichenkette, bestehend aus den Teilen Header, Payload und Signatur.
+### Authorisierung
+
+In `AuthEntryPointJwt` befindet sich der `AuthentificationEntryPoint`, welcher unbefugte Anfroderungen von Usern oder anderen behandelt. Will ein User ohne gültigen JWT auf geschützte Ressourcen zugreiffen wirdd `AuthEntryPointJwt` aufgerufen, um die Antwort zu konfigurieren und eine Fehlermeldung zurückzugeben.
+
+`AuthTokenFilter` ist ein `OncePerRequestFilter`, der jede eingehendeAnforderung überprüft, ob ein gültiger JWT im Header vorhanden ist. Ist ein gültiger Token vorhanden, wird der User authentifizuert und seine Identität wird im Spring Security-Kontext gespeichert. Die Filterkette konfiguriert die Zugriffsberechtigungen für die jeweiligen Endpunkte, beispielsweise können Seiten wie 
+`WebSecurityConfig` definiert die Sicherheitsrichtlinien für unsere Anwendungen. In diesem Zusammenhang konfiguriert sie den `AuthEntryPointJwt` als Eintrittspunkt für die unbefugten Anforderungen. 
 
 Im Header werden Metadaten über den Token selbst gesichert, beispielsweise den Signaturalgorithmus. In unserer Applikation beinhalter er
 
@@ -203,6 +226,7 @@ Im Header werden Metadaten über den Token selbst gesichert, beispielsweise den 
 
 Mittels Spring Security kann die Form von Authentifizierung gehandhabt werden. Standardmässig verlangt Spring Security eine Authentifizierung für jede einzelne Request. Desswegen wird bei jeder Verwendung von `HttpSecurity` vorausgesetzt, dass gewisse Authentifizierungsrichtlinien angewendet werden.
 
+![spring-boot-authentication-spring-security-architecture.png](documentation%2Fspring-boot-authentication-spring-security-architecture.png)
 
 ### HttpServletRequest
 
@@ -213,7 +237,7 @@ http
 )
 ```
 
-Dies setzt voraus, dass bei jedem Endpoint in der Applikation im Punkt Sicherheit mindestens eine Authentifizierung benötigt wird. Jedoch wird in der Applikation auch zwischen verscheidenen Stufen bzw. Arten von Authentifizierung unterschieden. 
+Dies setzt voraus, dass bei jedem Endpoint in der Applikation im Punkt Sicherheit mindestens eine Authentifizierung benötigt wird. Jedoch wird in der Applikation auch zwischen verscheidenen Stufen bzw. Arten von Authentifizierung unterschieden.
 
 ### AuthorizationFilter
 
@@ -222,6 +246,16 @@ Der AuthorizationFilter befindet sich standardmässig am Ende der Spring Securit
 Ein Ort, an dem dies in der Regel wichtig wird, ist die Hinzufügung von Spring MVC-Endpunkten. Da diese von der DispatcherServlet ausgeführt werden und dies nach dem Autorisierungsfilter erfolgt, müssen die Endpunkte in `authorizeHttpRequests` aufgenommen werden, um zugelassen zu werden.
 
 `authorizeHttpRequests` ist der zentrale Punkt, an dem die Anforderungen für die Autorisierung der HTTP-Anfragen definiert werden. Hier wird angegeben, welche Pfade (Endpunkte) von welchen Benutzern aufgerufen werden dürfen. Einige Endpunkte, wie "/api/auth/login", "/api/auth/register" usw., werden für alle Benutzer (permitAll) zugänglich gemacht, während anyRequest().authenticated() sicherstellt, dass alle anderen Anfragen eine Authentifizierung erfordern.
+
+### Logging
+
+Logging ist ein nützliches Instrument, um die Leistung und das Verhalten Ihrer Anwendung zu überwachen, Fehler zu diagnostizieren und zu beheben sowie Sicherheitsbedenken anzugehen.
+
+`LoggingAspect` ist ein Aspekt, der die Protokollierung von Methodenaufrufen ermöglicht. Dieser Aspekt verwendet Spring AOP und definiert einen "Advice", der nach einem erfolgreichen Methodenaufruf in den Controllern ausgeführt wird. Dieser Advice ruft `logMethodCall` auf für die Informationserfassung. Diese Informationen werden dann in der Datenbank gespeichert, indem ein Eintrag in `LogEntry` erstellt und über das `LogEntryRepository` persistiert wird.
+
+`LogEntry` wird verwendet, um die Informationen für jeden Protokolleintrag darzustellen. Sie beinhaltet Attribute wie den Benutzernamen, den Endpunkt, den Zeitstempel und den Namen der aufgerufenen Methode.
+
+`LogEntryRepository` ist ein Spring Data JPA-Repository, das die Kommunikation mit der Datenbank für Log-Einträge erleichtert. Mit diesem Repositories können leicht Log-Einträge erstellt, abgerufen, aktualisiert und gelöscht.
 
 ## Datenbank
 
@@ -237,15 +271,65 @@ Bei der Anmeldung oder Regitstierung eines Users wird die DB angefragt. Bei der 
 
 ### InfluxDB
 
-Diese Datenbank ist, wie bereits erwähnt, extern angeschlossen. Sie agiert sälbstständig und die gespeicherten Daten werden ebenfalls eigenständig erhoben und gewartet. Sprich diese DB kann nicht in oder von der Website verändert werden. Sie dient lediglich als Darstellung dieser Daten. 
+Diese Datenbank ist, wie bereits erwähnt, extern angeschlossen. Sie agiert sälbstständig und die gespeicherten Daten werden ebenfalls eigenständig erhoben und gewartet. Sprich diese DB kann nicht in oder von der Website verändert werden. Sie dient lediglich als Darstellung dieser Daten.
 In diesem Fall handelt es sich um einen Datensatz von verschiedenen Zeitpunkten, welche die Temperatur und die Feuchtigkeit einer Messstelle beinhalten. Mittels Formatierung können diese Daten in einem Graphen ersichtlich dargestellet werden. Dies geschieht auf der Seite Data View, welche ebenfalls nur durch einen authentifizierten User zugänglich ist.
 
 ![website_data_view.jpeg](documentation%2Fwebsite_data_view.jpeg)
+
+## TestCases
+
+Um sicher zu stellen, dass die Applikation auch wirklich die korrekt funktioniert ist ein Pool aus verschiedenen Test unersetzlich. Anstelle einer Testauflistung in dieser Dokumentation, haben wir uns dafür entschieden, Tests in der Applikation selbst uz schreiben und hier lediglich die Verlinkung zu diesen Tests und Auswertungen anzugeben.
+
+Hier sind die Dokumentationen für die einzelnen API-Endpunkte:
+
+[DefaultApi.md](src%2Fmain%2Fgen%2Fdocs%2FDefaultApi.md)<br>
+[FluxRecord.md](src%2Fmain%2Fgen%2Fdocs%2FFluxRecord.md)<br>
+[ForgotPasswordRequest.md](src%2Fmain%2Fgen%2Fdocs%2FForgotPasswordRequest.md)<br>
+[LoginRequest.md](src%2Fmain%2Fgen%2Fdocs%2FLoginRequest.md)<br>
+[RegisterRequest.md](src%2Fmain%2Fgen%2Fdocs%2FRegisterRequest.md)<br>
+[ResetPasswordRequest.md](src%2Fmain%2Fgen%2Fdocs%2FResetPasswordRequest.md)<br>
+[Role.md](src%2Fmain%2Fgen%2Fdocs%2FRole.md)<br>
+[TokenRefreshRequest.md](src%2Fmain%2Fgen%2Fdocs%2FTokenRefreshRequest.md)<br>
+[User.md](src%2Fmain%2Fgen%2Fdocs%2FUser.md)<br>
+[UserStatus.md](src%2Fmain%2Fgen%2Fdocs%2FUserStatus.md)<br>
+[VerifyRequest.md](src%2Fmain%2Fgen%2Fdocs%2FVerifyRequest.md)<br>
+
+Hier sind die Tests für die einzelnen API-Endpunkte:
+
+[FluxRecordTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FFluxRecordTest.java)<br>
+[ForgotPasswordRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FForgotPasswordRequestTest.java)<br>
+[LoginRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FLoginRequestTest.java)<br>
+[RegisterRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FRegisterRequestTest.java)<br>
+[ResetPasswordRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FResetPasswordRequestTest.java)<br>
+[RoleTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FRoleTest.java)<br>
+[TokenRefreshRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FTokenRefreshRequestTest.java)<br>
+[UserStatusTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserStatusTest.java)<br>
+[UserTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserTest.java)<br>
+[VerifyRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FVerifyRequestTest.java)<br>
+
+# Issues
+
+## JWT und Sessionhandling
+
+In unserer Applikation haben wir den JWT für das Sessionhandling verwendet. Obwohl das Programm damit reibungslos funktioniert, ist dies nicht die optimale Lösung. Der JWT kann von der Applikation nämlich als Baerer Token angesehen werden. Desswegen entspricht er nicht den spezifischen Anforderungen gemäss den Spezifikationen von OAuth 2.0. Dies legt fest, dass Baerer Token im Authorization-HTTP-Header mit dem Baerer-Authentifizierungsschema verwendet werden sollten.
+
+Die Verwendung des JSON Web Token zur Verhinderung von Cross-Site Request Forgery ist ohne genaue Details schwer zu bewerten. Um einen geeigneten Schutz gegen CSRFs wäre besser ein OAuth-Token zusammen mit OAuth 2.0 verwendet worden. Aufgrund mangelnder Zeit und eine komplette Umstrukturierung des Sessionhandlings zu vermeinden, haben wir uns gegen eine Anpassung auf diesen Standard entschieden.
+
+![jwt-flowchart.png](documentation%2Fjwt-flowchart.png)
+
+## Bootstrap und CSS-Formatierung
+
+In unserer Applikation haben wir das Responsiv-Webdesign anfänglich mit Bootstrap aufziehen wollen, sind dabei aber auf Probleme gestossen. Bootstrap verwendet sehr spezifische CSS-Selektoren, um seinen eigenen Stiel zu definieren. Diese Selektoren überschreiben häuffig den allgemeinen CSS-Code, der von uns geschrieben wurde. Um dies zu verhindern, hätten wir die sehr spezifischen Bootstrap-Selektoren verwenden müssen um Bootstrap selbst zu überschreiben.
+
+Diese manuellen Anpassungen in Bootsrtap würden ebenfalls zu weiteren Problemen führen. Ist beispielsweise eine neue Version von Bootstrap vorhanden und wird eingebungen, wären die manuellen Anpassungen eventuell nicht mehr mit der neuen Version kompatibel und müssten angepasst werden, sofern diese dann überhaupt noch zu verwenden sind.
+
+---
+
+# Work in Progress Notizen
+
 ## Project Structure
 
-Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>
-
-# Progress
+Aufbau gemäss [Best Practices](https://medium.com/the-resonant-web/spring-boot-2-0-project-structure-and-best-practices-part-2-7137bdcba7d3)</br>,
 
 ## Version 1.0
 
@@ -295,7 +379,6 @@ JWT authentication with refresh token and cookie ready
 Cookies did not work out. They didn't get stored in the browser even though they were correctly sent and received on the client. After quite some research it turns out, browsers have a hard time handling self-signed certificates, cors http(s) requests and especially setting cookies on localhost. Once those issues get resolved we might start a new attempt.
 For the time being, the functions and methods are just commented out, and localstorage of the browser is used despite the security issues. There just isn't a different option.
 
-# Issues
 
 ## JWT is not meant for authentication
 
@@ -324,7 +407,7 @@ So, in the context of a RESTful service, it's common to disable the form-based l
 
 For further information see: [spring documentation](https://docs.spring.io/spring-security/reference/servlet/authentication/passwords/form.html)
 
-# Anleitungen
+## Anleitungen
 
 - [Full tutorial](https://spring.io/guides/tutorials/react-and-spring-data-rest/)
 - [outdated but schematic tutorial (***Ehrenbre***)](https://www.bezkoder.com/spring-boot-react-jwt-auth/)
@@ -335,7 +418,7 @@ For further information see: [spring documentation](https://docs.spring.io/sprin
 See class `WebSecurityConfig` for the configuration of the security filter chain.
 
 - [The Security Filter Chain](https://kasunprageethdissanayake.medium.com/spring-security-the-security-filter-chain-2e399a1cb8e3)
-- [Request Authorization](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html) 
+- [Request Authorization](https://docs.spring.io/spring-security/reference/servlet/authorization/authorize-http-requests.html)
 - https://docs.spring.io/spring-security/site/docs/5.5.x/guides/form-javaconfig.html
 
 

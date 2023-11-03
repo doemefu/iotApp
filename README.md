@@ -280,8 +280,32 @@ In diesem Fall handelt es sich um einen Datensatz von verschiedenen Zeitpunkten,
 
 Um sicher zu stellen, dass die Applikation auch wirklich die korrekt funktioniert ist ein Pool aus verschiedenen Test unersetzlich. Anstelle einer Testauflistung in dieser Dokumentation, haben wir uns dafür entschieden, Tests in der Applikation selbst uz schreiben und hier lediglich die Verlinkung zu diesen Tests und Auswertungen anzugeben.
 
-iotApp -> gen -> docs: API-Endpoints
-src -> main -> gen -> src -> java -> org.openapitools.client -> model: Tests für API-Endpoints
+Hier sind die Dokumentationen für die einzelnen API-Endpunkte:
+
+[DefaultApi.md](src%2Fmain%2Fgen%2Fdocs%2FDefaultApi.md)<br>
+[FluxRecord.md](src%2Fmain%2Fgen%2Fdocs%2FFluxRecord.md)<br>
+[ForgotPasswordRequest.md](src%2Fmain%2Fgen%2Fdocs%2FForgotPasswordRequest.md)<br>
+[LoginRequest.md](src%2Fmain%2Fgen%2Fdocs%2FLoginRequest.md)<br>
+[RegisterRequest.md](src%2Fmain%2Fgen%2Fdocs%2FRegisterRequest.md)<br>
+[ResetPasswordRequest.md](src%2Fmain%2Fgen%2Fdocs%2FResetPasswordRequest.md)<br>
+[Role.md](src%2Fmain%2Fgen%2Fdocs%2FRole.md)<br>
+[TokenRefreshRequest.md](src%2Fmain%2Fgen%2Fdocs%2FTokenRefreshRequest.md)<br>
+[User.md](src%2Fmain%2Fgen%2Fdocs%2FUser.md)<br>
+[UserStatus.md](src%2Fmain%2Fgen%2Fdocs%2FUserStatus.md)<br>
+[VerifyRequest.md](src%2Fmain%2Fgen%2Fdocs%2FVerifyRequest.md)<br>
+
+Hier sind die Tests für die einzelnen API-Endpunkte:
+
+[FluxRecordTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FFluxRecordTest.java)<br>
+[ForgotPasswordRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FForgotPasswordRequestTest.java)<br>
+[LoginRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FLoginRequestTest.java)<br>
+[RegisterRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FRegisterRequestTest.java)<br>
+[ResetPasswordRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FResetPasswordRequestTest.java)<br>
+[RoleTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FRoleTest.java)<br>
+[TokenRefreshRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FTokenRefreshRequestTest.java)<br>
+[UserStatusTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserStatusTest.java)<br>
+[UserTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserTest.java)<br>
+[VerifyRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FVerifyRequestTest.java)<br>
 
 # Issues
 

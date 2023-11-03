@@ -7,7 +7,6 @@ on:
 
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}
-  # Replace <azure subscription name> with your actual Azure subscription name
   AZURE_SUBSCRIPTION: Azure for Students
 
 jobs:
@@ -23,27 +22,28 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '11'
+          cache: 'maven'
 
-      - name: maven build, clean
+      - name: Build and install local artifact
+        run: |
+          cd src/main/gen
+          mvn install
+
+      - name: Maven build, clean
         run: |
           mvn clean package
 
       - name: Login via Azure CLI
         uses: azure/login@v1
         with:
-          # Ensure AZURE_CREDENTIALS secret is set in your repository's secrets
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: deploy to production with artifact
+      - name: Deploy to production with artifact
         uses: azure/spring-apps-deploy@v1
         with:
-          # Use the actual Azure subscription name
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: Deploy
-          # Replace <service instance name> with the name of your Azure Spring Apps service instance
           service-name: IoT-App
-          # Replace <app name> with the name of your app
           app-name: IoT-App
           use-staging-deployment: false
-          # The path to the JAR file to deploy
           package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar

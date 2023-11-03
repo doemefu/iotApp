@@ -50,5 +50,5 @@ jobs:
           service-name: IoT-App
           app-name: IoT-App
           use-staging-deployment: false
-          package: ${{ env.ASC_PACKAGE_PATH }}/target/iot-app.jar
+          package: ${{ env.ASC_PACKAGE_PATH }}/target/*.jar
 

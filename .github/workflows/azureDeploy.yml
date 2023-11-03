@@ -48,7 +48,7 @@ jobs:
           azure-subscription: ${{ env.AZURE_SUBSCRIPTION }}
           action: Deploy
           service-name: iot-app
-          app-name: iot-app
+          app-name: iot-backend
           use-staging-deployment: false
           package: ${{ env.ASC_PACKAGE_PATH }}/target/*.jar
 

@@ -38,6 +38,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: List JAR files
+        run: |
+          find ${{ env.ASC_PACKAGE_PATH }} -name "*.jar"
+
       - name: Deploy to production with artifact
         uses: azure/spring-apps-deploy@v1
         with:
@@ -46,4 +50,5 @@ jobs:
           service-name: IoT-App
           app-name: IoT-App
           use-staging-deployment: false
-          package: ${{ env.ASC_PACKAGE_PATH }}/**/*.jar
+          package: ${{ env.ASC_PACKAGE_PATH }}/target/iot-app.jar
+

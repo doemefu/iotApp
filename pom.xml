@@ -191,6 +191,10 @@
 				<groupId>com.microsoft.azure</groupId>
 				<artifactId>azure-functions-maven-plugin</artifactId>
 				<version>1.28.0</version>
+				<configuration>
+					<appName>iot-app-backend</appName>
+					<resourceGroup>IoT-App</resourceGroup>
+				</configuration>
 			</plugin>
 		</plugins>
 	</build>

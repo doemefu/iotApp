@@ -187,6 +187,11 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.6.0</version>
 			</plugin>
+			<plugin>
+				<groupId>com.microsoft.azure</groupId>
+				<artifactId>azure-functions-maven-plugin</artifactId>
+				<version>1.28.0</version>
+			</plugin>
 		</plugins>
 	</build>
 

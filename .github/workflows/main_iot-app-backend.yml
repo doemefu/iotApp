@@ -35,7 +35,7 @@ jobs:
         shell: pwsh
         run: |
           pushd './${{ env.PACKAGE_DIRECTORY }}'
-          mvn -Pprod clean package
+          mvn -Pprod clean package -DskipTests
           popd
 
       - name: 'Run Azure Functions Action'

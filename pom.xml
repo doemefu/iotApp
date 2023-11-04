@@ -192,7 +192,7 @@
 				<artifactId>azure-functions-maven-plugin</artifactId>
 				<version>1.28.0</version>
 				<configuration>
-					<appName>iot-app-backend</appName>
+					<functionAppName>iot-app-backend</functionAppName>
 					<resourceGroup>IoT-App</resourceGroup>
 				</configuration>
 			</plugin>

@@ -3,7 +3,7 @@ name: AzureSpringApps
 on:
   push:
     branches:
-      - main
+      - old # change this to main to activate
 
 env:
   ASC_PACKAGE_PATH: ${{ github.workspace }}

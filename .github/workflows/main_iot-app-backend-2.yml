@@ -21,8 +21,13 @@ jobs:
         with:
           java-version: '17'
 
+      - name: Build and install local artifact
+        run: |
+          cd src/main/gen
+          mvn install
+
       - name: Build with Maven
-        run: mvn clean install
+        run: mvn -Pprod clean package -DskipTests
 
       - name: Upload artifact for deployment job
         uses: actions/upload-artifact@v3

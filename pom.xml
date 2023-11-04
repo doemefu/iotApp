@@ -17,6 +17,23 @@
 		<java.version>17</java.version>
 		<!-- <start-class>ch.furchert.ssl.HttpsEnabledApplication</start-class> -->
 	</properties>
+	<profiles>
+		<profile>
+			<id>dev</id>
+			<properties>
+				<activatedProperties>dev</activatedProperties>
+			</properties>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<id>prod</id>
+			<properties>
+				<activatedProperties>prod</activatedProperties>
+			</properties>
+		</profile>
+	</profiles>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -150,6 +167,11 @@
 			<artifactId>openapi-java-client</artifactId>
 			<version>1.0.0</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.microsoft.sqlserver</groupId>
+			<artifactId>mssql-jdbc</artifactId>
+			<version>11.2.3.jre18</version>
 		</dependency>
 
 	</dependencies>

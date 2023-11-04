@@ -31,7 +31,7 @@ jobs:
 
       - name: Maven build, clean, with no tests
         run: |
-          mvn clean package -DskipTests
+          mvn -Pprod clean package -DskipTests
 
       - name: Login via Azure CLI
         uses: azure/login@v1

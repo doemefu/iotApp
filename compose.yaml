@@ -1,6 +1,8 @@
 services:
   mariadb:
     image: 'mariadb:latest'
+    profiles:
+      - 'dev'
     environment:
       - 'MYSQL_DATABASE=mydatabase'
       - 'MYSQL_PASSWORD=secret'

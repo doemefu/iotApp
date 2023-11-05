@@ -6,7 +6,7 @@ name: Build and deploy Java project to Azure Function App - iot-app-backend
 on:
   push:
     branches:
-      - main
+      - old # change this to main to activate
   workflow_dispatch:
 
 env:

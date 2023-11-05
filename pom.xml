@@ -172,7 +172,7 @@
 		<dependency>
 			<groupId>com.microsoft.sqlserver</groupId>
 			<artifactId>mssql-jdbc</artifactId>
-			<version>11.2.3.jre18</version>
+			<version>11.2.3.jre17</version>
 		</dependency>
 
 	</dependencies>
@@ -188,6 +188,7 @@
 				<artifactId>maven-dependency-plugin</artifactId>
 				<version>3.6.0</version>
 			</plugin>
+			<!--
 			<plugin>
 				<groupId>com.microsoft.azure</groupId>
 				<artifactId>azure-functions-maven-plugin</artifactId>
@@ -197,6 +198,7 @@
 					<resourceGroup>IoT-App</resourceGroup>
 				</configuration>
 			</plugin>
+			-->
 		</plugins>
 	</build>
 

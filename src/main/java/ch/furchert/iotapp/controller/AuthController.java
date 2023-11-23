@@ -19,7 +19,9 @@ import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -96,7 +98,7 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails
@@ -107,11 +109,11 @@ public class AuthController {
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        //ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getAccessToken());
+        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
         return ResponseEntity.ok()
-                //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                //.header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(
                     //new UserInfoResponse(
                     new JwtResponse(
@@ -189,8 +191,9 @@ public class AuthController {
         emailService.sendSimpleMessage(
                 user.getEmail(),
                 "Verify email",
-                "Hello, " + user.getUsername() + " \\n To verify your email, click the link below:\\n" +
-                "https://localhost:3000/auth/verifyEmail?token=" + token
+                "Hello, " + user.getUsername() + " \n To verify your email, click the link below:\n " +
+                //"https://localhost:3000/auth/verifyEmail?token=" + token
+                "https://furchert.ch/auth/verifyEmail?token=" + token
         );
 
         return ResponseEntity

@@ -117,7 +117,7 @@ public class UserManagementController {
         emailService.sendSimpleMessage(
                 existingUser.getEmail(),
                 "Password Reset",
-                "Hello, " + existingUser.getUsername() + " \\n please reset your password here: https://localhost:3000/auth/resetPassword?token=" + token);
+                "Hello, " + existingUser.getUsername() + " \n please reset your password here: https://furchert.ch/auth/resetPassword?token=" + token);
 
         return ResponseEntity
                 .ok()

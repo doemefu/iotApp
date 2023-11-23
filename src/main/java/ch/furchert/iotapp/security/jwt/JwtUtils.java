@@ -30,7 +30,6 @@ public class JwtUtils {
     @Value("${furchert.iotapp.jwtExpirationMs}")
     private int jwtExpirationMs;
 
-    /*
     @Value("${furchert.iotapp.jwtCookieName}")
     private String jwtCookie;
 
@@ -87,7 +86,6 @@ public class JwtUtils {
             return null;
         }
     }
-    */
 
     public String generateJwtToken(UserDetailsImpl userPrincipal) {
         return generateTokenFromUsername(userPrincipal.getUsername());

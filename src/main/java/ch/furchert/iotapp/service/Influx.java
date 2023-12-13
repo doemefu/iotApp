@@ -18,10 +18,11 @@ public class Influx {
     private InfluxDBClient influxDBClient;
     private QueryApi queryApi;
 
-    private static final char[] token = "ovfI55M7pjuw15bmeqKhwbO1FdyXcgw_1oD1nEhNnvn7B_dibqK0TGunR-a4HMif_GCo6cbSh_8_vP0kX_kWXw==".toCharArray();
-    private static final String org = "m153";
-    private static final String bucket = "doemesPlants";
-    private static final String InfluxURL = "http://52.236.138.112:8086";
+    //private static final char[] token = "ovfI55M7pjuw15bmeqKhwbO1FdyXcgw_1oD1nEhNnvn7B_dibqK0TGunR-a4HMif_GCo6cbSh_8_vP0kX_kWXw==".toCharArray();
+    private static final char[] token = "EgdYFJOptmMPvxKs-NH7aeAJJ7GznekrgARnYeM64tts2yeF2p396dT-BBJiEWVbKGBLF6D1hwPRYwKbDPBvmA==".toCharArray();
+    private static final String org = "iotApp";
+    private static final String bucket = "Terrarium";
+    private static final String InfluxURL = "http://influxdb:8086";
 
 
     @PostConstruct
@@ -40,11 +41,12 @@ public class Influx {
     public List<FluxRecord> query() {
         System.out.println("Querying data from InfluxDB");
         String flux = """
-                from(bucket: "doemesPlants")
+                from(bucket: "Terrarium")
                   |> range(start: -24h, stop: now())
-                  |> filter(fn: (r) => r["device"] == "terra1")
                   |> aggregateWindow(every: 30m, fn: mean, createEmpty: false)
                   |> yield(name: "mean")""";
+
+        //                  |> filter(fn: (r) => r["device"] == "terra1")
         List<FluxRecord> records = new ArrayList<>();
 
         AtomicBoolean done = new AtomicBoolean(false);

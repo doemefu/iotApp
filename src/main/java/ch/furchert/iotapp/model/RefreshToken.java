@@ -11,7 +11,7 @@ public class RefreshToken {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
-    @OneToOne
+    @ManyToOne //ManyToOne should enable login from multiple devices for the same user
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 

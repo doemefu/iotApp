@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import ch.furchert.iotapp.service.UserDetailsImpl;
@@ -31,39 +30,39 @@ public class JwtUtils {
     private int jwtExpirationMs;
 
     @Value("${furchert.iotapp.jwtCookieName}")
-    private String jwtCookie;
+    private String jwtCookieName;
 
     @Value("${furchert.iotapp.jwtRefreshCookieName}")
-    private String jwtRefreshCookie;
+    private String jwtRefreshCookieName;
 
     public ResponseCookie generateJwtCookie(UserDetailsImpl userPrincipal) {
         String jwt = generateTokenFromUsername(userPrincipal.getUsername());
-        return generateCookie(jwtCookie, jwt, "/api");
+        return generateCookie(jwtCookieName, jwt, "/api");
     }
 
     public ResponseCookie generateJwtCookie(User user){
         String jwt = generateTokenFromUsername(user.getUsername());
-        return generateCookie(jwtCookie, jwt, "/api");
+        return generateCookie(jwtCookieName, jwt, "/api");
     }
 
     public ResponseCookie generateRefreshJwtCookie(String refreshToken){
-        return generateCookie(jwtRefreshCookie, refreshToken, "/api/auth");
+        return generateCookie(jwtRefreshCookieName, refreshToken, "/api/auth");
     }
 
     public String getJwtFromCookies(HttpServletRequest request){
-        return getCookieValueByName(request, jwtCookie);
+        return getCookieValueByName(request, jwtCookieName);
     }
 
     public String getJwtRefreshFromCookies(HttpServletRequest request){
-        return getCookieValueByName(request, jwtRefreshCookie);
+        return getCookieValueByName(request, jwtRefreshCookieName);
     }
 
     public ResponseCookie getCleanJwtCookie(){
-        return ResponseCookie.from(jwtCookie).path("/api").build();
+        return ResponseCookie.from(jwtCookieName).path("/api").build();
     }
 
     public ResponseCookie getCleanJwtRefreshCookie(){
-        return ResponseCookie.from(jwtRefreshCookie).path("/api/auth/refreshtoken").build();
+        return ResponseCookie.from(jwtRefreshCookieName).path("/api/auth/refreshtoken").build();
     }
 
     private ResponseCookie generateCookie(String name, String value, String path){
@@ -73,6 +72,7 @@ public class JwtUtils {
                 .maxAge(24*60*60)
                 .httpOnly(true)
                 .secure(true)
+                .sameSite("Lax")
                 .build();
     }
 

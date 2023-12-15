@@ -249,6 +249,9 @@ public class AuthController {
                     .map(user -> {
                         //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
                         String newToken = jwtUtils.generateTokenFromUsername(user.getUsername());
+
+                        //Use the old refresh token to issue a new one
+                        //refreshTokenService.useToken(requestRefreshToken);
                         return ResponseEntity
                                 .ok()
                                 //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())

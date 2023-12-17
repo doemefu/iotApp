@@ -3,6 +3,7 @@ package ch.furchert.iotapp.security.jwt;
 import java.security.Key;
 import java.util.Date;
 
+import ch.furchert.iotapp.model.RefreshToken;
 import ch.furchert.iotapp.model.User;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -47,6 +48,10 @@ public class JwtUtils {
 
     public ResponseCookie generateRefreshJwtCookie(String refreshToken){
         return generateCookie(jwtRefreshCookieName, refreshToken, "/api/auth");
+    }
+
+    public ResponseCookie replaceRefreshJwtCookie(RefreshToken refreshToken){
+        return generateCookie(jwtRefreshCookieName, refreshToken.getToken(), "/api/auth");
     }
 
     public String getJwtFromCookies(HttpServletRequest request){

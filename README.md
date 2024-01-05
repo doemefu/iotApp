@@ -307,6 +307,77 @@ Hier sind die Tests für die einzelnen API-Endpunkte:
 [UserTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserTest.java)<br>
 [VerifyRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FVerifyRequestTest.java)<br>
 
+# Security Tests
+## NMAP
+### Was ist NMAP?
+Nmap (Network Mapper) ist ein Open-Source-Tool für die Netzwerkerkennung und Sicherheitsprüfung. Es kann verwendet werden, um Hosts und Dienste in einem Computernetzwerk zu entdecken, sowie Informationen über diese zu sammeln. Nmap bietet verschiedene Scan-Techniken, einschließlich Ping-Scans, Port-Scans und Service-Version-Scans, um umfassende Informationen über ein Netzwerk zu erhalten.
+
+### Ping Scan
+**Befehl: 'nmap -sn furchert.ch'**
+
+**Ergebnis:**
+'Starting Nmap 7.94 ( https://nmap.org ) at 2023-12-20 10:33 CET
+ Nmap scan report for furchert.ch (84.74.80.106)
+ Host is up (0.028s latency).
+ rDNS record for 84.74.80.106: 84-74-80-106.dclient.hispeed.ch
+ Nmap done: 1 IP address (1 host up) scanned in 6.58 seconds'
+Der Ping-Scan zeigt an, dass das Host "furchert.ch" erreichbar ist, mit einer Latenz von 0.028 Sekunden. Die IP-Adresse des Hosts ist 84.74.80.106.
+
+### Port Scan
+**Befehl: 'nmap furchert.ch'**
+
+**Ergebnis:**
+'Starting Nmap 7.94 ( https://nmap.org ) at 2023-12-20 10:34 CET
+ Nmap scan report for furchert.ch (84.74.80.106)
+ Host is up (0.018s latency).
+ rDNS record for 84.74.80.106: 84-74-80-106.dclient.hispeed.ch
+ Not shown: 967 filtered tcp ports (no-response)
+ PORT      STATE  SERVICE
+ 21/tcp    open   ftp
+ 80/tcp    open   http
+ 113/tcp   closed ident
+ 443/tcp   open   https
+ 8008/tcp  open   http
+ 15000/tcp open   hydap
+ ... (weitere offene Ports)
+ Nmap done: 1 IP address (1 host up) scanned in 73.90 seconds'
+Der Port-Scan zeigt, dass verschiedene Ports auf dem Host geöffnet sind, darunter FTP (21/tcp), HTTP (80/tcp), HTTPS (443/tcp), und mehr. Einige Ports zeigen den Service "tcpwrapped" an, was darauf hindeutet, dass Nmap den genauen Dienst nicht identifizieren kann.
+
+### Service Version Scan
+**Befehl: 'nmap -sV furchert.ch'**
+
+**Ergebnis:**
+'Nmap scan report for furchert.ch (84.74.80.106)
+ Host is up (0.017s latency).
+ Not shown: 968 filtered tcp ports (no-response)
+ PORT      STATE SERVICE    VERSION
+ 21/tcp    open  ftp-proxy  McAfee Web Gateway ftp proxy 11.2.5 - build: 42905
+ 80/tcp    open  rtsp
+ 443/tcp   open  ssl/http   nginx 1.25.3
+ 8008/tcp  open  http
+ 15000/tcp open  tcpwrapped
+ ... (weitere Service-Versionen)
+ 2 services unrecognized despite returning data.'
+Der Service-Version-Scan identifiziert bestimmte Dienste und ihre Versionen auf offenen Ports. Zum Beispiel wird der Port 21/tcp als "ftp-proxy" mit der Version "McAfee Web Gateway ftp proxy 11.2.5 - build: 42905" identifiziert. Der Port 80/tcp zeigt einen HTTP-Dienst an, der von Nginx (Version 1.25.3) gehostet wird.
+
+### Aggressiver Scan
+**Befehl: 'nmap -A furchert.ch'**
+
+**Ergebnis:**
+'Nmap scan report for furchert.ch (84.74.80.106)
+ Host is up (0.013s latency).
+ Not shown: 967 filtered tcp ports (no-response)
+ PORT      STATE  SERVICE    VERSION
+ 21/tcp    open   ftp-proxy  McAfee Web Gateway ftp proxy 11.2.5 - build: 42905
+ 80/tcp    open   rtsp
+ 113/tcp   closed ident
+ 443/tcp   open   ssl/http   nginx 1.25.3
+ 8008/tcp  open   http
+ 15000/tcp open   tcpwrapped
+ ... (weitere Ergebnisse)
+ 2 services unrecognized despite returning data.'
+Der aggressive Scan führt eine umfassendere Untersuchung durch und versucht, zusätzliche Informationen wie Betriebssystemdetails und Traceroute-Ergebnisse zu liefern. Es werden bestimmte Dienste und ihre Versionen identifiziert, darunter HTTP (Nginx 1.25.3), und es gibt Hinweise auf mögliche Sicherheitsmechanismen wie X-Frame-Options.
+
 # Issues
 
 ## JWT und Sessionhandling

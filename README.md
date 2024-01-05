@@ -307,6 +307,34 @@ Hier sind die Tests für die einzelnen API-Endpunkte:
 [UserTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FUserTest.java)<br>
 [VerifyRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FVerifyRequestTest.java)<br>
 
+# Security Tests
+
+## Metasploit
+
+Metasploit ist ein weit verbreitetes Open-Source-Framework für Penetrationtests, Sicherheitsforschung und - entwicklung. Es bietet eine Platform, mit der Sicherheitsfachleute Schwachstellen in Computersystemen identifizieren, ausnutzen und patchen können.
+
+### Exploits und Payloads
+
+Metasploit bietet eine grosse Sammlung von Exploits für verschiedene Schwachstellen in Softwareanwendungen. Ein Exploit ist ein Programm oder eine Technik, die eine Schwachstelle in einem Computersystem ausnutzt.
+Payloads sind Nutzlasten, die nach einer erfolgreichen Ausnutzung einer Schwachstelle ausgeführt werden, um einen Angriff auf das System zu gewähren.
+
+### Modularität
+
+Metasploit ist modular aufgebaut, was bedeutet, dass es in einzelne Module unterteilt ist, welche unabhängig voneinander arbeiten können.
+
+### Frameworks und Penetrationtests
+
+Metasploit wird häufig in Penetrationtests und Sicherheitsaudits eingesetzt, um die Sicherheit von Systemen zu bewerten. Sicherheitsfachleute können es verwenden, um Schwachstellen zu identifizieren, Sicherheitslpcken auszunutzen und Systeme auf ihre Resistenz gegenüber Angriffen zu prüfen.
+
+### Community und Entwicklung
+
+Die Community von Metasploit spielt eie eine wichtige Rolle bei der Weiterentwicklung des Frameworks. Durch die Beteiligung von Sicherheitsforschern und Entwicklern weltweit wird Metasploit kontinuierlich aktualisiert, um die neusten Sicherheitsanforderungen zu erfüllen.
+
+### Meterpreter
+
+Der Meterpreter ist ein Payload, der oft in Verbindung mit Metasploit-Exploits verwendet wird. Es ermöglichst den Angreiffern, eine Shell auf dem Zielrechner zu starten und verschiedene Aktionen auszuführen. Beispielsweise können Dateien komprimiert, Screenshots gemacht oder die Kontrolle über das System übernommen werden.
+
+
 # Issues
 
 ## JWT und Sessionhandling

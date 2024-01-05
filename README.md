@@ -398,49 +398,56 @@ Die Verwendung von Zed Attack Proxy (ZAP) für unsere Applikation ermöglicht au
 
 ### Auswertung
 **Cloud Metadata Potentially Exposed**
-_Beschreibung_
+#### Beschreibung
 The Cloud Metadata Attack attempts to abuse a misconfigured NGINX server in order to access the instance metadata maintained by cloud service providers such as AWS, GCP and Azure. All of these providers provide metadata via an internal unroutable IP address '169.254.169.254' - this can be exposed by incorrectly configured NGINX servers and accessed by using this IP address in the Host header field.
 
-_Zusätzliche Informationen_
+#### Zusätzliche Informationen
 Based on the successful response status code cloud metadata may have been returned in the response. Check the response data to see if any cloud metadata has been returned. The meta data returned can include information that would allow an attacker to completely compromise the system.
 
-_Lösung_
+#### Lösung
 Do not trust any user data in NGINX configs. In this case it is probably the use of the $host variable which is set from the 'Host' header and can be controlled by an attacker.
 
-_URL_
+#### URL
+```
 https://furchert.ch/latest/meta-data/
+```
 
 **Content Security Policy (CSP) Header not set**
-_Beschreibung_
+#### Beschreibung
 Content Security Policy (CSP) is an added layer of security that helps to detect and mitigate certain types of attacks, including Cross Site Scripting (XSS) and data injection attacks. These attacks are used for everything from data theft to site defacement or distribution of malware. CSP provides a set of standard HTTP headers that allow website owners to declare approved sources of content that browsers should be allowed to load on that page — covered types are JavaScript, CSS, HTML frames, fonts, images and embeddable objects such as Java applets, ActiveX, audio and video files.
 
-_Lösung_
+#### Lösung
 Ensure that your web server, application server, load balancer, etc. is configured to set the Content-Security-Policy header.
 
-_URL_
+#### URL
+```
 https://furchert.ch/sitemap.xml
 https://furchert.ch
+```
 
 **Missing Anti-clickjacking Header**
-_Beschreibung_
+#### Beschreibung
 The response does not include either Content-Security-Policy with 'frame-ancestors' directive or X-Frame-Options to protect against 'ClickJacking' attacks.
 
-_Lösung_
+#### Lösung
 Modern Web browsers support the Content-Security-Policy and X-Frame-Options HTTP headers. Ensure one of them is set on all web pages returned by your site/app.
 If you expect the page to be framed only by pages on your server (e.g. it's part of a FRAMESET) then you'll want to use SAMEORIGIN, otherwise if you never expect the page to be framed, you should use DENY. Alternatively consider implementing Content Security Policy's "frame-ancestors" directive.
 
-_URL_
+#### URL
+```
 https://furchert.ch
 https://furchert.ch/sitemap.xml
+```
 
 **Server Leaks Version Information via "Server" HTTP Response Header Field**
-_Beschreibung_
+#### Beschreibung
 The web/application server is leaking version information via the "Server" HTTP response header. Access to such information may facilitate attackers identifying other vulnerabilities your web/application server is subject to.
 
-_Lösung_
+#### Lösung
 Ensure that your web server, application server, load balancer, etc. is configured to suppress the "Server" header or provide generic details.
 
-_URL_
+#### URL
+```
 https://furchert.ch
 https://furchert.ch/api
 https://furchert.ch/api/
@@ -451,15 +458,17 @@ https://furchert.ch/robots.txt
 https://furchert.ch/sitemap.xml
 https://furchert.ch/static/css/main.29cfba1e.css
 https://furchert.ch/static/js/main.062e310a.js
+```
 
 **Strict-Transport-Security Header Not Set**
-_Beschreibung_
+#### Beschreibung
 HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.
 
-_Lösung_
+#### Lösung
 Ensure that your web server, application server, load balancer, etc. is configured to enforce Strict-Transport-Security.
 
-_URL_
+#### URL
+```
 https://furchert.ch
 https://furchert.ch/favicon.ico
 https://furchert.ch/logo192.png
@@ -468,20 +477,22 @@ https://furchert.ch/robots.txt
 https://furchert.ch/sitemap.xml
 https://furchert.ch/static/css/main.29cfba1e.css
 https://furchert.ch/static/js/main.062e310a.js
+```
 
 **X-Content-Type-Options Header Missing**
-_Beschreibung_
+#### Beschreibung
 The Anti-MIME-Sniffing header X-Content-Type-Options was not set to 'nosniff'. This allows older versions of Internet Explorer and Chrome to perform MIME-sniffing on the response body, potentially causing the response body to be interpreted and displayed as a content type other than the declared content type. Current (early 2014) and legacy versions of Firefox will use the declared content type (if one is set), rather than performing MIME-sniffing.
 
-_Zusätzliche Informationen_
+#### Zusätzliche Informationen
 This issue still applies to error type pages (401, 403, 500, etc.) as those pages are often still affected by injection issues, in which case there is still concern for browsers sniffing pages away from their actual content type.
 At "High" threshold this scan rule will not alert on client or server error responses.
 
-_Lösung_
+#### Lösung
 Ensure that the application/web server sets the Content-Type header appropriately, and that it sets the X-Content-Type-Options header to 'nosniff' for all web pages.
 If possible, ensure that the end user uses a standards-compliant and modern web browser that does not perform MIME-sniffing at all, or that can be directed by the web application/web server to not perform MIME-sniffing.
 
-_URL_
+#### URL
+```
 https://furchert.ch
 https://furchert.ch/favicon.ico
 https://furchert.ch/logo192.png
@@ -490,6 +501,7 @@ https://furchert.ch/robots.txt
 https://furchert.ch/sitemap.xml
 https://furchert.ch/static/css/main.29cfba1e.css
 https://furchert.ch/static/js/main.062e310a.js
+```
 
 # Issues
 

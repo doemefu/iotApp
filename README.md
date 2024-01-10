@@ -311,6 +311,34 @@ Hier sind die Tests für die einzelnen API-Endpunkte:
 [VerifyRequestTest.java](src%2Fmain%2Fgen%2Fsrc%2Ftest%2Fjava%2Forg%2Fopenapitools%2Fclient%2Fmodel%2FVerifyRequestTest.java)<br>
 
 # Security Tests
+
+## Metasploit
+
+Metasploit ist ein weit verbreitetes Open-Source-Framework für Penetrationtests, Sicherheitsforschung und - entwicklung. Es bietet eine Platform, mit der Sicherheitsfachleute Schwachstellen in Computersystemen identifizieren, ausnutzen und patchen können.
+
+### Exploits und Payloads
+
+Metasploit bietet eine grosse Sammlung von Exploits für verschiedene Schwachstellen in Softwareanwendungen. Ein Exploit ist ein Programm oder eine Technik, die eine Schwachstelle in einem Computersystem ausnutzt.
+Payloads sind Nutzlasten, die nach einer erfolgreichen Ausnutzung einer Schwachstelle ausgeführt werden, um einen Angriff auf das System zu gewähren.
+
+### Modularität
+
+Metasploit ist modular aufgebaut, was bedeutet, dass es in einzelne Module unterteilt ist, welche unabhängig voneinander arbeiten können.
+
+### Frameworks und Penetrationtests
+
+Metasploit wird häufig in Penetrationtests und Sicherheitsaudits eingesetzt, um die Sicherheit von Systemen zu bewerten. Sicherheitsfachleute können es verwenden, um Schwachstellen zu identifizieren, Sicherheitslpcken auszunutzen und Systeme auf ihre Resistenz gegenüber Angriffen zu prüfen.
+
+### Community und Entwicklung
+
+Die Community von Metasploit spielt eie eine wichtige Rolle bei der Weiterentwicklung des Frameworks. Durch die Beteiligung von Sicherheitsforschern und Entwicklern weltweit wird Metasploit kontinuierlich aktualisiert, um die neusten Sicherheitsanforderungen zu erfüllen.
+
+### Meterpreter
+
+Der Meterpreter ist ein Payload, der oft in Verbindung mit Metasploit-Exploits verwendet wird. Es ermöglichst den Angreiffern, eine Shell auf dem Zielrechner zu starten und verschiedene Aktionen auszuführen. Beispielsweise können Dateien komprimiert, Screenshots gemacht oder die Kontrolle über das System übernommen werden.
+
+
+=======
 ## NMAP
 ### Was ist NMAP?
 Nmap (Network Mapper) ist ein Open-Source-Tool für die Netzwerkerkennung und Sicherheitsprüfung. Es kann verwendet werden, um Hosts und Dienste in einem Computernetzwerk zu entdecken, sowie Informationen über diese zu sammeln. Nmap bietet verschiedene Scan-Techniken, einschließlich Ping-Scans, Port-Scans und Service-Version-Scans, um umfassende Informationen über ein Netzwerk zu erhalten.
@@ -461,6 +489,7 @@ https://furchert.ch/static/js/main.062e310a.js
 ```
 ---
 **Strict-Transport-Security Header Not Set**
+
 #### Beschreibung
 HTTP Strict Transport Security (HSTS) is a web security policy mechanism whereby a web server declares that complying user agents (such as a web browser) are to interact with it using only secure HTTPS connections (i.e. HTTP layered over TLS/SSL). HSTS is an IETF standards track protocol and is specified in RFC 6797.
 
@@ -503,6 +532,7 @@ https://furchert.ch/static/css/main.29cfba1e.css
 https://furchert.ch/static/js/main.062e310a.js
 ```
 ---
+
 # Issues
 
 ## JWT und Sessionhandling

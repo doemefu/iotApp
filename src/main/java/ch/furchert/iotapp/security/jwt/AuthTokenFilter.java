@@ -30,7 +30,7 @@ public class AuthTokenFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
         try{
-            String jwt = parseJwt(request);
+            String jwt = parseJwtCookie(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)){
                 String username = jwtUtils.getUserNameFromJwtToken(jwt);
 
@@ -62,4 +62,16 @@ public class AuthTokenFilter extends OncePerRequestFilter {
 
         return null;
     }
+
+    private String parseJwtCookie(HttpServletRequest request){
+        String requestToken = jwtUtils.getJwtRefreshFromCookies(request);
+
+        if (!requestToken.isEmpty()){
+            return requestToken;
+        }
+
+        return null;
+    }
+
+
 }

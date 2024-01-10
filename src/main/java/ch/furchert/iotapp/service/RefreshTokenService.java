@@ -35,20 +35,40 @@ public class RefreshTokenService {
         refreshToken.setExpiryDate(Instant.now().plusMillis(refreshTokenDurationMs));
         refreshToken.setToken(UUID.randomUUID().toString());
 
-        refreshToken = refreshTokenRepository.save(refreshToken);
+        refreshTokenRepository.save(refreshToken);
         return refreshToken;
     }
+
+    //Vlt in JwtUtils verschieben
+    public RefreshToken useToken(String oldTokenString){
+
+        Optional<RefreshToken> oldTokenOpt = refreshTokenRepository.findByToken(oldTokenString);
+        RefreshToken oldToken = oldTokenOpt.get();
+        RefreshToken newToken = new RefreshToken();
+
+        newToken.setUser(oldToken.getUser());
+        newToken.setExpiryDate(oldToken.getExpiryDate());
+        newToken.setToken(UUID.randomUUID().toString());
+
+        refreshTokenRepository.save(newToken);
+        refreshTokenRepository.delete(oldToken);
+
+        return newToken;
+    }
+
+
     public RefreshToken verifyExpiration(RefreshToken token) {
         if (token.getExpiryDate().compareTo(Instant.now()) < 0) {
             refreshTokenRepository.delete(token);
             throw new TokenRefreshException(
                     token.getToken(),
-                    "Refresh token was expired. Please make a new Sign-In request"
+                    "Refresh token is expired. Please make a new Sign-In request"
             );
         }
 
         return token;
     }
+
     @Transactional
     public int deleteByUserId(Long userId){
         return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());

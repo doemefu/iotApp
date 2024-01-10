@@ -17,9 +17,13 @@ import ch.furchert.iotapp.util.payload.request.VerifyRequest;
 import ch.furchert.iotapp.util.payload.response.JwtResponse;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
+import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,7 +36,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
-@CrossOrigin(origins = "*", maxAge = 3600)
+@CrossOrigin(origins = "https://furchert.ch", allowCredentials = "true", maxAge = 3600)
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
@@ -96,27 +100,27 @@ public class AuthController {
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
-        //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
+        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails
                                 .getAuthorities()
                                 .stream()
                                 .map(GrantedAuthority::getAuthority)
-                                .collect(Collectors.toList());
+                                .toList();
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
-        //ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getAccessToken());
+        ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
 
         return ResponseEntity.ok()
-                //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
-                //.header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(
-                    //new UserInfoResponse(
-                    new JwtResponse(
-                            jwt,
-                            refreshToken.getToken(),
+                    new UserInfoResponse(
+                    //new JwtResponse(
+                            //jwt,
+                            //refreshToken.getToken(),
                             userDetails.getId(),
                             userDetails.getUsername(),
                             userDetails.getEmail(),
@@ -189,8 +193,9 @@ public class AuthController {
         emailService.sendSimpleMessage(
                 user.getEmail(),
                 "Verify email",
-                "Hello, " + user.getUsername() + " \\n To verify your email, click the link below:\\n" +
-                "https://localhost:3000/auth/verifyEmail?token=" + token
+                "Hello, " + user.getUsername() + " \n To verify your email, click the link below:\n " +
+                //"https://localhost:3000/auth/verifyEmail?token=" + token
+                "https://furchert.ch/auth/verifyEmail?token=" + token
         );
 
         return ResponseEntity
@@ -229,30 +234,40 @@ public class AuthController {
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);
+        ResponseCookie emptyJwtCookie = jwtUtils.getCleanJwtCookie();
+        ResponseCookie emptyJwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
         return ResponseEntity
                 .ok()
+                .header(HttpHeaders.SET_COOKIE, emptyJwtCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, emptyJwtRefreshCookie.toString())
                 .body(new MessageResponse("You've been signed out!"));
     }
 
     @PostMapping("/refreshtoken")
-    public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
-        //String refreshToken = jwtUtils.getJwtRefreshFromCookies(request);
-        String requestRefreshToken = request.getRefreshToken();
+    //public ResponseEntity<?> refreshtoken(@Valid @RequestBody TokenRefreshRequest request) {
+    public ResponseEntity<?> refreshtoken(HttpServletRequest request) {
+        String requestRefreshToken = jwtUtils.getJwtRefreshFromCookies(request);
+        //String requestRefreshToken = request.getRefreshToken();
 
         if ((requestRefreshToken != null) && (!requestRefreshToken.isEmpty())) {
             return refreshTokenService.findByToken(requestRefreshToken)
                     .map(refreshTokenService::verifyExpiration)
                     .map(RefreshToken::getUser)
                     .map(user -> {
-                        //ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
-                        String newToken = jwtUtils.generateTokenFromUsername(user.getUsername());
+                        ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(user);
+                        //String newToken = jwtUtils.generateTokenFromUsername(user.getUsername());
+
+                        //Use the old refresh token to issue a new one
+                        RefreshToken refreshToken = refreshTokenService.useToken(requestRefreshToken);
+                        ResponseCookie jwtRefreshCookie = jwtUtils.replaceRefreshJwtCookie(refreshToken);
+
                         return ResponseEntity
                                 .ok()
-                                //.header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
+                                .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                                 .body(
-                                        //TODO: issue new refresh token
-                                        new TokenRefreshResponse(newToken, requestRefreshToken)
-                                        //new MessageResponse("Token is refreshed successfully!")
+                                        //new TokenRefreshResponse(newToken, requestRefreshToken)
+                                        new MessageResponse("Token is refreshed successfully!")
                         );
                     })
                     .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,

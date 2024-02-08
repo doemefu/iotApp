@@ -1,10 +1,9 @@
 package ch.furchert.iotapp.service;
 
+import org.springframework.messaging.MessagingException;
+
 import java.io.IOException;
 import java.util.Map;
-
-
-import org.springframework.messaging.MessagingException;
 
 public interface EmailService {
     void sendSimpleMessage(String to,

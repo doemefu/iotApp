@@ -1,14 +1,13 @@
 package ch.furchert.iotapp.controller;
 
 import ch.furchert.iotapp.model.User;
+import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.service.EmailServiceImpl;
 import ch.furchert.iotapp.service.EmailTokenService;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.ForgotPasswordRequest;
 import ch.furchert.iotapp.util.payload.request.ResetPasswordRequest;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
-import ch.furchert.iotapp.repository.UserRepository;
-
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;

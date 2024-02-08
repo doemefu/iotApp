@@ -22,7 +22,7 @@ public class DataController {
     public ResponseEntity<List<FluxRecord>> getInfluxData() {
         System.out.println("Getting data from InfluxDB");
         List<FluxRecord> records = influxService.query();
-        System.out.println("die records: " + records);
+        //System.out.println("die records: " + records);
         return new ResponseEntity<>(records, HttpStatus.OK);
     }
 }

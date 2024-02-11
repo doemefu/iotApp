@@ -1,0 +1,12 @@
+{
+  "schedules": [
+    {
+      "description": "Jede halbe Stunde",
+      "cronExpression": "0 0/30 * * * ?"
+    },
+    {
+      "description": "Zweimal am Tag",
+      "cronExpression": "0 0 8,20 * * ?"
+    }
+  ]
+}

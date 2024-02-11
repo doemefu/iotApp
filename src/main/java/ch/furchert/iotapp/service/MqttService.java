@@ -10,8 +10,12 @@ import org.springframework.stereotype.Component;
 
 @Component
 
-public class TestMqttClient implements CommandLineRunner {
+public class MqttService implements CommandLineRunner {
 
+//CommandlineRunner is used to run the method when the application starts
+//As the conventional approach, I have the data population code in a
+// CommandLineRunner method of the @SpringBootApplication class and the data
+// retrieval code in a @PostConstruct method of a service class.
 
     String topic = "javaBackend/mqtt/status";
     String content = "Message from MqttPublishSample";
@@ -19,7 +23,7 @@ public class TestMqttClient implements CommandLineRunner {
     String broker = "tcp://cloud.tbz.ch:1883";
     String clientId = "JavaBackend";
     MemoryPersistence persistence = new MemoryPersistence();
-
+    MqttClient sampleClient;
     @Override
     public void run(String... args) throws Exception {
         testMqtt();
@@ -27,7 +31,7 @@ public class TestMqttClient implements CommandLineRunner {
     public void testMqtt() {
 
         try {
-            MqttClient sampleClient = new MqttClient(this.broker, clientId, persistence);
+            sampleClient = new MqttClient(this.broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
             connOpts.setCleanSession(true);
             System.out.println("Connecting to broker: " + broker);
@@ -41,14 +45,24 @@ public class TestMqttClient implements CommandLineRunner {
             sampleClient.disconnect();
             System.out.println("Disconnected");
             //System.exit(0);
-        } catch (
-                MqttException me) {
+        } catch (MqttException me) {
             System.out.println("reason " + me.getReasonCode());
             System.out.println("msg " + me.getMessage());
             System.out.println("loc " + me.getLocalizedMessage());
             System.out.println("cause " + me.getCause());
             System.out.println("excep " + me);
             me.printStackTrace();
+        }
+    }
+
+    public void sendMessage(String topic, String message) {
+        MqttMessage message2 = new MqttMessage(message.getBytes());
+        message2.setQos(qos);
+
+        try {
+            sampleClient.publish(topic, message2);
+        } catch (MqttException e) {
+            throw new RuntimeException(e);
         }
     }
 }

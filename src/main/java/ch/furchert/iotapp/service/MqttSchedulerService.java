@@ -1,18 +1,20 @@
 package ch.furchert.iotapp.service;
 
-import ch.furchert.iotapp.model.ScheduleConfig;
+import ch.furchert.iotapp.config.ScheduleConfig;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class MqttSchedulerService {
@@ -29,17 +31,17 @@ public class MqttSchedulerService {
     @PostConstruct
     public void scheduleTasksBasedOnConfig() {
         try {
-            // Pfad zur JSON-Konfigurationsdatei
-            String configPath = resourceLoader.getResource("classpath:schedules.json").getURI().getPath();
-            ScheduleConfig config = new ObjectMapper().readValue(
-                    Files.readAllBytes(Paths.get(configPath)),
-                    ScheduleConfig.class);
+            // Direktes Lesen der Ressource als Stream
+            Resource resource = resourceLoader.getResource("classpath:schedules.json");
+            ScheduleConfig config = new ObjectMapper().readValue(resource.getInputStream(), ScheduleConfig.class);
 
             List<ScheduleConfig.Schedule> schedules = config.getSchedules();
             schedules.forEach(schedule -> taskScheduler.schedule(() -> {
-                // Hier Logik zum Senden der MQTT-Nachricht einfügen
-                mqttService.sendMessage("your/topic", "Test Message");
-            }, new CronTrigger(schedule.getCronExpression())));
+                // Verwenden der Werte für 'topic' und 'payload' aus der Konfiguration
+                if(Objects.equals(schedule.getActive(), "true")){
+                    mqttService.sendMessage(schedule.getTopic(), String.valueOf(LocalDateTime.now()), true);
+                }
+            }, new CronTrigger(schedule.getCronExpression(), ZoneId.of("Europe/Zurich"))));
         } catch (IOException e) {
             e.printStackTrace();
         }

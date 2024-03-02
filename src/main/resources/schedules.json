@@ -1,12 +1,36 @@
 {
   "schedules": [
     {
+      "title": "test",
       "description": "Jede halbe Stunde",
-      "cronExpression": "0 0/30 * * * ?"
+      "topic": "javaBackend/mqtt/scheduletopic",
+      "payload": "{\"Hallo\": eine weitere halbe Stunde ist vergangen}",
+      "cronExpression": "0 0/30 * * * ?",
+      "active": "false"
     },
     {
-      "description": "Zweimal am Tag",
-      "cronExpression": "0 0 8,20 * * ?"
+      "title": "Licht an",
+      "description": "Licht um 08:00 an",
+      "topic": "terraGeneral/light/schedule",
+      "payload": "{\"LightState\": 1}",
+      "cronExpression": "0 0 8 * * ?",
+      "active": "true"
+    },
+    {
+      "title": "Licht aus",
+      "description": "Licht um 20:00 aus",
+      "topic": "terraGeneral/light/schedule",
+      "payload": "{\"LightState\": 0}",
+      "cronExpression": "0 0 20 * * ?",
+      "active": "true"
+    },
+    {
+      "title": "Regen",
+      "description": "Regen um 07, 09, 17, 19, 21 Uhr",
+      "topic": "terraGeneral/rain/schedule",
+      "payload": "{\"RainState\": 1}",
+      "cronExpression": "0 0 7,9,11,19,21 * * ?",
+      "active": "true"
     }
   ]
 }

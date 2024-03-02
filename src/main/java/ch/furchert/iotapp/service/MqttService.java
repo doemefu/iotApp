@@ -8,61 +8,79 @@ import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-@Component
-
-public class MqttService implements CommandLineRunner {
+import java.time.LocalDateTime;
 
 //CommandlineRunner is used to run the method when the application starts
 //As the conventional approach, I have the data population code in a
 // CommandLineRunner method of the @SpringBootApplication class and the data
 // retrieval code in a @PostConstruct method of a service class.
 
-    String topic = "javaBackend/mqtt/status";
-    String content = "Message from MqttPublishSample";
-    int qos = 1;
-    String broker = "tcp://cloud.tbz.ch:1883";
-    String clientId = "JavaBackend";
-    MemoryPersistence persistence = new MemoryPersistence();
-    MqttClient sampleClient;
+@Component
+public class MqttService implements CommandLineRunner {
+
+    private final String broker = "tcp://cloud.tbz.ch:1883";
+    private final String clientId = "JavaBackend";
+    private final MemoryPersistence persistence = new MemoryPersistence();
+    private MqttClient sampleClient;
+
     @Override
     public void run(String... args) throws Exception {
-        testMqtt();
+        connect();
+        // Weitere Initialisierungsaktionen hier
     }
-    public void testMqtt() {
 
+    public void connect() {
         try {
-            sampleClient = new MqttClient(this.broker, clientId, persistence);
+            sampleClient = new MqttClient(broker, clientId, persistence);
             MqttConnectOptions connOpts = new MqttConnectOptions();
-            connOpts.setCleanSession(true);
-            System.out.println("Connecting to broker: " + broker);
+            connOpts.setKeepAliveInterval(60);
+            connOpts.setAutomaticReconnect(true);
+
+            String willTopic = "javaBackend/mqtt/status";
+            String willMessage = "{\"MqttState\": 0}";
+            connOpts.setWill(willTopic, willMessage.getBytes(), 1, false);
+
             sampleClient.connect(connOpts);
             System.out.println("Connected");
-            System.out.println("Publishing message: " + content);
-            MqttMessage message = new MqttMessage(content.getBytes());
-            message.setQos(qos);
-            sampleClient.publish(topic, message);
-            System.out.println("Message published");
-            sampleClient.disconnect();
-            System.out.println("Disconnected");
-            //System.exit(0);
+
+            // Willkommensnachricht senden, die als "retained" markiert ist
+            sendMessage("javaBackend/mqtt/status", "{\"MqttState\": 1}", true);
+            sendMessage("javaBackend/mqtt/scheduletopic", "Hello from the Backend! Its " + LocalDateTime.now() + " here", true);
+
         } catch (MqttException me) {
-            System.out.println("reason " + me.getReasonCode());
-            System.out.println("msg " + me.getMessage());
-            System.out.println("loc " + me.getLocalizedMessage());
-            System.out.println("cause " + me.getCause());
-            System.out.println("excep " + me);
-            me.printStackTrace();
+            handleMqttException(me);
         }
     }
 
-    public void sendMessage(String topic, String message) {
-        MqttMessage message2 = new MqttMessage(message.getBytes());
-        message2.setQos(qos);
-
+    public void sendMessage(String topic, String message, boolean retained) {
         try {
-            sampleClient.publish(topic, message2);
-        } catch (MqttException e) {
-            throw new RuntimeException(e);
+            MqttMessage mqttMessage = new MqttMessage(message.getBytes());
+            mqttMessage.setQos(1);
+            mqttMessage.setRetained(retained);
+            sampleClient.publish(topic, mqttMessage);
+            System.out.println("Message published to topic \"" + topic + "\": " + message);
+        } catch (MqttException me) {
+            handleMqttException(me);
+        }
+    }
+
+    private void handleMqttException(MqttException me) {
+        System.out.println("reason " + me.getReasonCode());
+        System.out.println("msg " + me.getMessage());
+        System.out.println("loc " + me.getLocalizedMessage());
+        System.out.println("cause " + me.getCause());
+        System.out.println("excep " + me);
+        me.printStackTrace();
+    }
+
+    public void disconnect() {
+        try {
+            if (sampleClient != null) {
+                sampleClient.disconnect();
+                System.out.println("Disconnected");
+            }
+        } catch (MqttException me) {
+            handleMqttException(me);
         }
     }
 }

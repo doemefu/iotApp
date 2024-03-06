@@ -8,6 +8,7 @@ public class ScheduleConfig {
     public List<Schedule> getSchedules() {
         return schedules;
     }
+
     public void setSchedules(List<Schedule> schedules) {
         this.schedules = schedules;
     }

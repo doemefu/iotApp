@@ -27,6 +27,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.security.SecureRandom;
 import java.util.Arrays;
+import java.util.List;
 
 
 @Configuration
@@ -37,10 +38,9 @@ import java.util.Arrays;
 public class WebSecurityConfig {
 
     @Autowired
-    private AuthEntryPointJwt unauthorizedHandler;
-
-    @Autowired
     UserDetailsServiceImpl userDetailsService;
+    @Autowired
+    private AuthEntryPointJwt unauthorizedHandler;
 
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
@@ -72,7 +72,7 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception{
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
     }
 
@@ -81,7 +81,7 @@ public class WebSecurityConfig {
         http
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(AbstractHttpConfigurer::disable)
-                .exceptionHandling(exception-> exception.authenticationEntryPoint(unauthorizedHandler))
+                .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
@@ -92,7 +92,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/get/**").permitAll()
                                 .requestMatchers("/api/user-management/forgotPassword").permitAll()
                                 .requestMatchers("/api/user-management/resetPassword").permitAll()
-                            .anyRequest().authenticated()
+                                .anyRequest().authenticated()
                 )
                 /*old
                 .authorizeRequests((requests) -> requests
@@ -123,8 +123,8 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("*"));
-        configuration.setAllowedMethods(Arrays.asList("GET","POST","OPTIONS"));
+        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));
 

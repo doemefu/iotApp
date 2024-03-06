@@ -11,7 +11,6 @@ import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.Objects;
@@ -38,7 +37,7 @@ public class MqttSchedulerService {
             List<ScheduleConfig.Schedule> schedules = config.getSchedules();
             schedules.forEach(schedule -> taskScheduler.schedule(() -> {
                 // Verwenden der Werte für 'topic' und 'payload' aus der Konfiguration
-                if(Objects.equals(schedule.getActive(), "true")){
+                if (Objects.equals(schedule.getActive(), "true")) {
                     mqttService.sendMessage(schedule.getTopic(), schedule.getPayload(), true);
                 }
             }, new CronTrigger(schedule.getCronExpression(), ZoneId.of("Europe/Zurich"))));

@@ -35,7 +35,7 @@ public class User {
 
     //TODO: Check fetch type
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_role",
+    @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
@@ -53,7 +53,8 @@ public class User {
     @Column(name = "changed_at")
     private Date changedAt;
 
-    public User() { }
+    public User() {
+    }
 
     public User(String username, String email, String password) {
         this.username = username;

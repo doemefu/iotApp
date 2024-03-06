@@ -16,13 +16,11 @@ import java.util.Optional;
 public class EmailTokenService {
 
     @Autowired
+    PasswordEncoder encoder;
+    @Autowired
     private EmailTokenRepository emailTokenRepository;
-
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    PasswordEncoder encoder;
 
     public void createEmailTokenForUser(User user, String token) {
         EmailToken myToken = new EmailToken();

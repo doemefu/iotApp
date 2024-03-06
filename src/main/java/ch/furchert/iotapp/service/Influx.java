@@ -15,15 +15,13 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class Influx {
 
-    private InfluxDBClient influxDBClient;
-    private QueryApi queryApi;
-
     //private static final char[] token = "ovfI55M7pjuw15bmeqKhwbO1FdyXcgw_1oD1nEhNnvn7B_dibqK0TGunR-a4HMif_GCo6cbSh_8_vP0kX_kWXw==".toCharArray();
     private static final char[] token = "EgdYFJOptmMPvxKs-NH7aeAJJ7GznekrgARnYeM64tts2yeF2p396dT-BBJiEWVbKGBLF6D1hwPRYwKbDPBvmA==".toCharArray();
     private static final String org = "iotApp";
     private static final String bucket = "Terrarium";
     private static final String InfluxURL = "http://influxdb:8086";
-
+    private InfluxDBClient influxDBClient;
+    private QueryApi queryApi;
 
     @PostConstruct
     public void init() {

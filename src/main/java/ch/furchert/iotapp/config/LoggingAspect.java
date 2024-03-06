@@ -26,17 +26,15 @@ import java.time.LocalDateTime;
 public class LoggingAspect {
 
     private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
+    private final Logger log = LoggerFactory.getLogger(this.getClass());
     @Autowired
     private LogEntryRepository logEntryRepository;
-
     @Autowired
     private UserRepository userRepository;
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
     @Pointcut("execution(* ch.furchert.iotapp.controller.*.*(..))")
-    public void authControllerMethods() {}
+    public void authControllerMethods() {
+    }
 
     @AfterReturning(pointcut = "authControllerMethods()", returning = "result")
     public void logMethodCall(JoinPoint joinPoint, Object result) {

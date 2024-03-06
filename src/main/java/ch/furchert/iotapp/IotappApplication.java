@@ -12,8 +12,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @EnableScheduling
 public class IotappApplication {
 
-	public static void main(String[] args) {
-		SpringApplication.run(IotappApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(IotappApplication.class, args);
+    }
 
 }

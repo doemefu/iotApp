@@ -39,7 +39,7 @@ public class MqttSchedulerService {
             schedules.forEach(schedule -> taskScheduler.schedule(() -> {
                 // Verwenden der Werte für 'topic' und 'payload' aus der Konfiguration
                 if(Objects.equals(schedule.getActive(), "true")){
-                    mqttService.sendMessage(schedule.getTopic(), String.valueOf(LocalDateTime.now()), true);
+                    mqttService.sendMessage(schedule.getTopic(), schedule.getPayload(), true);
                 }
             }, new CronTrigger(schedule.getCronExpression(), ZoneId.of("Europe/Zurich"))));
         } catch (IOException e) {

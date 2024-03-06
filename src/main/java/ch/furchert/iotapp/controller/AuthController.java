@@ -12,11 +12,8 @@ import ch.furchert.iotapp.service.RefreshTokenService;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import ch.furchert.iotapp.util.payload.request.LoginRequest;
 import ch.furchert.iotapp.util.payload.request.RegisterRequest;
-import ch.furchert.iotapp.util.payload.request.TokenRefreshRequest;
 import ch.furchert.iotapp.util.payload.request.VerifyRequest;
-import ch.furchert.iotapp.util.payload.response.JwtResponse;
 import ch.furchert.iotapp.util.payload.response.MessageResponse;
-import ch.furchert.iotapp.util.payload.response.TokenRefreshResponse;
 import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
@@ -34,7 +31,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @CrossOrigin(origins = "https://furchert.ch", allowCredentials = "true", maxAge = 3600)
 @RestController
@@ -229,8 +225,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
-        System.out.println("logoutUser" + authorizationHeader);
+    //public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        String someHeaders = String.valueOf(request.getHeaderNames());
+
+        //System.out.println("logoutUser" + authorizationHeader);
+        System.out.println("logoutUser" + someHeaders);
+
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);

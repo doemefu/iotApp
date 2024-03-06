@@ -1,14 +1,13 @@
 package ch.furchert.iotapp.model;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Date;
-
 import jakarta.persistence.*;
-
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "user_accounts",

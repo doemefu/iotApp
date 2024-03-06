@@ -3,7 +3,6 @@ package ch.furchert.iotapp.service;
 import ch.furchert.iotapp.model.User;
 import ch.furchert.iotapp.model.UserStatus;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

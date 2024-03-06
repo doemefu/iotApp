@@ -225,8 +225,13 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
-        System.out.println("logoutUser" + authorizationHeader);
+    //public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity<?> logoutUser(HttpServletRequest request) {
+        String someHeaders = String.valueOf(request.getHeaderNames());
+
+        //System.out.println("logoutUser" + authorizationHeader);
+        System.out.println("logoutUser" + someHeaders);
+
         UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         Long userId = userDetails.getId();
         refreshTokenService.deleteByUserId(userId);

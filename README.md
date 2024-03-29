@@ -129,6 +129,41 @@ Dieser Token wird zurück an den Client gesendet und von ihm gespeichert.
 Sobald der User eine neue Request an den Server sendet, bspw. beim Wechsel von seinem Userprofil zur Startseite, wird nun dieser JWT mitgegeben.
 Anschliessend wird dieser vom Server validiert und die Respons wird zurück an den Client gesendet.
 
+# Improvements
+
+## Datenbank
+
+Im Rahmen des Moduls xxx wurden diverse Verbesserung der Datenbankperformance und -sicherheit umgesetzt. Dies umfasst
+unter anderem die folgenden Änderungen:
+
+### System-Versioned Tables
+
+[MariaDB Doku](https://mariadb.com/kb/en/system-versioned-tables/)
+```sql
+alter table user_accounts add system versioning;
+alter table user_role add system versioning;
+```
+
+Dann kam aber das raus:
+```bash
+MariaDB [mydatabase]> Select * from user_accounts for system_time AS OF TIMESTAMP'2024-03-27 15:00:00';
++----+----------------------------+----------------------------+--------------------------+--------------------------------------------------------------+-------------+-----------+
+| id | changed_at                 | created_at                 | email                    | password                                                     | username    | status_id |
++----+----------------------------+----------------------------+--------------------------+--------------------------------------------------------------+-------------+-----------+
+|  1 | 2023-12-15 20:50:46.858000 | 2023-12-15 20:50:31.010000 | dominicfur@gmail.com     | $2y$10$MWRes8gjSw26CWYmzOkQAuytaqMYG0iOy9PgfdJFd8FXoXy.526Am | dominicfur  |         2 |
+|  2 | 2023-12-16 10:30:46.406000 | 2023-12-16 10:30:36.630000 | domifur@hotmail.com      | $2y$10$2O1tpusKDXleiXwLP1J3yu/Vu0NDy10dfln4uyVhmuYupfcZrps9u | dominicfur2 |         2 |
+|  3 | 2023-12-20 09:55:28.079000 | 2023-12-20 09:55:28.079000 | david.egeler@edu.tbz.ch  | $2y$10$TgqKfNq0fmZMobp5CN1oRO7u5km.vJmY1UNby5M/wOPTmHnHpVtO2 | david       |         1 |
+|  4 | 2023-12-20 10:10:51.247000 | 2023-12-20 10:10:31.560000 | david.egeler@hotmail.com | $2y$10$6oxnN4gESOrUoyxbqKygGuUwVzjZDYPOVd1bkgQUm2I3zB2f3sB/C | david1      |         2 |
+|  5 | 2024-03-27 15:11:57.337000 | 2024-03-27 15:11:57.337000 | test@test.test           | $2y$10$ugXAlp1JoSNUmkU23swEfeV4wubPVpJER/Tz/va1NnPoLqGhvj1CC | test        |         1 |
+|  6 | 2024-03-27 15:12:40.704000 | 2024-03-27 15:12:40.704000 | test@gmail.com           | $2y$10$s2AoaQXFwdoMGTvScp/qF.z5bb.7D3KPv8qeRxftRFku31cPmeUM. | test123     |         1 |
++----+----------------------------+----------------------------+--------------------------+--------------------------------------------------------------+-------------+-----------+
+```
+deshalb musste ich:
+```sql
+SET GLOBAL time_zone = 'Europe/Zurich';
+```
+und restarten
+
 # Umsetzung
 
 Die Applikation ist als 4 Tier Architektur aufgebaut. Sie besteht aus einer Client-, Presentation-, Application- und Data-Storage-Schicht.

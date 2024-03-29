@@ -25,20 +25,22 @@ public class UserDetailsImpl implements UserDetails {
     private final String password;
     private final Collection<? extends GrantedAuthority> authorities;
     private final UserStatus userStatus;
-    private final Date createdAt;
-    private final Date changedAt;
+    private final Date created;
+    private final Date updated;
+    private final Date lastLogin;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities,
-                           UserStatus userStatus, Date createdAt, Date changedAt) {
+                           UserStatus userStatus, Date created, Date updated, Date lastLogin) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.userStatus = userStatus;
-        this.createdAt = createdAt;
-        this.changedAt = changedAt;
+        this.created = created;
+        this.updated = updated;
+        this.lastLogin = lastLogin;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -55,8 +57,9 @@ public class UserDetailsImpl implements UserDetails {
                 user.getPassword(),
                 authorities,
                 user.getUserStatus(),
-                user.getCreatedAt(),
-                user.getChangedAt()
+                user.getCreated(),
+                user.getUpdated(),
+                user.getLastLogin()
         );
     }
 
@@ -87,12 +90,12 @@ public class UserDetailsImpl implements UserDetails {
         return userStatus;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreated() {
+        return created;
     }
 
-    public Date getChangedAt() {
-        return changedAt;
+    public Date getUpdated() {
+        return updated;
     }
 
     @Override
@@ -115,6 +118,9 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
+    public Date getLastLogin() {
+        return lastLogin;
+    }
 
     @Override
     public boolean equals(Object o) {

@@ -1,7 +1,12 @@
 package ch.furchert.iotapp.service;
 
+import ch.furchert.iotapp.model.Terrarium;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.integration.annotation.IntegrationComponentScan;
 import org.springframework.stereotype.Service;
@@ -18,15 +23,43 @@ import java.util.Arrays;
 @IntegrationComponentScan
 public class MqttService implements CommandLineRunner {
 
-    private final String broker = "tcp://cloud.tbz.ch:1883";
+    private static final Logger log = LoggerFactory.getLogger(MqttService.class);
+    @Value("${furchert.iotapp.mqttBroker}")
+    private String broker;
+
     private final String clientId = "JavaBackend";
+
     private final MemoryPersistence persistence = new MemoryPersistence();
+
     private MqttClient sampleClient;
+
+    @Autowired
+    private TerrariumManagementService terrariumManagementService;
+
+    private final String[] topics = {
+            "terra1/mqtt/status",
+            "terra1/light",
+            "terra1/light/man",
+            "terra1/rain",
+            "terra1/rain/man",
+            "terra1/SHT35/data",
+            "terra2/mqtt/status",
+            "terra2/light",
+            "terra2/light/man",
+            "terra2/rain",
+            "terra2/rain/man",
+            "terra2/SHT35/data"
+    };
 
     @Override
     public void run(String... args) throws Exception {
         connect();
-        // Weitere Initialisierungsaktionen hier
+
+        // Durch alle Topics iterieren und jedes abonnieren
+        for (String topic : this.topics) {
+            subscribe(topic);
+        }
+
     }
 
     public void connect() {
@@ -49,7 +82,6 @@ public class MqttService implements CommandLineRunner {
                 @Override
                 public void messageArrived(String topic, MqttMessage message) throws Exception {
                     handleIncomingMessage(topic, message);
-                    System.out.println(topic + ": " + Arrays.toString(message.getPayload()));
                 }
 
                 @Override
@@ -90,7 +122,22 @@ public class MqttService implements CommandLineRunner {
     }
 
     public void handleIncomingMessage(String topic, MqttMessage message) {
-        System.out.println("Incoming message: " + topic + ": " + Arrays.toString(message.getPayload()));
+
+        String messageString = message.toString();
+
+        System.out.println("Incoming message: " + topic + ": " + messageString);
+
+        if(topic.contains("terra1")){
+            Terrarium terrarium = terrariumManagementService.getTerrarium("terra1");
+            updateTerra(messageString, terrarium);
+        } else if (topic.contains("terra2")) {
+            Terrarium terrarium = terrariumManagementService.getTerrarium("terra2");
+            updateTerra(messageString, terrarium);
+        } else if (topic.contains("telegramBot")) {
+            handleTelegramBot(messageString);
+        } else {
+            log.warn("Unknown topic incoming: {}", topic);
+        }
     }
 
     private void handleMqttException(MqttException me) {
@@ -111,5 +158,23 @@ public class MqttService implements CommandLineRunner {
         } catch (MqttException me) {
             handleMqttException(me);
         }
+    }
+
+    private void updateTerra(String message, Terrarium terrarium) {
+        if (message.contains("SHT35")) {
+            String[] data = message.split(" ");
+            terrarium.setTemperature(Double.parseDouble(data[1]));
+            terrarium.setHumidity(Double.parseDouble(data[2]));
+        } else if (message.contains("light")) {
+            terrarium.setLightOn(message.contains("1"));
+        } else if (message.contains("rain")) {
+            terrarium.setRainOn(message.contains("1"));
+        } else if (message.contains("nightLight")) {
+            terrarium.setNightLightOn(message.contains("1"));
+        }
+    }
+
+    private void handleTelegramBot(String message) {
+        //TODO: Implementieren
     }
 }

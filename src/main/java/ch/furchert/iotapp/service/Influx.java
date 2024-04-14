@@ -52,7 +52,6 @@ public class Influx {
                   |> aggregateWindow(every: 30m, fn: mean, createEmpty: false)
                   |> yield(name: "mean")""";
 
-        //                  |> filter(fn: (r) => r["device"] == "terra1")
         List<FluxRecord> records = new ArrayList<>();
 
         AtomicBoolean done = new AtomicBoolean(false);

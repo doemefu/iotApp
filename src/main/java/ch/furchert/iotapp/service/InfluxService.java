@@ -6,6 +6,7 @@ import com.influxdb.client.QueryApi;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 
+import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
@@ -55,7 +56,24 @@ public class InfluxService {
         // Führe die Abfrage aus und mappe die Ergebnisse auf MeasurementData-Objekte
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
+    public List<InfluxTerraData> queryMeasurementData(Instant start, Instant end) {
+        // Erstelle die Flux-Abfrage mit dem flux-dsl Query Builder
+        Flux fluxQuery = Flux
+                .from("Terrarium")
+                .range(start, end)
+                .filter(Restrictions.or(
+                        Restrictions.field().equal("Humidity"),
+                        Restrictions.field().equal("Temperature")
+                ))
+                .aggregateWindow(15L, ChronoUnit.MINUTES, "mean")
+                .keep(new String[]{"_field", "_time", "application", "device", "_value"})
+                .yield("median");
 
+        QueryApi queryApi = this.influxDBClient.getQueryApi();
+
+        // Führe die Abfrage aus und mappe die Ergebnisse auf MeasurementData-Objekte
+        return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
+    }
     public void close() {
         if (this.influxDBClient != null) {
             this.influxDBClient.close();

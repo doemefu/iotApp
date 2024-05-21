@@ -14,23 +14,23 @@ public class UserStatus {
     @Column(length = 20)
     private EUserStatus name;
 
-    private Date created;
-    private Date updated;
+    //private Date created;
+    //private Date updated;
 
     public UserStatus() {
 
     }
 
-    @PrePersist
-    protected void onCreate() {
-        this.created = new Date();
-        this.updated = new Date();
-    }
+    //@PrePersist
+    //protected void onCreate() {
+    //    this.created = new Date();
+    //    this.updated = new Date();
+    //}
 
-    @PreUpdate
-    protected void onUpdate() {
-        this.updated = new Date();
-    }
+    //@PreUpdate
+    //protected void onUpdate() {
+    //    this.updated = new Date();
+    //}
 
     public UserStatus(EUserStatus name) {
         this.name = name;

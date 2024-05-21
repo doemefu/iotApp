@@ -85,31 +85,12 @@ public class WebSecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
                         auth.requestMatchers("/api/auth/**").permitAll()
-                                //.requestMatchers("/api/auth/register").permitAll()
-                                //.requestMatchers("/api/auth/verifyEmail").permitAll()
-                                //.requestMatchers("/api/auth/login").permitAll()
-                                //.requestMatchers("/api/auth/logout").permitAll()
                                 .requestMatchers("/api/get/**").permitAll()
                                 .requestMatchers("/api/user-management/forgotPassword").permitAll()
                                 .requestMatchers("/api/user-management/resetPassword").permitAll()
+                                .requestMatchers("/api/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                /*old
-                .authorizeRequests((requests) -> requests
-                        .requestMatchers( "/register").permitAll()
-                        .anyRequest().authenticated()
-                )
-                .formLogin((form) -> form
-                        .loginPage("https://localhost:3000/login")
-                        // https://www.baeldung.com/spring-redirect-after-login
-                        .defaultSuccessUrl("https://localhost:3000/home", true)
-                        .permitAll()
-                )
-                .logout((logout) -> logout
-                        .logoutSuccessUrl("https://localhost:3000/home")
-                        .permitAll()
-                )
-                */
         ;
 
         http.authenticationProvider(authenticationProvider());
@@ -123,7 +104,7 @@ public class WebSecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("*"));
+        configuration.setAllowedOrigins(List.of("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));

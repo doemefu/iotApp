@@ -25,7 +25,7 @@ public class MqttSchedulerService {
     private ResourceLoader resourceLoader;
 
     @Autowired
-    private MqttService mqttService;
+    private MqttClientService mqttClientService;
 
     @PostConstruct
     public void scheduleTasksBasedOnConfig() {
@@ -38,7 +38,7 @@ public class MqttSchedulerService {
             schedules.forEach(schedule -> taskScheduler.schedule(() -> {
                 // Verwenden der Werte für 'topic' und 'payload' aus der Konfiguration
                 if (Objects.equals(schedule.getActive(), "true")) {
-                    mqttService.sendMessage(schedule.getTopic(), schedule.getPayload(), true);
+                    mqttClientService.publish(schedule.getTopic(), schedule.getPayload(), 1, true);
                 }
             }, new CronTrigger(schedule.getCronExpression(), ZoneId.of("Europe/Zurich"))));
         } catch (IOException e) {

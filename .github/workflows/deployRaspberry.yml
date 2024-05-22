@@ -33,10 +33,7 @@ jobs:
 
       - name: Save Docker image
         run: |
-          mkdir -p ${{ github.workspace }}/docker-images # Erstellt ein Verzeichnis für das Image
-          docker save -o . iot-app:back
-          ls -lh ${{ github.workspace }}/docker-images/ # Überprüft die Dateigröße
-
+          docker save iot-app:back
 
   transfer:
     needs: build

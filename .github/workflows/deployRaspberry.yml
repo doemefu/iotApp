@@ -33,6 +33,7 @@ jobs:
         run: docker save -o back-iot-image iot-app:back
 
   transfer:
+    needs: build
     runs-on: ubuntu-latest
     environment:
       name: 'RaspberryPi'
@@ -48,6 +49,7 @@ jobs:
           target: "/home/dfurchert/iotApp/"
 
   deploy:
+    needs: transfer
     runs-on: ubuntu-latest
     environment:
       name: 'RaspberryPi'
@@ -64,6 +66,6 @@ jobs:
             docker stop iotapp-backend-1 || true
             docker rm iotapp-backend-1 || true
             docker load -i back-iot-image
-            docker-compose up -d
+            docker compose up -d
             sleep 300
-            docker-compose restart
+            docker compose restart

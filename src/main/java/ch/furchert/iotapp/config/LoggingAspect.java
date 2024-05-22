@@ -2,22 +2,20 @@ package ch.furchert.iotapp.config;
 
 import ch.furchert.iotapp.model.LogEntry;
 import ch.furchert.iotapp.repository.LogEntryRepository;
-import ch.furchert.iotapp.repository.UserRepository;
-import ch.furchert.iotapp.security.jwt.JwtUtils;
 import ch.furchert.iotapp.service.UserDetailsImpl;
 import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
-import org.aspectj.lang.annotation.Pointcut;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 import java.time.LocalDateTime;
 
@@ -25,46 +23,45 @@ import java.time.LocalDateTime;
 @Component
 public class LoggingAspect {
 
-    private static final Logger logger = LoggerFactory.getLogger(JwtUtils.class);
-
     @Autowired
     private LogEntryRepository logEntryRepository;
 
-    @Autowired
-    private UserRepository userRepository;
+    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
-    private final Logger log = LoggerFactory.getLogger(this.getClass());
-
-    @Pointcut("execution(* ch.furchert.iotapp.controller.*.*(..))")
-    public void authControllerMethods() {}
-
-    @AfterReturning(pointcut = "authControllerMethods()", returning = "result")
+    @AfterReturning(pointcut = "execution(* ch.furchert.iotapp.controller.*.*(..))", returning = "result")
     public void logMethodCall(JoinPoint joinPoint, Object result) {
+        ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 
-        LogEntry logEntry = new LogEntry();
-        UserDetailsImpl userDetails = null;
-
+        String username = "anonymous";
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        Object principal = auth.getPrincipal();
-
-        if (principal instanceof UserDetailsImpl) {
-            userDetails = (UserDetailsImpl) principal;
-            logEntry.setUsername(userDetails.getUsername());
-        } else {
-            logEntry.setUsername("anonymous");
+        if (auth != null && auth.getPrincipal() != null) {
+            Object principal = auth.getPrincipal();
+            if (principal instanceof UserDetailsImpl) {
+                username = ((UserDetailsImpl) principal).getUsername();
+            }
         }
 
-        HttpServletRequest request =
-                ((ServletRequestAttributes) RequestContextHolder.currentRequestAttributes())
-                        .getRequest();
+        if (attributes != null) {
+            HttpServletRequest request = attributes.getRequest();
+            logHttpRequest(joinPoint, result, request, username);
+        } else {
+            logNonHttpRequest(joinPoint, result, username);
+        }
+    }
 
-
+    private void logHttpRequest(JoinPoint joinPoint, Object result, HttpServletRequest request, String username) {
+        LogEntry logEntry = new LogEntry();
+        logEntry.setUsername(username);
         logEntry.setMethodName(joinPoint.getSignature().getName());
-        logEntry.setEndpoint(request.getRequestURI()); // Get the endpoint URL
+        logEntry.setEndpoint(request.getRequestURI());
         logEntry.setTimestamp(LocalDateTime.now());
-
         logEntryRepository.save(logEntry);
 
-        log.info("Method {} returned with value {}", joinPoint.getSignature(), result);
+        logger.info("HTTP Request - Method {} returned with value {}", joinPoint.getSignature(), result);
+    }
+
+    private void logNonHttpRequest(JoinPoint joinPoint, Object result, String username) {
+        // Logging logic for non-HTTP contexts, possibly WebSocket or scheduled tasks
+        logger.info("Non-HTTP Request - User: {}, Method {} executed", username, joinPoint.getSignature());
     }
 }

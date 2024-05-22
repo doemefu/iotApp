@@ -15,20 +15,18 @@ import java.util.UUID;
 
 @Service
 public class RefreshTokenService {
+    @Autowired
+    UserRepository userRepository;
     @Value("${furchert.iotapp.jwtRefreshExpirationMs}")
     private Long refreshTokenDurationMs;
-
     @Autowired
     private RefreshTokenRepository refreshTokenRepository;
 
-    @Autowired
-    UserRepository userRepository;
-
-    public Optional<RefreshToken> findByToken(String token){
+    public Optional<RefreshToken> findByToken(String token) {
         return refreshTokenRepository.findByToken(token);
     }
 
-    public RefreshToken createRefreshToken(Long userId){
+    public RefreshToken createRefreshToken(Long userId) {
         RefreshToken refreshToken = new RefreshToken();
 
         refreshToken.setUser(userRepository.findById(userId).get());
@@ -40,7 +38,7 @@ public class RefreshTokenService {
     }
 
     //Vlt in JwtUtils verschieben
-    public RefreshToken useToken(String oldTokenString){
+    public RefreshToken useToken(String oldTokenString) {
 
         Optional<RefreshToken> oldTokenOpt = refreshTokenRepository.findByToken(oldTokenString);
         RefreshToken oldToken = oldTokenOpt.get();
@@ -70,12 +68,12 @@ public class RefreshTokenService {
     }
 
     @Transactional
-    public int deleteByUserId(Long userId){
+    public int deleteByUserId(Long userId) {
         return refreshTokenRepository.deleteByUser(userRepository.findById(userId).get());
     }
 
     @Transactional
-    public int deleteByToken(RefreshToken token){
+    public int deleteByToken(RefreshToken token) {
         return refreshTokenRepository.deleteByToken(token.getToken());
     }
 

@@ -40,50 +40,50 @@ public class JwtUtils {
         return generateCookie(jwtCookieName, jwt, "/api");
     }
 
-    public ResponseCookie generateJwtCookie(User user){
+    public ResponseCookie generateJwtCookie(User user) {
         String jwt = generateTokenFromUsername(user.getUsername());
         return generateCookie(jwtCookieName, jwt, "/api");
     }
 
-    public ResponseCookie generateRefreshJwtCookie(String refreshToken){
+    public ResponseCookie generateRefreshJwtCookie(String refreshToken) {
         return generateCookie(jwtRefreshCookieName, refreshToken, "/api/auth");
     }
 
-    public ResponseCookie replaceRefreshJwtCookie(RefreshToken refreshToken){
+    public ResponseCookie replaceRefreshJwtCookie(RefreshToken refreshToken) {
         return generateCookie(jwtRefreshCookieName, refreshToken.getToken(), "/api/auth");
     }
 
-    public String getJwtFromCookies(HttpServletRequest request){
+    public String getJwtFromCookies(HttpServletRequest request) {
         return getCookieValueByName(request, jwtCookieName);
     }
 
-    public String getJwtRefreshFromCookies(HttpServletRequest request){
+    public String getJwtRefreshFromCookies(HttpServletRequest request) {
         return getCookieValueByName(request, jwtRefreshCookieName);
     }
 
-    public ResponseCookie getCleanJwtCookie(){
+    public ResponseCookie getCleanJwtCookie() {
         return ResponseCookie.from(jwtCookieName).path("/api").build();
     }
 
-    public ResponseCookie getCleanJwtRefreshCookie(){
+    public ResponseCookie getCleanJwtRefreshCookie() {
         return ResponseCookie.from(jwtRefreshCookieName).path("/api/auth/refreshtoken").build();
     }
 
-    private ResponseCookie generateCookie(String name, String value, String path){
+    private ResponseCookie generateCookie(String name, String value, String path) {
         return ResponseCookie
                 .from(name, value)
                 .path(path)
-                .maxAge(24*60*60)
+                .maxAge(24 * 60 * 60)
                 .httpOnly(true)
                 .secure(true)
                 .sameSite("Lax")
                 .build();
     }
 
-    private String getCookieValueByName(HttpServletRequest request, String name){
+    private String getCookieValueByName(HttpServletRequest request, String name) {
         Cookie cookie = WebUtils.getCookie(request, name);
-        if (cookie != null){
-            System.out.println("cookie: " + cookie.toString());
+        if (cookie != null) {
+            System.out.println("cookie: " + cookie);
             return cookie.getValue();
         } else {
             System.out.println("cookie is null");
@@ -95,7 +95,7 @@ public class JwtUtils {
         return generateTokenFromUsername(userPrincipal.getUsername());
     }
 
-    public String generateTokenFromUsername(String username){
+    public String generateTokenFromUsername(String username) {
         return Jwts.builder()
                 .setSubject(username)
                 .setIssuedAt(new Date())
@@ -104,21 +104,21 @@ public class JwtUtils {
                 .compact();
     }
 
-    public String getUserNameFromJwtToken(String token){
+    public String getUserNameFromJwtToken(String token) {
         return Jwts.parserBuilder().setSigningKey(key()).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    public boolean validateJwtToken(String authToken){
+    public boolean validateJwtToken(String authToken) {
         try {
             Jwts.parserBuilder().setSigningKey(key()).build().parse(authToken);
             return true;
-        }catch (MalformedJwtException e) {
+        } catch (MalformedJwtException e) {
             logger.error("Invalid JWT token: {}", e.getMessage());
-        }catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             logger.error("JWT token is expired: {}", e.getMessage());
-        }catch (UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             logger.error("JWT token is unsupported: {}", e.getMessage());
-        }catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             logger.error("JWT claims string is empty: {}", e.getMessage());
         }
         return false;

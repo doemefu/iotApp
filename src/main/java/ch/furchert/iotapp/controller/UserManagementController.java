@@ -36,12 +36,10 @@ public class UserManagementController {
 
     @Autowired
     EmailServiceImpl emailService;
-
-    @Autowired
-    private EmailTokenService emailTokenService;
-
     @Autowired
     PasswordEncoder encoder;
+    @Autowired
+    private EmailTokenService emailTokenService;
 
     @GetMapping("/showUser/{id}")
     public ResponseEntity<?> getUserById(@PathVariable Long id) {
@@ -142,7 +140,7 @@ public class UserManagementController {
             return ResponseEntity
                     .status(HttpStatus.UNPROCESSABLE_ENTITY)
                     .body(new MessageResponse("User or token not found!")
-            );
+                    );
         }
         user = userOptional.get();
 

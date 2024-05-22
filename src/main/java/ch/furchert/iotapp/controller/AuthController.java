@@ -81,7 +81,7 @@ public class AuthController {
 
         User user = userOptional.get();
 
-        if(user.getUserStatus().getName().equals(EUserStatus.UNVERIFIED)) {
+        if (user.getUserStatus().getName().equals(EUserStatus.UNVERIFIED)) {
             return ResponseEntity
                     .status(HttpStatus.UNAUTHORIZED)
                     .body(new MessageResponse("Verify your email first"));
@@ -94,16 +94,19 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
+        user.setLastLoginNow();
+        userRepository.save(user);
+
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
 
         ResponseCookie jwtCookie = jwtUtils.generateJwtCookie(userDetails);
         String jwt = jwtUtils.generateJwtToken(userDetails);
 
         List<String> roles = userDetails
-                                .getAuthorities()
-                                .stream()
-                                .map(GrantedAuthority::getAuthority)
-                                .toList();
+                .getAuthorities()
+                .stream()
+                .map(GrantedAuthority::getAuthority)
+                .toList();
 
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
@@ -113,15 +116,15 @@ public class AuthController {
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, jwtRefreshCookie.toString())
                 .body(
-                    new UserInfoResponse(
-                    //new JwtResponse(
-                            //jwt,
-                            //refreshToken.getToken(),
-                            userDetails.getId(),
-                            userDetails.getUsername(),
-                            userDetails.getEmail(),
-                            roles
-                    )
+                        new UserInfoResponse(
+                                //new JwtResponse(
+                                //jwt,
+                                //refreshToken.getToken(),
+                                userDetails.getId(),
+                                userDetails.getUsername(),
+                                userDetails.getEmail(),
+                                roles
+                        )
                 );
     }
 
@@ -190,8 +193,8 @@ public class AuthController {
                 user.getEmail(),
                 "Verify email",
                 "Hello, " + user.getUsername() + " \n To verify your email, click the link below:\n " +
-                //"https://localhost:3000/auth/verifyEmail?token=" + token
-                "https://furchert.ch/auth/verifyEmail?token=" + token
+                        //"https://localhost:3000/auth/verifyEmail?token=" + token
+                        "https://furchert.ch/auth/verifyEmail?token=" + token
         );
 
         return ResponseEntity
@@ -210,7 +213,7 @@ public class AuthController {
 
         if (optionalUser.isPresent()) {
             user = optionalUser.get();
-            System.out.println("from user: " + user.toString());
+            System.out.println("from user: " + user);
 
             UserStatus userStatus = userStatusRepository.findByName(EUserStatus.ACTIVE)
                     .orElseThrow(() -> new RuntimeException("Error: Status is not found."));
@@ -269,7 +272,7 @@ public class AuthController {
                                 .body(
                                         //new TokenRefreshResponse(newToken, requestRefreshToken)
                                         new MessageResponse("Token is refreshed successfully!")
-                        );
+                                );
                     })
                     .orElseThrow(() -> new TokenRefreshException(requestRefreshToken,
                             "Refresh token is not in database!"));

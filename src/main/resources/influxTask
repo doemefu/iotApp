@@ -1,0 +1,42 @@
+option task = {name: "Terrarium 5 min resolution", every: 1d, offset: 20m}
+
+data =
+    from(bucket: "Terrarium")
+        |> range(start: -1d)
+        |> filter(fn: (r) => r.type == "data")
+
+// Temperature Data
+temperatureData =
+    data
+        |> filter(fn: (r) => r._field == "Temperature" && r.device == "terra1")
+        |> aggregateWindow(every: 5m, fn: median, createEmpty: false)
+        |> timeShift(duration: 2m30s)
+        |> map(
+            fn: (r) =>
+                ({
+                    _time: r._time,
+                    _value: r._value,
+                    _field: "Median_5min",
+                    device: "terra1",
+                    _measurement: "temperature",
+                }),
+        )
+        |> to(bucket: "Terrarium_H_5MIN")
+
+// Humidity Data
+humidityData =
+    data
+        |> filter(fn: (r) => r._field == "Humidity" && r.device == "terra1")
+        |> aggregateWindow(every: 5m, fn: median, createEmpty: false)
+        |> timeShift(duration: 2m30s)
+        |> map(
+            fn: (r) =>
+                ({
+                    _time: r._time,
+                    _value: r._value,
+                    _field: "Median_5min",
+                    device: "terra1",
+                    _measurement: "humidity",
+                }),
+        )
+        |> to(bucket: "Terrarium_H_5MIN")

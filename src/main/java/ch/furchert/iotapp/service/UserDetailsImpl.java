@@ -18,27 +18,29 @@ public class UserDetailsImpl implements UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
-    private Long id;
-    private String username;
-    private String email;
+    private final Long id;
+    private final String username;
+    private final String email;
     @JsonIgnore
-    private String password;
-    private Collection<? extends GrantedAuthority> authorities;
-    private UserStatus userStatus;
-    private Date createdAt;
-    private Date changedAt;
+    private final String password;
+    private final Collection<? extends GrantedAuthority> authorities;
+    private final UserStatus userStatus;
+    private final Date created;
+    private final Date updated;
+    private final Date lastLogin;
 
     public UserDetailsImpl(Long id, String username, String email, String password,
                            Collection<? extends GrantedAuthority> authorities,
-                           UserStatus userStatus, Date createdAt, Date changedAt){
+                           UserStatus userStatus, Date created, Date updated, Date lastLogin) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.password = password;
         this.authorities = authorities;
         this.userStatus = userStatus;
-        this.createdAt = createdAt;
-        this.changedAt = changedAt;
+        this.created = created;
+        this.updated = updated;
+        this.lastLogin = lastLogin;
     }
 
     public static UserDetailsImpl build(User user) {
@@ -55,13 +57,14 @@ public class UserDetailsImpl implements UserDetails {
                 user.getPassword(),
                 authorities,
                 user.getUserStatus(),
-                user.getCreatedAt(),
-                user.getChangedAt()
+                user.getCreated(),
+                user.getUpdated(),
+                user.getLastLogin()
         );
     }
 
     @Override
-    public Collection<? extends GrantedAuthority> getAuthorities(){
+    public Collection<? extends GrantedAuthority> getAuthorities() {
         return authorities;
     }
 
@@ -87,12 +90,12 @@ public class UserDetailsImpl implements UserDetails {
         return userStatus;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreated() {
+        return created;
     }
 
-    public Date getChangedAt() {
-        return changedAt;
+    public Date getUpdated() {
+        return updated;
     }
 
     @Override
@@ -115,13 +118,15 @@ public class UserDetailsImpl implements UserDetails {
         return true;
     }
 
-
+    public Date getLastLogin() {
+        return lastLogin;
+    }
 
     @Override
-    public boolean equals(Object o){
-        if(this == o)
+    public boolean equals(Object o) {
+        if (this == o)
             return true;
-        if(o == null || getClass() != o.getClass())
+        if (o == null || getClass() != o.getClass())
             return false;
 
         UserDetailsImpl user = (UserDetailsImpl) o;

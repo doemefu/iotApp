@@ -15,7 +15,7 @@ import org.thymeleaf.templateresolver.ITemplateResolver;
 import java.util.Properties;
 
 @ComponentScan(basePackages = {"ch.furchert.iotapp"})
-@PropertySource(value={"classpath:application.properties"})
+@PropertySource(value = {"classpath:application.properties"})
 public class EmailConfiguration {
 
     @Value("${spring.mail.host}")

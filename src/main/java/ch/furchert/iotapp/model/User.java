@@ -35,7 +35,7 @@ public class User {
 
     //TODO: Check fetch type
     @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(	name = "user_role",
+    @JoinTable(name = "user_role",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
     private Set<Role> roles = new HashSet<>();
@@ -46,14 +46,19 @@ public class User {
     private UserStatus userStatus;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "created_at")
-    private Date createdAt;
+    @Column(name = "created")
+    private Date created;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "changed_at")
-    private Date changedAt;
+    @Column(name = "updated")
+    private Date updated;
 
-    public User() { }
+    @Temporal(TemporalType.TIMESTAMP)
+    @Column(name = "last_login")
+    private Date lastLogin;
+
+    public User() {
+    }
 
     public User(String username, String email, String password) {
         this.username = username;
@@ -63,13 +68,13 @@ public class User {
 
     @PrePersist
     protected void onCreate() {
-        this.createdAt = new Date();
-        this.changedAt = new Date();
+        this.created = new Date();
+        this.updated = new Date();
     }
 
     @PreUpdate
     protected void onUpdate() {
-        this.changedAt = new Date();
+        this.updated = new Date();
     }
 
     public Long getId() {
@@ -112,20 +117,20 @@ public class User {
         this.roles = roles;
     }
 
-    public Date getCreatedAt() {
-        return createdAt;
+    public Date getCreated() {
+        return created;
     }
 
-    public void setCreatedAt(Date createdAt) {
-        this.createdAt = createdAt;
+    public void setCreated(Date createdAt) {
+        this.created = createdAt;
     }
 
-    public Date getChangedAt() {
-        return changedAt;
+    public Date getUpdated() {
+        return updated;
     }
 
-    public void setChangedAt(Date changedAt) {
-        this.changedAt = changedAt;
+    public void setUpdated(Date changedAt) {
+        this.updated = changedAt;
     }
 
     public UserStatus getUserStatus() {
@@ -134,5 +139,16 @@ public class User {
 
     public void setUserStatus(UserStatus userStatus) {
         this.userStatus = userStatus;
+    }
+
+    public Date getLastLogin() {
+        return lastLogin;
+    }
+    public void setLastLogin(Date lastAccess) {
+        this.lastLogin = lastAccess;
+    }
+
+    public void setLastLoginNow() {
+        this.lastLogin = new Date();
     }
 }

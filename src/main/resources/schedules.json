@@ -25,6 +25,22 @@
       "active": "true"
     },
     {
+      "title": "Nachtlicht an",
+      "description": "Nachtlicht um 23:00 an",
+      "topic": "terraGeneral/nightLight/schedule",
+      "payload": "{\"NightLightState\": 1}",
+      "cronExpression": "0 0 23 * * ?",
+      "active": "true"
+    },
+    {
+      "title": "Nachtlicht aus",
+      "description": "Nachtlicht um 05:00 aus",
+      "topic": "terraGeneral/nightLight/schedule",
+      "payload": "{\"NightLightState\": 0}",
+      "cronExpression": "0 0 5 * * ?",
+      "active": "true"
+    },
+    {
       "title": "Regen",
       "description": "Regen um 07, 09, 17, 19, 21 Uhr",
       "topic": "terraGeneral/rain/schedule",

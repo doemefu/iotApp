@@ -1,5 +1,6 @@
 package ch.furchert.iotapp.model;
 
+import java.util.Date;
 import jakarta.persistence.*;
 
 @Entity
@@ -13,9 +14,23 @@ public class UserStatus {
     @Column(length = 20)
     private EUserStatus name;
 
+    //private Date created;
+    //private Date updated;
+
     public UserStatus() {
 
     }
+
+    //@PrePersist
+    //protected void onCreate() {
+    //    this.created = new Date();
+    //    this.updated = new Date();
+    //}
+
+    //@PreUpdate
+    //protected void onUpdate() {
+    //    this.updated = new Date();
+    //}
 
     public UserStatus(EUserStatus name) {
         this.name = name;

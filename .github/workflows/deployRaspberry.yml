@@ -1,0 +1,69 @@
+name: Build and Deploy to Raspberry Pi
+
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - develop
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v3
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Build with Maven
+        run: mvn -Pprod clean package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t iot-app:back .
+
+      - name: Save Docker image
+        run: docker save -o back-iot-image iot-app:back
+
+  transfer:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'RaspberryPi'
+    steps:
+      - name: Copy image to Raspberry Pi
+        uses: appleboy/scp-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          source: "back-iot-image"
+          target: "/home/dfurchert/iotApp/"
+
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: 'RaspberryPi'
+    steps:
+      - name: Deploy on Raspberry Pi
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          script: |
+            cd iotApp/
+            docker stop iotapp-backend-1 || true
+            docker rm iotapp-backend-1 || true
+            docker load -i back-iot-image
+            docker-compose up -d
+            sleep 300
+            docker-compose restart

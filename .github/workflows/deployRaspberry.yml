@@ -34,7 +34,7 @@ jobs:
       - name: Save Docker image
         run: |
           mkdir -p ${{ github.workspace }}/docker-images # Erstellt ein Verzeichnis für das Image
-          docker save -o ${{ github.workspace }}/docker-images/back-iot-image iot-app:back
+          docker save -o . iot-app:back
           ls -lh ${{ github.workspace }}/docker-images/ # Überprüft die Dateigröße
 
 
@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
           port: 63022
-          source: "${{ github.workspace }}/docker-images/back-iot-image"
+          source: "."
           target: "/home/dfurchert/iotApp/"
 
 

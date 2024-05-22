@@ -31,8 +31,11 @@ jobs:
 
       - name: Save Docker image
         run: |
-          docker save -o back-iot-image iot-app:back 
-          ls -lh back-iot-image
+          docker build -t iot-app:back .
+          mkdir -p ${{ github.workspace }}/docker-images # Erstellt ein Verzeichnis für das Image
+          docker save -o ${{ github.workspace }}/docker-images/back-iot-image iot-app:back
+          ls -lh ${{ github.workspace }}/docker-images/ # Überprüft die Dateigröße
+
 
   transfer:
     needs: build
@@ -48,8 +51,9 @@ jobs:
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
           port: 63022
-          source: "back-iot-image"
+          source: "${{ github.workspace }}/docker-images/back-iot-image"
           target: "/home/dfurchert/iotApp/"
+
 
   deploy:
     needs: transfer

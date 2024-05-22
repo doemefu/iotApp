@@ -12,6 +12,8 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment:
+      name: 'RaspberryPi'
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -44,7 +46,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Copy image to Raspberry Pi
-        uses: appleboy/scp-action@master
+        uses: appleboy/scp-action@0.1.7
         with:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}

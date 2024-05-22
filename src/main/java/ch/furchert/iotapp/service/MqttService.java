@@ -1,5 +1,6 @@
 package ch.furchert.iotapp.service;
 
+import ch.furchert.iotapp.model.MqttMessageReceivedEvent;
 import ch.furchert.iotapp.model.Terrarium;
 import com.fasterxml.jackson.databind.*;
 import org.eclipse.paho.client.mqttv3.*;
@@ -7,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 
 //CommandlineRunner is used to run the method when the application starts
@@ -21,6 +23,9 @@ public class MqttService implements CommandLineRunner {
 
     @Autowired
     private MqttClientService mqttClientService;
+
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
 
     @Autowired
     private TerrariumManagementService terrariumManagementService;
@@ -46,7 +51,7 @@ public class MqttService implements CommandLineRunner {
     };
 
     @Override
-    public void run(String... args) throws Exception {
+    public void run(String... args) {
 
         // Durch alle Topics iterieren und jedes abonnieren
         for (String topic : this.topics) {
@@ -72,6 +77,10 @@ public class MqttService implements CommandLineRunner {
         } else {
             log.warn("Unknown topic incoming: {}", topic);
         }
+
+        MqttMessageReceivedEvent event = new MqttMessageReceivedEvent(this, topic, message.toString());
+        eventPublisher.publishEvent(event);
+        System.out.println("Event published from the MqttService: " + event);
     }
 
     private void updateTerra(String message, Terrarium terrarium) {

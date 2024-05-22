@@ -44,9 +44,11 @@ public class MqttClientService {
                 }
 
                 @Override
-                public void messageArrived(String topic, MqttMessage message) throws Exception {
+                public void messageArrived(String topic, MqttMessage message) {
                     MqttMessageReceivedEvent event = new MqttMessageReceivedEvent(this, topic, message.toString());
-                    eventPublisher.publishEvent(event);            }
+                    eventPublisher.publishEvent(event);
+                    System.out.println("Event published in MqttClientService: " + event);
+                }
 
                 @Override
                 public void deliveryComplete(IMqttDeliveryToken token) {//Called when a outgoing publish is complete

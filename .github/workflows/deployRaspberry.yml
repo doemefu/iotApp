@@ -35,7 +35,7 @@ jobs:
         run: docker save iot-app:back
 
   transfer:
-    needs: build
+    needs: build-and-save
     runs-on: ubuntu-latest
     environment:
       name: 'RaspberryPi'

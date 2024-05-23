@@ -32,8 +32,7 @@ jobs:
         run: docker build -t iot-app:back .
 
       - name: Save Docker image
-        run: |
-          docker save iot-app:back
+        run: docker save iot-app:back
 
   transfer:
     needs: build
@@ -79,6 +78,7 @@ jobs:
           port: ${{ secrets.RPI_PORT }}
           script: |
             cd iotApp/
+            docker rmi iot-app:back || true
             docker load -i back-iot-image
 
       - name: Start Docker Compose

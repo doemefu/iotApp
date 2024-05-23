@@ -10,7 +10,7 @@ on:
       - develop
 
 jobs:
-  build:
+  build-and-save:
     runs-on: ubuntu-latest
     environment:
       name: 'RaspberryPi'
@@ -52,14 +52,13 @@ jobs:
           source: "."
           target: "/home/dfurchert/iotApp/"
 
-
   deploy:
     needs: transfer
     runs-on: ubuntu-latest
     environment:
       name: 'RaspberryPi'
     steps:
-      - name: Deploy on Raspberry Pi
+      - name: Stop and Remove Old Docker Container
         uses: appleboy/ssh-action@master
         with:
           host: ${{ secrets.RPI_HOST }}
@@ -70,7 +69,45 @@ jobs:
             cd iotApp/
             docker stop iotapp-backend-1 || true
             docker rm iotapp-backend-1 || true
+
+      - name: Replace Docker Image
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          script: |
+            cd iotApp/
             docker load -i back-iot-image
+
+      - name: Start Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          script: |
+            cd iotApp/
             docker compose up -d
-            sleep 300
+
+      - name: Wait for Services to Stabilize
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          script: sleep 300
+
+      - name: Restart Docker Compose
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.RPI_HOST }}
+          username: ${{ secrets.RPI_USERNAME }}
+          key: ${{ secrets.RPI_SSH_KEY }}
+          port: 63022
+          script: |
+            cd iotApp/
             docker compose restart

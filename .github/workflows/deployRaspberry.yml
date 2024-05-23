@@ -48,7 +48,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           source: "."
           target: "/home/dfurchert/iotApp/"
 
@@ -64,7 +64,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           script: |
             cd iotApp/
             docker stop iotapp-backend-1 || true
@@ -76,7 +76,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           script: |
             cd iotApp/
             docker load -i back-iot-image
@@ -87,7 +87,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           script: |
             cd iotApp/
             docker compose up -d
@@ -98,7 +98,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           script: sleep 300
 
       - name: Restart Docker Compose
@@ -107,7 +107,7 @@ jobs:
           host: ${{ secrets.RPI_HOST }}
           username: ${{ secrets.RPI_USERNAME }}
           key: ${{ secrets.RPI_SSH_KEY }}
-          port: 63022
+          port: ${{ secrets.RPI_PORT }}
           script: |
             cd iotApp/
             docker compose restart

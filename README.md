@@ -85,7 +85,7 @@ Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie d
 
 # Einleitung
 
-Dieses Projekt ist Teil der Leistungsbeurteilung des Modules 133.
+Dieses Projekt ist Teil des IoT-Ecosystems.
 
 
 ## Projektbeschreibung

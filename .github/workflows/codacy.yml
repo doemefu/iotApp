@@ -55,24 +55,26 @@ jobs:
         run: |
           python scripts/split_sarif.py results.sarif 20
 
+      - name: Check if part1 SARIF file exists
+        id: check-part1
+        run: |
+          if [ -e results_part1.sarif ]; then echo "FILE_PART1_EXISTS=true" >> $GITHUB_ENV; fi
+
+      - name: Check if part2 SARIF file exists
+        id: check-part2
+        run: |
+          if [ -e results_part2.sarif ]; then echo "FILE_PART2_EXISTS=true" >> $GITHUB_ENV; fi
+
       - name: Upload SARIF results file - Part 1
-        if: ${{ steps.check-part1.outputs.file-exists == 'true' }}
+        if: env.FILE_PART1_EXISTS == 'true'
         uses: github/codeql-action/upload-sarif@v3.25.6
         with:
           sarif_file: results_part1.sarif
           category: part1
 
       - name: Upload SARIF results file - Part 2
-        if: ${{ steps.check-part2.outputs.file-exists == 'true' }}
+        if: env.FILE_PART2_EXISTS == 'true'
         uses: github/codeql-action/upload-sarif@v3.25.6
         with:
           sarif_file: results_part2.sarif
           category: part2
-
-      - name: Check if part1 SARIF file exists
-        id: check-part1
-        run: echo "::set-output name=file-exists::$(test -e results_part1.sarif && echo true || echo false)"
-
-      - name: Check if part2 SARIF file exists
-        id: check-part2
-        run: echo "::set-output name=file-exists::$(test -e results_part2.sarif && echo true || echo false)"

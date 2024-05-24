@@ -17,7 +17,6 @@ on:
   push:
     branches: [ "main" ]
   pull_request:
-    # The branches below must be a subset of the branches above
     branches: [ "main" ]
   schedule:
     - cron: '00 04 * * 4'
@@ -28,37 +27,52 @@ permissions:
 jobs:
   codacy-security-scan:
     permissions:
-      contents: read # for actions/checkout to fetch code
-      security-events: write # for github/codeql-action/upload-sarif to upload SARIF results
-      actions: read # only required for a private repository by github/codeql-action/upload-sarif to get the Action run status
+      contents: read
+      security-events: write
+      actions: read
     name: Codacy Security Scan
     runs-on: ubuntu-latest
     steps:
-      # Checkout the repository to the GitHub Actions runner
       - name: Checkout code
         uses: actions/checkout@v4
 
-      # Execute Codacy Analysis CLI and generate a SARIF output with the security issues identified during the analysis
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+
       - name: Run Codacy Analysis CLI
         uses: codacy/codacy-analysis-cli-action@v4.4.0
         with:
-          # Check https://github.com/codacy/codacy-analysis-cli#project-token to get your project token from your Codacy repository
-          # You can also omit the token and run the tools that support default configurations
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           verbose: true
-          output: results2.sarif
+          output: results.sarif
           format: sarif
-          # Adjust severity of non-security issues
           gh-code-scanning-compat: true
-          # Force 0 exit code to allow SARIF file generation
-          # This will handover control about PR rejection to the GitHub side
           max-allowed-issues: 2147483647
 
-      # Split the file
-      - uses: advanced-security/sarif-toolkit/submodules@main
+      - name: Split SARIF file if needed
+        run: |
+          python scripts/split_sarif.py results.sarif 20
 
-      # Upload the SARIF file generated in the previous step
-      - name: Upload SARIF results file
+      - name: Upload SARIF results file - Part 1
+        if: ${{ steps.check-part1.outputs.file-exists == 'true' }}
         uses: github/codeql-action/upload-sarif@v3.25.6
         with:
-          sarif_file: results2.sarif
+          sarif_file: results_part1.sarif
+          category: part1
+
+      - name: Upload SARIF results file - Part 2
+        if: ${{ steps.check-part2.outputs.file-exists == 'true' }}
+        uses: github/codeql-action/upload-sarif@v3.25.6
+        with:
+          sarif_file: results_part2.sarif
+          category: part2
+
+      - name: Check if part1 SARIF file exists
+        id: check-part1
+        run: echo "::set-output name=file-exists::$(test -e results_part1.sarif && echo true || echo false)"
+
+      - name: Check if part2 SARIF file exists
+        id: check-part2
+        run: echo "::set-output name=file-exists::$(test -e results_part2.sarif && echo true || echo false)"

@@ -15,9 +15,8 @@ name: Codacy Security Scan
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    branches:
+      - "**"
   schedule:
     - cron: '00 04 * * 4'
 

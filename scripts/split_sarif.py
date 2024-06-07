@@ -2,7 +2,7 @@ import json
 import sys
 
 def split_sarif(input_file, max_runs):
-    with open(input_file, 'r') as file:
+    with open(input_file, 'r', encoding='utf-8') as file:
         sarif = json.load(file)
 
     runs = sarif.get('runs', [])
@@ -12,10 +12,10 @@ def split_sarif(input_file, max_runs):
     part1 = {'version': sarif['version'], '$schema': sarif['$schema'], 'runs': runs[:max_runs]}
     part2 = {'version': sarif['version'], '$schema': sarif['$schema'], 'runs': runs[max_runs:]}
 
-    with open('results_part1.sarif', 'w') as file:
+    with open('results_part1.sarif', 'w', encoding='utf-8') as file:
         json.dump(part1, file, indent=2)
 
-    with open('results_part2.sarif', 'w') as file:
+    with open('results_part2.sarif', 'w', encoding='utf-8') as file:
         json.dump(part2, file, indent=2)
 
 

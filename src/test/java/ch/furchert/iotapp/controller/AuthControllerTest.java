@@ -154,7 +154,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testAuthenticateUser_UserNotFound() throws Exception {
+    public void testAuthenticateUserUserNotFound() throws Exception {
         when(userRepository.findByUsername("invalidUser")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/auth/login")
@@ -165,7 +165,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testRegisterUser_UsernameAlreadyExists() throws Exception {
+    public void testRegisterUserUsernameAlreadyExists() throws Exception {
         when(userRepository.existsByUsername("existingUser")).thenReturn(true);
 
         mockMvc.perform(post("/api/auth/register")
@@ -176,7 +176,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testVerifyEmail_InvalidToken() throws Exception {
+    public void testVerifyEmailInvalidToken() throws Exception {
         when(emailTokenService.validateEmailToken("invalidToken")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/auth/verifyEmail")
@@ -187,7 +187,7 @@ public class AuthControllerTest {
     }
 
     @Test
-    public void testRefreshToken_InvalidToken() throws Exception {
+    public void testRefreshTokenInvalidToken() throws Exception {
         when(refreshTokenService.findByToken("invalidRefreshToken")).thenReturn(Optional.empty());
 
         mockMvc.perform(post("/api/auth/refreshtoken")

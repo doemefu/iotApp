@@ -24,6 +24,9 @@ public class DataController {
     @Autowired
     private Influx influx;
 
+    @Autowired
+    private InfluxService influxService; // Anpassung auf den korrekten Service-Typ
+
     @GetMapping("/influxData")
     public ResponseEntity<List<FluxRecord>> getInfluxData() {
         System.out.println("Getting data from InfluxDB");
@@ -31,9 +34,6 @@ public class DataController {
         //System.out.println("die records: " + records);
         return new ResponseEntity<>(records, HttpStatus.OK);
     }
-
-    @Autowired
-    private InfluxService influxService; // Anpassung auf den korrekten Service-Typ
 
     @GetMapping("/influxDataNew")
     public ResponseEntity<List<InfluxTerraData>> getInfluxDataNew(

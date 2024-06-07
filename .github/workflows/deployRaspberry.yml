@@ -29,7 +29,7 @@ jobs:
         run: docker build -t iot-app:back .
 
       - name: Save Docker image
-        run: docker save -a back-iot-image iot-app:back
+        run: docker save -a back-iot-image-automated iot-app:back
 
   transfer:
     needs: build-and-save
@@ -76,7 +76,7 @@ jobs:
           script: |
             cd iotApp/
             docker rmi iot-app:back || true
-            docker load -i back-iot-image
+            docker load -i back-iot-image-automated
 
       - name: Start Docker Compose
         uses: appleboy/ssh-action@master

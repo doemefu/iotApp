@@ -31,6 +31,12 @@ jobs:
       - name: Save Docker image
         run: docker save -o back-iot-image-automated iot-app:back
 
+      - name: PWD
+        run: pwd
+
+      - name: Show content
+        run: ls -a
+
   transfer:
     needs: build-and-save
     runs-on: ubuntu-latest
@@ -38,6 +44,13 @@ jobs:
       name: 'RaspberryPi'
     steps:
       - uses: actions/checkout@main
+
+      - name: PWD
+        run: pwd
+
+      - name: Show content
+        run: ls -a
+
       - name: Copy image to Raspberry Pi
         uses: appleboy/scp-action@master
         with:

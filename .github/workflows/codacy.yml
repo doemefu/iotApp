@@ -33,15 +33,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@main
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@main
         with:
           python-version: '3.x'
 
       - name: Run Codacy Analysis CLI
-        uses: codacy/codacy-analysis-cli-action@v4.4.0
+        uses: codacy/codacy-analysis-cli-action@master
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           verbose: true
@@ -66,14 +66,14 @@ jobs:
 
       - name: Upload SARIF results file - Part 1
         if: env.FILE_PART1_EXISTS == 'true'
-        uses: github/codeql-action/upload-sarif@v3.25.6
+        uses: github/codeql-action/upload-sarif@main
         with:
           sarif_file: results_part1.sarif
           category: part1
 
       - name: Upload SARIF results file - Part 2
         if: env.FILE_PART2_EXISTS == 'true'
-        uses: github/codeql-action/upload-sarif@v3.25.6
+        uses: github/codeql-action/upload-sarif@main
         with:
           sarif_file: results_part2.sarif
           category: part2

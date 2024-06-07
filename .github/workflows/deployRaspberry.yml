@@ -29,7 +29,7 @@ jobs:
         run: docker build -t iot-app:back .
 
       - name: Save Docker image
-        run: docker save iot-app:back
+        run: docker save -a back-iot-image iot-app:back
 
   transfer:
     needs: build-and-save

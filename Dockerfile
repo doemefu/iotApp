@@ -6,7 +6,7 @@ LABEL authors="dfurchert"
 
 # Copy the built artifact from your local file system
 # Replace 'path/to/your/iotapp.jar' with the actual path to the JAR file on your local system
-COPY /target/iotapp-1.1.jar /usr/app/iotapp.jar
+COPY /target/iotapp-1.2.jar /usr/app/iotapp.jar
 
 # Set the working directory for the application
 WORKDIR /usr/app

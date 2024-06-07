@@ -1,5 +1,11 @@
 <h1>IoT-App Backend</h1>
 
+[![Build and Deploy to Raspberry Pi](https://github.com/doemefu/iotApp/actions/workflows/deployRaspberry.yml/badge.svg)](https://github.com/doemefu/iotApp/actions/workflows/deployRaspberry.yml)
+
+[![CodeQL](https://github.com/doemefu/iotApp/actions/workflows/codeql.yml/badge.svg)](https://github.com/doemefu/iotApp/actions/workflows/codeql.yml)
+
+[![Codacy Security Scan](https://github.com/doemefu/iotApp/actions/workflows/codacy.yml/badge.svg)](https://github.com/doemefu/iotApp/actions/workflows/codacy.yml)
+
 Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie die Dokumentation des Projektes.
 
 # Inhalt

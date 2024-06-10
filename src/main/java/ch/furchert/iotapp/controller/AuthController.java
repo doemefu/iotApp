@@ -69,9 +69,10 @@ public class AuthController {
     private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestHeader("X-XSRF-TOKEN") String xsrfToken) {
 
         logger.info("login request start");
+        logger.debug("X-XSRF-TOKEN: {}", xsrfToken);
 
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 

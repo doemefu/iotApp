@@ -1,11 +1,14 @@
 package ch.furchert.iotapp.service;
 
+import ch.furchert.iotapp.controller.DataController;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
 import com.influxdb.query.FluxRecord;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -28,6 +31,8 @@ public class Influx {
     @Value("${furchert.iotapp.influxHost}")
     private String InfluxURL;
 
+    private static final Logger log = LoggerFactory.getLogger(Influx.class);
+
     private InfluxDBClient influxDBClient;
     private QueryApi queryApi;
 
@@ -45,7 +50,7 @@ public class Influx {
     }
 
     public List<FluxRecord> query() {
-        System.out.println("Querying data from InfluxDB");
+        log.trace("Querying data from InfluxDB");
         String flux = """
                 from(bucket: "Terrarium")
                   |> range(start: -24h, stop: now())
@@ -60,10 +65,10 @@ public class Influx {
             records.add(fluxRecord);
             //System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
         }, throwable -> {
-            System.out.println("Error occurred: " + throwable.getMessage());
+            log.error("Error occurred: {}", throwable.getMessage());
             done.set(true);
         }, () -> {
-            System.out.println("Query completed");
+            log.info("Query completed");
             done.set(true);
         });
 

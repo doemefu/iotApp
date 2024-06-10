@@ -5,6 +5,7 @@ import ch.furchert.iotapp.model.*;
 import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.repository.UserStatusRepository;
+import ch.furchert.iotapp.security.jwt.AuthTokenFilter;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
 import ch.furchert.iotapp.service.EmailServiceImpl;
 import ch.furchert.iotapp.service.EmailTokenService;
@@ -17,6 +18,8 @@ import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -63,8 +66,12 @@ public class AuthController {
     @Autowired
     private EmailTokenService emailTokenService;
 
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
+
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        logger.info("login request start");
 
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
@@ -111,6 +118,8 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+
+        logger.info("login request done");
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())

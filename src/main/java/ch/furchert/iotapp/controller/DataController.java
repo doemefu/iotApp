@@ -3,6 +3,8 @@ package ch.furchert.iotapp.controller;
 import ch.furchert.iotapp.service.Influx;
 import ch.furchert.iotapp.service.InfluxService;
 import com.influxdb.query.FluxRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,11 +29,13 @@ public class DataController {
     @Autowired
     private InfluxService influxService; // Anpassung auf den korrekten Service-Typ
 
+    private static final Logger log = LoggerFactory.getLogger(DataController.class);
+
     @GetMapping("/influxData")
     public ResponseEntity<List<FluxRecord>> getInfluxData() {
-        System.out.println("Getting data from InfluxDB");
+        log.trace("Getting data from InfluxDB");
         List<FluxRecord> records = influx.query();
-        //System.out.println("die records: " + records);
+        log.debug("die records: {}", records);
         return new ResponseEntity<>(records, HttpStatus.OK);
     }
 
@@ -39,7 +43,7 @@ public class DataController {
     public ResponseEntity<List<InfluxTerraData>> getInfluxDataNew(
             @RequestParam(value = "period", defaultValue = "24h") String period) {
 
-        System.out.println("Getting data from InfluxDB for period: " + period);
+        log.trace("Getting data from InfluxDB for period: {}", period);
         Instant endTime = Instant.now(); // Das aktuelle Datum und Uhrzeit
         Instant startTime = calculateStartTime(endTime, period);
 

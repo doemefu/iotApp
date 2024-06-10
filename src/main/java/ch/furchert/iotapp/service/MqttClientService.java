@@ -3,6 +3,8 @@ package ch.furchert.iotapp.service;
 import ch.furchert.iotapp.model.MqttMessageReceivedEvent;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
@@ -20,6 +22,8 @@ public class MqttClientService {
     private final String clientId = "JavaBackend";
     private MqttClient mqttClient;
     private final MemoryPersistence persistence = new MemoryPersistence();
+
+    private static final Logger log = LoggerFactory.getLogger(MqttClientService.class);
 
     @Autowired
     private ApplicationEventPublisher eventPublisher;
@@ -47,7 +51,7 @@ public class MqttClientService {
                 public void messageArrived(String topic, MqttMessage message) {
                     MqttMessageReceivedEvent event = new MqttMessageReceivedEvent(this, topic, message.toString());
                     eventPublisher.publishEvent(event);
-                    System.out.println("Event published in MqttClientService: " + event);
+                    log.trace("Event published in MqttClientService: {}", event);
                 }
 
                 @Override
@@ -95,11 +99,11 @@ public class MqttClientService {
     }
 
     private void handleMqttException(MqttException me) {
-        System.out.println("reason " + me.getReasonCode());
-        System.out.println("msg " + me.getMessage());
-        System.out.println("loc " + me.getLocalizedMessage());
-        System.out.println("cause " + me.getCause());
-        System.out.println("excep " + me);
+        log.error("reason {}", me.getReasonCode());
+        log.error("msg {}", me.getMessage());
+        log.error("loc {}", me.getLocalizedMessage());
+        log.error("cause {}", me.getCause());
+        log.error("except. {}", me);
         me.printStackTrace();
     }
 }

@@ -64,7 +64,7 @@ public class MqttService implements CommandLineRunner {
 
         String messageString = message.toString();
 
-        System.out.println("Incoming message: " + topic + ": " + messageString);
+        log.trace("Incoming message: {}: {}", topic, messageString);
 
         if(topic.contains("terra1")){
             Terrarium terrarium = terrariumManagementService.getTerrarium("terra1");
@@ -80,7 +80,7 @@ public class MqttService implements CommandLineRunner {
 
         MqttMessageReceivedEvent event = new MqttMessageReceivedEvent(this, topic, message.toString());
         eventPublisher.publishEvent(event);
-        System.out.println("Event published from the MqttService: " + event);
+        log.trace("Event published from the MqttService: {}", event);
     }
 
     private void updateTerra(String message, Terrarium terrarium) {

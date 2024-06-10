@@ -3,6 +3,8 @@ package ch.furchert.iotapp.controller;
 import ch.furchert.iotapp.model.MqttMessageReceivedEvent;
 import ch.furchert.iotapp.model.ToggleRequest;
 import ch.furchert.iotapp.service.MqttClientService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.event.EventListener;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -25,16 +27,18 @@ public class WebSocketController {
     @Autowired
     private MqttClientService mqttClientService;
 
+    private static final Logger log = LoggerFactory.getLogger(WebSocketController.class);
+
     // Methode, die auf Client-Anfragen reagiert
     @MessageMapping("/requestData")
     public void requestData(String terrariumId) {
-        System.out.println("Received request for terrarium " + terrariumId);
+        log.trace("Received request for terrarium {}", terrariumId);
         sendTerrariumUpdate(terrariumId);
     }
 
     // Diese Methode sendet aktualisierte Terrarium-Daten an ein bestimmtes WebSocket-Topic
     public void sendTerrariumUpdate(String terrariumId) {
-        System.out.println("Sending terrarium update for terrarium " + terrariumId);
+        log.trace("Sending terrarium update for terrarium {}", terrariumId);
         Terrarium terrarium = terrariumManagementService.getTerrarium(terrariumId);
         if (terrarium != null) {
             template.convertAndSend("/topic/terrarium/" + terrariumId, terrarium);
@@ -58,7 +62,7 @@ public class WebSocketController {
 
     @EventListener
     public void onMqttMessageReceived(MqttMessageReceivedEvent event) {
-        System.out.println("Received MQTT event in Websocket controller: " + event.getTopic() + ": " + event.getMessage());
+        log.trace("Received MQTT event in Websocket controller: {}: {}", event.getTopic(), event.getMessage());
         if(event.getTopic().contains("terra1")){ // Only update the terrarium if the message is for terra1
             sendTerrariumUpdate("terra1");
         }else {

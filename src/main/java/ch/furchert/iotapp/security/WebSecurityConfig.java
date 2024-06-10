@@ -3,6 +3,8 @@ package ch.furchert.iotapp.security;
 import ch.furchert.iotapp.security.jwt.AuthEntryPointJwt;
 import ch.furchert.iotapp.security.jwt.AuthTokenFilter;
 import ch.furchert.iotapp.service.UserDetailsServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -43,6 +45,8 @@ public class WebSecurityConfig {
     @Autowired
     private AuthEntryPointJwt unauthorizedHandler;
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
+
     @Bean
     public AuthTokenFilter authenticationJwtTokenFilter() {
         return new AuthTokenFilter();
@@ -64,10 +68,12 @@ public class WebSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
+        logger.trace("WebSecurityConfig.authenticationProvider start");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+        logger.trace("WebSecurityConfig.authenticationProvider end");
 
         return authProvider;
     }
@@ -79,9 +85,10 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        logger.trace("WebSecurityConfig.filterChain start");
         http
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
@@ -95,8 +102,8 @@ public class WebSecurityConfig {
         ;
 
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        logger.trace("WebSecurityConfig.filterChain end");
 
         return http.build();
     }
@@ -107,7 +114,7 @@ public class WebSecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type", "X-XSRF-TOKEN"));
         configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

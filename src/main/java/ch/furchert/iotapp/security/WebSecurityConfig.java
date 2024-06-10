@@ -3,6 +3,10 @@ package ch.furchert.iotapp.security;
 import ch.furchert.iotapp.security.jwt.AuthEntryPointJwt;
 import ch.furchert.iotapp.security.jwt.AuthTokenFilter;
 import ch.furchert.iotapp.service.UserDetailsServiceImpl;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,10 +28,13 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.security.SecureRandom;
 import java.util.Arrays;
 import java.util.List;
@@ -86,6 +93,7 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         logger.trace("WebSecurityConfig.filterChain start");
+
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
@@ -100,6 +108,19 @@ public class WebSecurityConfig {
                                 .anyRequest().authenticated()
                 )
         ;
+
+        // Adding the custom filter for logging CSRF tokens from headers
+        http.addFilterBefore(new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+                String xsrfToken = request.getHeader("X-XSRF-TOKEN");
+                if (xsrfToken != null) {
+                    logger.debug("Received X-XSRF-TOKEN: " + xsrfToken);
+                }
+                filterChain.doFilter(request, response);
+            }
+        }, CsrfFilter.class); // You can change the position based on where you need the logging to happen
+
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);

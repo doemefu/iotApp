@@ -17,12 +17,10 @@ public class ContentController {
     UserRepository userRepository;
 
     @GetMapping("/all")
-    public String allAccess( @RequestHeader("X-XSRF-TOKEN") String xsrfToken) {
+    public String allAccess() {
 
         logger.info("get/all request received");
-        logger.debug("X-XSRF-TOKEN: {}", xsrfToken);
-
-        return "Public Content.";
+        return "This is public Content.";
     }
 
     @GetMapping("/user")

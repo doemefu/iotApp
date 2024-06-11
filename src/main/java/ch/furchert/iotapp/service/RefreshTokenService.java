@@ -14,7 +14,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
-public class RefreshTokenService {
+    public class RefreshTokenService {
     @Autowired
     UserRepository userRepository;
     @Value("${furchert.iotapp.jwtRefreshExpirationMs}")

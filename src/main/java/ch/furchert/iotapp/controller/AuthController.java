@@ -248,6 +248,7 @@ public class AuthController {
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, emptyJwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, emptyJwtRefreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, "XSRF-TOKEN=; Path=/api; Max-Age=0; Secure; SameSite=Lax")
                 .body(new MessageResponse("You've been signed out!"));
     }
 

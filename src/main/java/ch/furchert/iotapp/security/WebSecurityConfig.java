@@ -101,6 +101,13 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
+                /*
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .deleteCookies("XSRF-TOKEN")
+                        .invalidateHttpSession(true)
+                        .logoutSuccessUrl("/api/auth/logout/success"))
+                */
         ;
 
         http.authenticationProvider(authenticationProvider());

@@ -95,7 +95,11 @@ public class WebSecurityConfig {
         logger.debug("WebSecurityConfig.filterChain start");
 
         http
-                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
+                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .requireCsrfProtectionMatcher(request -> {
+                            // Disable CSRF for API paths for debugging
+                            return !request.getServletPath().startsWith("/api/auth/login");
+                        }))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

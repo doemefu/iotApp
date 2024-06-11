@@ -75,12 +75,12 @@ public class WebSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
-        logger.trace("WebSecurityConfig.authenticationProvider start");
+        logger.debug("WebSecurityConfig.authenticationProvider start");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
-        logger.trace("WebSecurityConfig.authenticationProvider end");
+        logger.debug("WebSecurityConfig.authenticationProvider end");
 
         return authProvider;
     }
@@ -92,7 +92,7 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        logger.trace("WebSecurityConfig.filterChain start");
+        logger.debug("WebSecurityConfig.filterChain start");
 
         http
                 .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
@@ -107,24 +107,21 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
+                .addFilterBefore(new OncePerRequestFilter() {
+                    @Override
+                    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+                        String xsrfToken = request.getHeader("X-XSRF-TOKEN");
+                        if (xsrfToken != null) {
+                            logger.debug("Received X-XSRF-TOKEN: " + xsrfToken);
+                        }
+                        filterChain.doFilter(request, response);
+                    }
+                }, CsrfFilter.class)
         ;
-
-        // Adding the custom filter for logging CSRF tokens from headers
-        http.addFilterBefore(new OncePerRequestFilter() {
-            @Override
-            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-                String xsrfToken = request.getHeader("X-XSRF-TOKEN");
-                if (xsrfToken != null) {
-                    logger.debug("Received X-XSRF-TOKEN: " + xsrfToken);
-                }
-                filterChain.doFilter(request, response);
-            }
-        }, CsrfFilter.class); // You can change the position based on where you need the logging to happen
-
 
         http.authenticationProvider(authenticationProvider());
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
-        logger.trace("WebSecurityConfig.filterChain end");
+        logger.debug("WebSecurityConfig.filterChain end");
 
         return http.build();
     }

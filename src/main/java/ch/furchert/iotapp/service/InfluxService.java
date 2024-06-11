@@ -1,20 +1,18 @@
 package ch.furchert.iotapp.service;
 
+import ch.furchert.iotapp.model.InfluxTerraData;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
-
-import ch.furchert.iotapp.model.InfluxTerraData;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
 
 @Service
 public class InfluxService {
@@ -56,6 +54,7 @@ public class InfluxService {
         // Führe die Abfrage aus und mappe die Ergebnisse auf MeasurementData-Objekte
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
+
     public List<InfluxTerraData> queryMeasurementData(Instant start, Instant end) {
         // Erstelle die Flux-Abfrage mit dem flux-dsl Query Builder
         Flux fluxQuery = Flux
@@ -74,6 +73,7 @@ public class InfluxService {
         // Führe die Abfrage aus und mappe die Ergebnisse auf MeasurementData-Objekte
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
+
     public void close() {
         if (this.influxDBClient != null) {
             this.influxDBClient.close();

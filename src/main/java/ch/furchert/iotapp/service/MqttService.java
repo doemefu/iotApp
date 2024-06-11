@@ -2,8 +2,9 @@ package ch.furchert.iotapp.service;
 
 import ch.furchert.iotapp.model.MqttMessageReceivedEvent;
 import ch.furchert.iotapp.model.Terrarium;
-import com.fasterxml.jackson.databind.*;
-import org.eclipse.paho.client.mqttv3.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,18 +21,7 @@ import org.springframework.stereotype.Service;
 public class MqttService implements CommandLineRunner {
 
     private static final Logger log = LoggerFactory.getLogger(MqttService.class);
-
-    @Autowired
-    private MqttClientService mqttClientService;
-
-    @Autowired
-    private ApplicationEventPublisher eventPublisher;
-
-    @Autowired
-    private TerrariumManagementService terrariumManagementService;
-
     private final ObjectMapper objectMapper = new ObjectMapper();
-
     private final String[] topics = {
             "terra1/mqtt/status",
             "terra1/light",
@@ -49,6 +39,12 @@ public class MqttService implements CommandLineRunner {
             "terra2/rain/man",
             "terra2/SHT35/data"
     };
+    @Autowired
+    private MqttClientService mqttClientService;
+    @Autowired
+    private ApplicationEventPublisher eventPublisher;
+    @Autowired
+    private TerrariumManagementService terrariumManagementService;
 
     @Override
     public void run(String... args) {
@@ -66,7 +62,7 @@ public class MqttService implements CommandLineRunner {
 
         log.trace("Incoming message: {}: {}", topic, messageString);
 
-        if(topic.contains("terra1")){
+        if (topic.contains("terra1")) {
             Terrarium terrarium = terrariumManagementService.getTerrarium("terra1");
             updateTerra(messageString, terrarium);
         } else if (topic.contains("terra2")) {
@@ -103,7 +99,7 @@ public class MqttService implements CommandLineRunner {
             } else if (rootNode.has("Water")) {
                 boolean waterOn = rootNode.get("Water").asBoolean();
                 terrarium.setWater(waterOn);
-            } else if (rootNode.has("MqttState")){
+            } else if (rootNode.has("MqttState")) {
                 boolean mqttState = rootNode.get("MqttState").asBoolean();
                 terrarium.setMqttState(mqttState);
             }

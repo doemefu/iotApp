@@ -1,6 +1,5 @@
 package ch.furchert.iotapp.model;
 
-import java.util.Date;
 import jakarta.persistence.*;
 
 @Entity

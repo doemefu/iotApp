@@ -3,7 +3,6 @@ package ch.furchert.iotapp.model;
 import com.influxdb.annotations.Column;
 import com.influxdb.annotations.Measurement;
 
-import javax.annotation.processing.Generated;
 import java.time.Instant;
 
 @Measurement(name = "InfluxTerraData")

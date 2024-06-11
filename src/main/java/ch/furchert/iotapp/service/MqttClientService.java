@@ -1,6 +1,8 @@
 package ch.furchert.iotapp.service;
 
 import ch.furchert.iotapp.model.MqttMessageReceivedEvent;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.eclipse.paho.client.mqttv3.*;
 import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 import org.slf4j.Logger;
@@ -9,27 +11,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
-import jakarta.annotation.PostConstruct;
-import jakarta.annotation.PreDestroy;
 
 import java.time.LocalDateTime;
 
 @Service
 public class MqttClientService {
 
+    private static final Logger log = LoggerFactory.getLogger(MqttClientService.class);
+    private final String clientId = "JavaBackend";
+    private final MemoryPersistence persistence = new MemoryPersistence();
     @Value("${furchert.iotapp.mqttBroker}")
     private String brokerUrl;
-    private final String clientId = "JavaBackend";
     private MqttClient mqttClient;
-    private final MemoryPersistence persistence = new MemoryPersistence();
-
-    private static final Logger log = LoggerFactory.getLogger(MqttClientService.class);
-
     @Autowired
     private ApplicationEventPublisher eventPublisher;
 
     @PostConstruct
-    public void init(){
+    public void init() {
         try {
             mqttClient = new MqttClient(brokerUrl, clientId, persistence);
             MqttConnectOptions options = new MqttConnectOptions();
@@ -61,7 +59,7 @@ public class MqttClientService {
 
             mqttClient.connect(options);
 
-            publish("javaBackend/mqtt/status", "{\"MqttState\": 1}", 1,true);
+            publish("javaBackend/mqtt/status", "{\"MqttState\": 1}", 1, true);
             publish("javaBackend/mqtt/scheduletopic", "Hello from the Backend! Its " + LocalDateTime.now() + " here", 0, true);
         } catch (MqttException e) {
             handleMqttException(e);
@@ -69,8 +67,8 @@ public class MqttClientService {
     }
 
     @PreDestroy
-    public void cleanUp(){
-        try{
+    public void cleanUp() {
+        try {
             if (mqttClient != null) {
                 mqttClient.disconnect();
             }
@@ -80,7 +78,7 @@ public class MqttClientService {
     }
 
     public void publish(String topic, String payload, int qos, boolean retained) {
-        try{
+        try {
             MqttMessage message = new MqttMessage(payload.getBytes());
             message.setQos(qos);
             message.setRetained(retained);
@@ -90,9 +88,9 @@ public class MqttClientService {
         }
     }
 
-    public void subscribe(String topic, IMqttMessageListener listener){
-        try{
-        mqttClient.subscribe(topic, listener);
+    public void subscribe(String topic, IMqttMessageListener listener) {
+        try {
+            mqttClient.subscribe(topic, listener);
         } catch (MqttException e) {
             handleMqttException(e);
         }

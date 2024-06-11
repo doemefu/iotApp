@@ -1,5 +1,6 @@
 package ch.furchert.iotapp.controller;
 
+import ch.furchert.iotapp.model.InfluxTerraData;
 import ch.furchert.iotapp.service.Influx;
 import ch.furchert.iotapp.service.InfluxService;
 import com.influxdb.query.FluxRecord;
@@ -17,19 +18,15 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
-import ch.furchert.iotapp.model.InfluxTerraData;
-
 @RestController
 @RequestMapping("/api/data")
 public class DataController {
 
+    private static final Logger log = LoggerFactory.getLogger(DataController.class);
     @Autowired
     private Influx influx;
-
     @Autowired
     private InfluxService influxService; // Anpassung auf den korrekten Service-Typ
-
-    private static final Logger log = LoggerFactory.getLogger(DataController.class);
 
     @GetMapping("/influxData")
     public ResponseEntity<List<FluxRecord>> getInfluxData() {

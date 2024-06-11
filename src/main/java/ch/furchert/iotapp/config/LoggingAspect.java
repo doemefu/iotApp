@@ -7,15 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 import java.time.LocalDateTime;
 
@@ -23,10 +22,9 @@ import java.time.LocalDateTime;
 @Component
 public class LoggingAspect {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
     @Autowired
     private LogEntryRepository logEntryRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
     @AfterReturning(pointcut = "execution(* ch.furchert.iotapp.controller.*.*(..))", returning = "result")
     public void logMethodCall(JoinPoint joinPoint, Object result) {

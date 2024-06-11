@@ -1,6 +1,5 @@
 package ch.furchert.iotapp.service;
 
-import ch.furchert.iotapp.controller.DataController;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
@@ -19,20 +18,15 @@ import java.util.concurrent.atomic.AtomicBoolean;
 @Service
 public class Influx {
 
+    private static final Logger log = LoggerFactory.getLogger(Influx.class);
     @Value("${furchert.iotapp.influxToken}")
     private String token;
-
     @Value("${furchert.iotapp.influxOrg}")
     private String org;
-
     @Value("${furchert.iotapp.influxBucket}")
     private String bucket;
-
     @Value("${furchert.iotapp.influxHost}")
     private String InfluxURL;
-
-    private static final Logger log = LoggerFactory.getLogger(Influx.class);
-
     private InfluxDBClient influxDBClient;
     private QueryApi queryApi;
 

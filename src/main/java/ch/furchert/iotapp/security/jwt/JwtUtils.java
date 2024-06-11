@@ -14,10 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 import org.springframework.web.util.WebUtils;
-import io.jsonwebtoken.Jwts;
 
 import javax.crypto.SecretKey;
-import java.security.PublicKey;
 import java.util.Date;
 
 

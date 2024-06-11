@@ -5,7 +5,6 @@ import ch.furchert.iotapp.model.*;
 import ch.furchert.iotapp.repository.RoleRepository;
 import ch.furchert.iotapp.repository.UserRepository;
 import ch.furchert.iotapp.repository.UserStatusRepository;
-import ch.furchert.iotapp.security.jwt.AuthTokenFilter;
 import ch.furchert.iotapp.security.jwt.JwtUtils;
 import ch.furchert.iotapp.service.EmailServiceImpl;
 import ch.furchert.iotapp.service.EmailTokenService;
@@ -39,34 +38,25 @@ import java.util.*;
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     RoleRepository roleRepository;
-
     @Autowired
     UserStatusRepository userStatusRepository;
-
     @Autowired
     PasswordEncoder encoder;
-
     @Autowired
     JwtUtils jwtUtils;
-
     @Autowired
     RefreshTokenService refreshTokenService;
-
     @Autowired
     EmailServiceImpl emailService;
-
     @Autowired
     private EmailTokenService emailTokenService;
-
-    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestHeader("X-XSRF-TOKEN") String xsrfToken) {
@@ -248,7 +238,7 @@ public class AuthController {
             UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             Long userId = userDetails.getId();
             refreshTokenService.deleteByUserId(userId);
-        }catch (Exception e) {
+        } catch (Exception e) {
             System.out.println("logoutUser error: " + e);
         }
 

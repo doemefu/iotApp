@@ -1,6 +1,5 @@
 package ch.furchert.iotapp.config;
 
-import ch.furchert.iotapp.controller.DataController;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,6 @@ import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBr
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
-
-import java.util.List;
 
 @Configuration
 @EnableWebSocketMessageBroker
@@ -32,6 +29,5 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
                 .setAllowedOrigins("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33")
                 .withSockJS()
                 .setInterceptors(new HttpSessionHandshakeInterceptor());
-        ;
     }
 }

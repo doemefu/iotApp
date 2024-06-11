@@ -66,36 +66,16 @@ public class Terrarium {
         return light;
     }
 
-    public void setLight(boolean lightOn) {
-        if (lightOn) this.light = ON;
-        else this.light = OFF;
-    }
-
     public EState isNightLightOn() {
         return nightLight;
-    }
-
-    public void setNightLight(boolean nightLightOn) {
-        if (nightLightOn) this.nightLight = ON;
-        else this.nightLight = OFF;
     }
 
     public EState isRainOn() {
         return rain;
     }
 
-    public void setRain(boolean rainOn) {
-        if (rainOn) this.rain = ON;
-        else this.rain = OFF;
-    }
-
     public EState isWaterOn() {
         return water;
-    }
-
-    public void setWater(boolean waterOn) {
-        if (waterOn) this.water = ON;
-        else this.water = OFF;
     }
 
     public String getName() {
@@ -119,15 +99,35 @@ public class Terrarium {
         return light;
     }
 
+    public void setLight(boolean lightOn) {
+        if (lightOn) this.light = ON;
+        else this.light = OFF;
+    }
+
     public EState getNightLight() {
         return nightLight;
+    }
+
+    public void setNightLight(boolean nightLightOn) {
+        if (nightLightOn) this.nightLight = ON;
+        else this.nightLight = OFF;
     }
 
     public EState getRain() {
         return rain;
     }
 
+    public void setRain(boolean rainOn) {
+        if (rainOn) this.rain = ON;
+        else this.rain = OFF;
+    }
+
     public EState getWater() {
         return water;
+    }
+
+    public void setWater(boolean waterOn) {
+        if (waterOn) this.water = ON;
+        else this.water = OFF;
     }
 }

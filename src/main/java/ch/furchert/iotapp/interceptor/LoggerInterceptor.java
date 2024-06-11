@@ -1,20 +1,18 @@
 package ch.furchert.iotapp.interceptor;
 
-import java.util.Enumeration;
-
+import com.google.common.base.Strings;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
 
-import com.google.common.base.Strings;
+import java.util.Enumeration;
 
 public class LoggerInterceptor implements HandlerInterceptor {
 
-    private static Logger log = LoggerFactory.getLogger(LoggerInterceptor.class);
+    private static final Logger log = LoggerFactory.getLogger(LoggerInterceptor.class);
 
     /**
      * Executed before actual handler is executed

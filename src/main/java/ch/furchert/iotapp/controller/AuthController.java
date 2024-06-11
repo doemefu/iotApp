@@ -238,16 +238,20 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    //public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        String someHeaders = String.valueOf(request.getHeaderNames());
 
-        //System.out.println("logoutUser" + authorizationHeader);
-        System.out.println("logoutUser" + someHeaders);
+        try {
+            String someHeaders = String.valueOf(request.getHeaderNames());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = userDetails.getId();
-        refreshTokenService.deleteByUserId(userId);
+            System.out.println("logoutUser" + someHeaders);
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Long userId = userDetails.getId();
+            refreshTokenService.deleteByUserId(userId);
+        }catch (Exception e) {
+            System.out.println("logoutUser error: " + e);
+        }
+
         ResponseCookie emptyJwtCookie = jwtUtils.getCleanJwtCookie();
         ResponseCookie emptyJwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
         return ResponseEntity
@@ -289,4 +293,5 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
     }
+
 }

@@ -92,7 +92,8 @@ public class WebSecurityConfig {
                         .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
                         .requireCsrfProtectionMatcher(request -> {
                             // Disable CSRF for API paths for debugging
-                            return !request.getServletPath().startsWith("/api/auth/login");
+                            return !request.getServletPath().startsWith("/api/auth/login") &&
+                                    !request.getServletPath().startsWith("/api/auth/register");
                         }))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))

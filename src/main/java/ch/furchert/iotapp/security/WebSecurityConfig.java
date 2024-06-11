@@ -29,6 +29,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfFilter;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -95,11 +96,9 @@ public class WebSecurityConfig {
         logger.debug("WebSecurityConfig.filterChain start");
 
         http
-                .csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .requireCsrfProtectionMatcher(request -> {
-                            // Disable CSRF for API paths for debugging
-                            return !request.getServletPath().startsWith("/api/auth/login");
-                        }))
+                .csrf(csrf -> csrf.
+                        csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
@@ -111,16 +110,6 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/ws/**").permitAll()
                                 .anyRequest().authenticated()
                 )
-                .addFilterBefore(new OncePerRequestFilter() {
-                    @Override
-                    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-                        String xsrfToken = request.getHeader("X-XSRF-TOKEN");
-                        if (xsrfToken != null) {
-                            logger.debug("Received X-XSRF-TOKEN: " + xsrfToken);
-                        }
-                        filterChain.doFilter(request, response);
-                    }
-                }, CsrfFilter.class)
         ;
 
         http.authenticationProvider(authenticationProvider());
@@ -137,7 +126,7 @@ public class WebSecurityConfig {
         configuration.setAllowedOrigins(List.of("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33"));
         configuration.setAllowedMethods(Arrays.asList("PATCH", "GET", "POST", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type", "X-XSRF-TOKEN"));
-        configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));
+        configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header", "X-XSRF-TOKEN"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

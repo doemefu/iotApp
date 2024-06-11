@@ -89,7 +89,11 @@ public class WebSecurityConfig {
         http
                 .csrf(csrf -> csrf.
                         csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler()))
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .requireCsrfProtectionMatcher(request -> {
+                            // Disable CSRF for API paths for debugging
+                            return !request.getServletPath().startsWith("/api/auth/login");
+                        }))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

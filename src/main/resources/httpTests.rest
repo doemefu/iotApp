@@ -7,7 +7,10 @@ Content-Type: application/json
   "username": "testmoduser",
   "email": "testmoduser@email.ch",
   "password": "testmoduser",
-  "roles": ["mod","user"]
+  "roles": [
+    "mod",
+    "user"
+  ]
 }
 
 <> 2023-09-19T205600.200.json
@@ -20,6 +23,7 @@ Content-Type: application/json
 <> 2023-09-19T182925.400.txt
 <> 2023-09-19T182924.200.json
 <> 2023-09-19T173148.200.json
+
 ###
 POST http://localhost:8080/api/auth/signup
 Content-Type: application/json
@@ -28,7 +32,9 @@ Content-Type: application/json
   "username": "testmod",
   "email": "testmod@email.ch",
   "password": "testmod",
-  "roles": ["mod"]
+  "roles": [
+    "mod"
+  ]
 }
 
 <> 2023-09-19T205600-1.200.json
@@ -56,11 +62,14 @@ Content-Type: application/json
   "username": "testuser2",
   "email": "testuser2@email.ch",
   "password": "testuser2",
-  "roles": ["user"]
+  "roles": [
+    "user"
+  ]
 }
 
 <> 2023-09-19T205600-3.200.json
 <> 2023-09-19T185111-2.200.json
+
 ###
 POST http://localhost:8080/api/auth/signup
 Content-Type: application/json
@@ -69,7 +78,9 @@ Content-Type: application/json
   "username": "testadmin",
   "email": "testadmin@email.ch",
   "password": "testadmin",
-  "roles": ["admin"]
+  "roles": [
+    "admin"
+  ]
 }
 
 <> 2023-09-19T205601.200.json
@@ -95,7 +106,8 @@ POST http://localhost:8080/api/auth/signin
 Content-Type: application/json
 
 {
-  "username": "testuser", "password": "testuser"
+  "username": "testuser",
+  "password": "testuser"
 }
 
 <> 2023-09-19T211125.200.json

@@ -144,6 +144,7 @@ public class User {
     public Date getLastLogin() {
         return lastLogin;
     }
+
     public void setLastLogin(Date lastAccess) {
         this.lastLogin = lastAccess;
     }

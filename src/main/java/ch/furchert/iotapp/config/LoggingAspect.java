@@ -7,15 +7,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.AfterReturning;
 import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 
 import java.time.LocalDateTime;
 
@@ -23,10 +22,9 @@ import java.time.LocalDateTime;
 @Component
 public class LoggingAspect {
 
+    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
     @Autowired
     private LogEntryRepository logEntryRepository;
-
-    private static final Logger logger = LoggerFactory.getLogger(LoggingAspect.class);
 
     @AfterReturning(pointcut = "execution(* ch.furchert.iotapp.controller.*.*(..))", returning = "result")
     public void logMethodCall(JoinPoint joinPoint, Object result) {
@@ -57,11 +55,11 @@ public class LoggingAspect {
         logEntry.setTimestamp(LocalDateTime.now());
         logEntryRepository.save(logEntry);
 
-        logger.info("HTTP Request - Method {} returned with value {}", joinPoint.getSignature(), result);
+        logger.debug("HTTP Request - Method {} returned with value {}", joinPoint.getSignature(), result);
     }
 
     private void logNonHttpRequest(JoinPoint joinPoint, Object result, String username) {
         // Logging logic for non-HTTP contexts, possibly WebSocket or scheduled tasks
-        logger.info("Non-HTTP Request - User: {}, Method {} executed", username, joinPoint.getSignature());
+        logger.debug("Non-HTTP Request - User: {}, Method {} executed", username, joinPoint.getSignature());
     }
 }

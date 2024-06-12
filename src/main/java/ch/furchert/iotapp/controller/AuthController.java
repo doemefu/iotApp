@@ -17,6 +17,8 @@ import ch.furchert.iotapp.util.payload.response.MessageResponse;
 import ch.furchert.iotapp.util.payload.response.UserInfoResponse;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -36,35 +38,30 @@ import java.util.*;
 @RestController
 @RequestMapping("api/auth")
 public class AuthController {
+    private static final Logger logger = LoggerFactory.getLogger(AuthController.class);
     @Autowired
     AuthenticationManager authenticationManager;
-
     @Autowired
     UserRepository userRepository;
-
     @Autowired
     RoleRepository roleRepository;
-
     @Autowired
     UserStatusRepository userStatusRepository;
-
     @Autowired
     PasswordEncoder encoder;
-
     @Autowired
     JwtUtils jwtUtils;
-
     @Autowired
     RefreshTokenService refreshTokenService;
-
     @Autowired
     EmailServiceImpl emailService;
-
     @Autowired
     private EmailTokenService emailTokenService;
 
     @PostMapping("/login")
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
+
+        logger.info("login request start");
 
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 
@@ -111,6 +108,8 @@ public class AuthController {
         RefreshToken refreshToken = refreshTokenService.createRefreshToken(userDetails.getId());
 
         ResponseCookie jwtRefreshCookie = jwtUtils.generateRefreshJwtCookie(refreshToken.getToken());
+
+        logger.info("login request done");
 
         return ResponseEntity.ok()
                 .header(HttpHeaders.SET_COOKIE, jwtCookie.toString())
@@ -228,22 +227,27 @@ public class AuthController {
     }
 
     @PostMapping("/logout")
-    //public ResponseEntity<?> logoutUser(@RequestHeader("Authorization") String authorizationHeader){
     public ResponseEntity<?> logoutUser(HttpServletRequest request) {
-        String someHeaders = String.valueOf(request.getHeaderNames());
 
-        //System.out.println("logoutUser" + authorizationHeader);
-        System.out.println("logoutUser" + someHeaders);
+        try {
+            String someHeaders = String.valueOf(request.getHeaderNames());
 
-        UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        Long userId = userDetails.getId();
-        refreshTokenService.deleteByUserId(userId);
+            System.out.println("logoutUser" + someHeaders);
+
+            UserDetailsImpl userDetails = (UserDetailsImpl) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            Long userId = userDetails.getId();
+            refreshTokenService.deleteByUserId(userId);
+        } catch (Exception e) {
+            System.out.println("logoutUser error: " + e);
+        }
+
         ResponseCookie emptyJwtCookie = jwtUtils.getCleanJwtCookie();
         ResponseCookie emptyJwtRefreshCookie = jwtUtils.getCleanJwtRefreshCookie();
         return ResponseEntity
                 .ok()
                 .header(HttpHeaders.SET_COOKIE, emptyJwtCookie.toString())
                 .header(HttpHeaders.SET_COOKIE, emptyJwtRefreshCookie.toString())
+                .header(HttpHeaders.SET_COOKIE, "XSRF-TOKEN=; Path=/api; Max-Age=0; Secure; SameSite=Lax")
                 .body(new MessageResponse("You've been signed out!"));
     }
 
@@ -279,4 +283,5 @@ public class AuthController {
         }
         return ResponseEntity.badRequest().body(new MessageResponse("Refresh Token is empty!"));
     }
+
 }

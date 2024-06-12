@@ -1,6 +1,8 @@
 package ch.furchert.iotapp.controller;
 
 import ch.furchert.iotapp.repository.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -12,13 +14,16 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/get")
 public class ContentController {
+    private static final Logger logger = LoggerFactory.getLogger(ContentController.class);
 
     @Autowired
     UserRepository userRepository;
 
     @GetMapping("/all")
     public String allAccess() {
-        return "Public Content.";
+
+        logger.info("get/all request received");
+        return "This is public Content.";
     }
 
     @GetMapping("/user")

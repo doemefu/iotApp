@@ -3,6 +3,8 @@ package ch.furchert.iotapp.security;
 import ch.furchert.iotapp.security.jwt.AuthEntryPointJwt;
 import ch.furchert.iotapp.security.jwt.AuthTokenFilter;
 import ch.furchert.iotapp.service.UserDetailsServiceImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -11,7 +13,6 @@ import org.springframework.security.authentication.dao.DaoAuthenticationProvider
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -21,6 +22,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
+import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
@@ -37,6 +40,7 @@ import java.util.List;
 // prePostEnabled = true) // by default
 public class WebSecurityConfig {
 
+    private static final Logger logger = LoggerFactory.getLogger(WebSecurityConfig.class);
     @Autowired
     UserDetailsServiceImpl userDetailsService;
     @Autowired
@@ -63,10 +67,12 @@ public class WebSecurityConfig {
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {
+        logger.debug("WebSecurityConfig.authenticationProvider start");
         DaoAuthenticationProvider authProvider = new DaoAuthenticationProvider();
 
         authProvider.setUserDetailsService(userDetailsService);
         authProvider.setPasswordEncoder(passwordEncoder());
+        logger.debug("WebSecurityConfig.authenticationProvider end");
 
         return authProvider;
     }
@@ -78,9 +84,14 @@ public class WebSecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        logger.debug("WebSecurityConfig.filterChain start");
+
         http
+                .csrf(csrf -> csrf.
+                        csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers("/api/auth/login", "/api/auth/register", "/api/ws/**"))
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth ->
@@ -88,14 +99,21 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/get/**").permitAll()
                                 .requestMatchers("/api/user-management/forgotPassword").permitAll()
                                 .requestMatchers("/api/user-management/resetPassword").permitAll()
-                                .requestMatchers("/api/ws/**").permitAll()
+                                .requestMatchers("/api/ws/**").permitAll() //TODO: check whether this is really permitAll
                                 .anyRequest().authenticated()
                 )
+                /*
+                .logout(logout -> logout
+                        .logoutUrl("/api/auth/logout")
+                        .deleteCookies("XSRF-TOKEN")
+                        .invalidateHttpSession(true)
+                        .logoutSuccessUrl("/api/auth/logout/success"))
+                */
         ;
 
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(authenticationJwtTokenFilter(), UsernamePasswordAuthenticationFilter.class);
+        logger.debug("WebSecurityConfig.filterChain end");
 
         return http.build();
     }
@@ -105,9 +123,9 @@ public class WebSecurityConfig {
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(List.of("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33"));
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "OPTIONS"));
-        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type"));
-        configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header"));
+        configuration.setAllowedMethods(Arrays.asList("PATCH", "GET", "POST", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("Authorization", "Cache-Control", "Content-Type", "Requestor-Type", "X-XSRF-TOKEN"));
+        configuration.setExposedHeaders(Arrays.asList("ResponseMessage", "X-Get-Header", "X-XSRF-TOKEN"));
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

@@ -103,7 +103,7 @@ public class WebSecurityConfig {
                                 .requestMatchers("/api/get/**").permitAll()
                                 .requestMatchers("/api/user-management/forgotPassword").permitAll()
                                 .requestMatchers("/api/user-management/resetPassword").permitAll()
-                                .requestMatchers("/api/ws/**").permitAll()
+                                .requestMatchers("/api/ws/**").permitAll() //TODO: check whether this is really permitAll
                                 .anyRequest().authenticated()
                 )
                 /*

@@ -59,10 +59,9 @@ public class AuthController {
     private EmailTokenService emailTokenService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest, @RequestHeader("X-XSRF-TOKEN") String xsrfToken) {
+    public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
 
         logger.info("login request start");
-        logger.debug("X-XSRF-TOKEN: {}", xsrfToken);
 
         Optional<User> userOptional = userRepository.findByUsername(loginRequest.getUsername());
 

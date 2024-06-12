@@ -29,13 +29,13 @@ public class WebSocketController {
     // Methode, die auf Client-Anfragen reagiert
     @MessageMapping("/requestData")
     public void requestData(String terrariumId) {
-        log.trace("Received request for terrarium {}", terrariumId);
+        log.debug("Received request for terrarium {}", terrariumId);
         sendTerrariumUpdate(terrariumId);
     }
 
     // Diese Methode sendet aktualisierte Terrarium-Daten an ein bestimmtes WebSocket-Topic
     public void sendTerrariumUpdate(String terrariumId) {
-        log.trace("Sending terrarium update for terrarium {}", terrariumId);
+        log.debug("Sending terrarium update for terrarium {}", terrariumId);
         Terrarium terrarium = terrariumManagementService.getTerrarium(terrariumId);
         if (terrarium != null) {
             template.convertAndSend("/topic/terrarium/" + terrariumId, terrarium);
@@ -59,7 +59,7 @@ public class WebSocketController {
 
     @EventListener
     public void onMqttMessageReceived(MqttMessageReceivedEvent event) {
-        log.trace("Received MQTT event in Websocket controller: {}: {}", event.getTopic(), event.getMessage());
+        log.debug("Received MQTT event in Websocket controller: {}: {}", event.getTopic(), event.getMessage());
         if (event.getTopic().contains("terra1")) { // Only update the terrarium if the message is for terra1
             sendTerrariumUpdate("terra1");
         } else {

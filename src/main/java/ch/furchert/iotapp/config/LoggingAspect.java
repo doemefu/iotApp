@@ -55,11 +55,11 @@ public class LoggingAspect {
         logEntry.setTimestamp(LocalDateTime.now());
         logEntryRepository.save(logEntry);
 
-        logger.info("HTTP Request - Method {} returned with value {}", joinPoint.getSignature(), result);
+        logger.debug("HTTP Request - Method {} returned with value {}", joinPoint.getSignature(), result);
     }
 
     private void logNonHttpRequest(JoinPoint joinPoint, Object result, String username) {
         // Logging logic for non-HTTP contexts, possibly WebSocket or scheduled tasks
-        logger.info("Non-HTTP Request - User: {}, Method {} executed", username, joinPoint.getSignature());
+        logger.debug("Non-HTTP Request - User: {}, Method {} executed", username, joinPoint.getSignature());
     }
 }

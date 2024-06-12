@@ -17,14 +17,14 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
-        log.info("configureMessageBroker");
+        log.debug("configureMessageBroker");
         config.enableSimpleBroker("/topic");
         config.setApplicationDestinationPrefixes("/app");
     }
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        log.info("registerStompEndpoints");
+        log.debug("registerStompEndpoints");
         registry.addEndpoint("/api/ws")
                 .setAllowedOrigins("https://furchert.ch", "http://localhost:80", "https://localhost:443", "https://localhost:33")
                 .withSockJS()

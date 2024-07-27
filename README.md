@@ -6,6 +6,8 @@
 
 [![Codacy Security Scan](https://github.com/doemefu/iotApp/actions/workflows/codacy.yml/badge.svg)](https://github.com/doemefu/iotApp/actions/workflows/codacy.yml)
 
+![Built on InfluxDB](https://www.influxdata.com/wp-content/uploads/built-on-influxdb-white-2022.svg)
+
 Dies ist die Doku der IoT App. Sie beinhaltet die Dokumentation der API, sowie die Dokumentation des Projektes.
 
 # Inhalt

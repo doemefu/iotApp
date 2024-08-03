@@ -91,7 +91,7 @@ public class InfluxService {
 
         String history = """
                 from(bucket: "Terrarium")
-                  |> range(start: -24h, stop: now())
+                  |> range(start: -23h, stop: now())
                   |> filter(fn: (r) => r["device"] == "terra1")
                   |> filter(fn: (r) => r["_field"] == "MqttState")
                   |> aggregateWindow(every: 1h, fn: min, createEmpty: true)

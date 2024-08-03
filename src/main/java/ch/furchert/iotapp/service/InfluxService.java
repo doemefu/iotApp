@@ -4,15 +4,19 @@ import ch.furchert.iotapp.model.InfluxTerraData;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
 import com.influxdb.client.QueryApi;
+import com.influxdb.query.FluxRecord;
+import com.influxdb.query.FluxTable;
 import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class InfluxService {
@@ -34,6 +38,13 @@ public class InfluxService {
     @PostConstruct
     public void init() {
         this.influxDBClient = InfluxDBClientFactory.create(InfluxURL, token.toCharArray(), org, bucket);
+    }
+
+    @PreDestroy
+    public void close() {
+        if (this.influxDBClient != null) {
+            this.influxDBClient.close();
+        }
     }
 
     public List<InfluxTerraData> queryMeasurementData() {
@@ -74,9 +85,51 @@ public class InfluxService {
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
 
-    public void close() {
-        if (this.influxDBClient != null) {
-            this.influxDBClient.close();
+    public int[] queryStatus(String device){
+
+        int[] historicState = new int[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+
+        String history = """
+                from(bucket: "Terrarium")
+                  |> range(start: -24h, stop: now())
+                  |> filter(fn: (r) => r["device"] == "terra1")
+                  |> filter(fn: (r) => r["_field"] == "MqttState")
+                  |> aggregateWindow(every: 1h, fn: min, createEmpty: true)
+                """;
+
+        String last = """
+                from(bucket: "Terrarium")
+                  |> range(start: -30d, stop: now())
+                  |> filter(fn: (r) => r["device"] == "terra1")
+                  |> filter(fn: (r) => r["_field"] == "MqttState")
+                  |> last()
+                """;
+
+        QueryApi queryApi = influxDBClient.getQueryApi();
+
+        List<FluxTable> tables = queryApi.query(history);
+
+        for (FluxTable fluxTable : tables) {
+            List<FluxRecord> records = fluxTable.getRecords();
+            int i = 1;
+            for (FluxRecord fluxRecord : records) {
+                System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
+                if (fluxRecord.getValueByKey("_value") instanceof Integer){
+                    historicState[i++] = (int) fluxRecord.getValueByKey("_value");
+                } else {
+                    historicState[i++] = historicState[i-2];
+                }
+            }
         }
+
+        Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
+        if(lastValue instanceof Integer){
+            historicState[0] = (int) lastValue;
+        } else {
+            historicState[0] = -1;
+        }
+
+        return historicState;
     }
+
 }

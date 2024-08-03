@@ -111,7 +111,7 @@ public class InfluxService {
 
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
-            int i = 1;
+            int i = 0;
             for (FluxRecord fluxRecord : records) {
                 System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
                 if (fluxRecord.getValueByKey("_value") instanceof Integer){
@@ -124,9 +124,9 @@ public class InfluxService {
 
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
         if(lastValue instanceof Integer){
-            historicState[0] = (int) lastValue;
+            historicState[24] = (int) lastValue;
         } else {
-            historicState[0] = -1;
+            historicState[24] = -1;
         }
 
         return historicState;

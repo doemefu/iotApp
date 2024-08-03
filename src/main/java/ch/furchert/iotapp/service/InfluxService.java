@@ -87,7 +87,7 @@ public class InfluxService {
 
     public int[] queryStatus(String device){
 
-        int[] historicState = new int[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+        int[] historicState = new int[]{ -1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1 };
 
         String history = """
                 from(bucket: "Terrarium")
@@ -109,10 +109,13 @@ public class InfluxService {
 
         List<FluxTable> tables = queryApi.query(history);
 
+        int a = 1;
         for (FluxTable fluxTable : tables) {
+            System.out.println("outer index: " + a);
             List<FluxRecord> records = fluxTable.getRecords();
             int i = 0;
             for (FluxRecord fluxRecord : records) {
+                System.out.println("inner index: " + i);
                 System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
                 if (fluxRecord.getValueByKey("_value") instanceof Integer){
                     historicState[i++] = (int) fluxRecord.getValueByKey("_value");
@@ -120,6 +123,7 @@ public class InfluxService {
                     historicState[i++] = historicState[i-2];
                 }
             }
+            a++;
         }
 
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");

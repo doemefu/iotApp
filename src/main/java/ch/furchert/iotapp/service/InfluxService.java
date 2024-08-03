@@ -109,7 +109,7 @@ public class InfluxService {
 
         List<FluxTable> tables = queryApi.query(history);
 
-        int a = 1;
+        int a = 0;
         for (FluxTable fluxTable : tables) {
             System.out.println("outer index: " + a);
             List<FluxRecord> records = fluxTable.getRecords();
@@ -120,7 +120,11 @@ public class InfluxService {
                 if (fluxRecord.getValueByKey("_value") instanceof Integer){
                     historicState[i++] = (int) fluxRecord.getValueByKey("_value");
                 } else {
-                    historicState[i++] = historicState[i-2];
+                    if(i==0){
+                        historicState[i++] = -1;
+                    } else {
+                        historicState[i++] = historicState[i - 2];
+                    }
                 }
             }
             a++;

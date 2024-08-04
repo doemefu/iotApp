@@ -90,21 +90,29 @@ public class InfluxService {
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
 
-    public int[] queryStatus(String device){
+    public double[] queryStatus(String device){
 
-        int[] historicState = new int[]{ -1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1,0,1,-1 };
+        double [] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+
+        String startHistory = """
+                from(bucket: "Terrarium")
+                  |> range(start: -7d, stop: -23h)
+                  |> filter(fn: (r) => r["device"] == "terra1")
+                  |> filter(fn: (r) => r["_field"] == "MqttState")
+                  |> last()
+                """;
 
         String history = """
                 from(bucket: "Terrarium")
                   |> range(start: -23h, stop: now())
                   |> filter(fn: (r) => r["device"] == "terra1")
                   |> filter(fn: (r) => r["_field"] == "MqttState")
-                  |> aggregateWindow(every: 1h, fn: min, createEmpty: true)
+                  |> aggregateWindow(every: 1h, fn: mean, createEmpty: true)
                 """;
 
         String last = """
                 from(bucket: "Terrarium")
-                  |> range(start: -30d, stop: now())
+                  |> range(start: -7d, stop: now())
                   |> filter(fn: (r) => r["device"] == "terra1")
                   |> filter(fn: (r) => r["_field"] == "MqttState")
                   |> last()
@@ -112,31 +120,29 @@ public class InfluxService {
 
         QueryApi queryApi = influxDBClient.getQueryApi();
 
+        Object historyStart = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
+        if(historyStart instanceof Double){
+            historicState[0] = (double) historyStart;
+        }
+
         List<FluxTable> tables = queryApi.query(history);
 
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
-            int i = 0;
+            int i = 1;
             for (FluxRecord fluxRecord : records) {
                 log.debug(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
                 if (fluxRecord.getValueByKey("_value") != null) {
-
-                    Double tempDouble = (double) fluxRecord.getValueByKey("_value");
-                    historicState[i++] = tempDouble.intValue();
-
+                    historicState[i++]= (double) fluxRecord.getValueByKey("_value");
                 } else {
-                    if(i==0){
-                        historicState[i++] = -1;
-                    } else {
-                        historicState[i++] = historicState[i - 2];
-                    }
+                    historicState[i++] = historicState[i - 2];
                 }
             }
         }
 
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
-        if(lastValue instanceof Integer){
-            historicState[24] = (int) lastValue;
+        if(lastValue instanceof Double){
+            historicState[24] = (double) lastValue;
         } else {
             historicState[24] = -1;
         }

@@ -1,5 +1,6 @@
 package ch.furchert.iotapp.service;
 
+import ch.furchert.iotapp.controller.DataController;
 import ch.furchert.iotapp.model.InfluxTerraData;
 import com.influxdb.client.InfluxDBClient;
 import com.influxdb.client.InfluxDBClientFactory;
@@ -10,6 +11,8 @@ import com.influxdb.query.dsl.Flux;
 import com.influxdb.query.dsl.functions.restriction.Restrictions;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -20,6 +23,8 @@ import java.util.Objects;
 
 @Service
 public class InfluxService {
+
+    private static final Logger log = LoggerFactory.getLogger(DataController.class);
 
     @Value("${furchert.iotapp.influxToken}")
     private String token;
@@ -109,14 +114,11 @@ public class InfluxService {
 
         List<FluxTable> tables = queryApi.query(history);
 
-        int a = 0;
         for (FluxTable fluxTable : tables) {
-            System.out.println("outer index: " + a);
             List<FluxRecord> records = fluxTable.getRecords();
             int i = 0;
             for (FluxRecord fluxRecord : records) {
-                System.out.println("inner index: " + i);
-                System.out.println(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
+                log.debug(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
                 if (fluxRecord.getValueByKey("_value") instanceof Integer){
                     historicState[i++] = (int) fluxRecord.getValueByKey("_value");
                 } else {
@@ -127,7 +129,6 @@ public class InfluxService {
                     }
                 }
             }
-            a++;
         }
 
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");

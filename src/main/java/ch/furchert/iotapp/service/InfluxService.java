@@ -17,8 +17,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -120,26 +124,44 @@ public class InfluxService {
 
         QueryApi queryApi = influxDBClient.getQueryApi();
 
-        Object historyStart = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
+        //first value
+        Object historyStart = queryApi.query(startHistory).getFirst().getRecords().getFirst().getValueByKey("_value");
         if(historyStart instanceof Double){
             historicState[0] = (double) historyStart;
         }
 
+        //history values
         List<FluxTable> tables = queryApi.query(history);
+
+        Map<Integer, Double> hourlyStates = new HashMap<>();
+        Map<Integer, Integer> hourlyCounts = new HashMap<>();
 
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
-            int i = 1;
+
             for (FluxRecord fluxRecord : records) {
-                log.debug(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
-                if (fluxRecord.getValueByKey("_value") != null) {
-                    historicState[i++]= (double) fluxRecord.getValueByKey("_value");
-                } else {
-                    historicState[i++] = historicState[i - 2];
+                Instant timestamp = fluxRecord.getTime();
+                ZonedDateTime zonedDateTime = timestamp.atZone(ZoneId.of("UTC")); // Adjust ZoneId as needed
+                int hour = zonedDateTime.getHour();
+
+                Double value = (Double) fluxRecord.getValueByKey("_value");
+
+                if (value != null) {
+                    hourlyStates.put(hour, hourlyStates.getOrDefault(hour, 0.0) + value);
+                    hourlyCounts.put(hour, hourlyCounts.getOrDefault(hour, 0) + 1);
                 }
             }
         }
 
+        for (int i = 1; i < 24; i++) {
+            if (hourlyStates.containsKey(i)) {
+                historicState[i] = hourlyStates.get(i) / hourlyCounts.get(i);
+            } else {
+                historicState[i] = getLastKnownState(historicState, i);
+            }
+        }
+
+        //live value
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
         if(lastValue instanceof Double){
             historicState[24] = (double) lastValue;
@@ -148,6 +170,15 @@ public class InfluxService {
         }
 
         return historicState;
+    }
+
+    private static double getLastKnownState(double[] historicState, int currentHour) {
+        for (int i = currentHour - 1; i >= 0; i--) {
+            if (historicState[i] != 0) {
+                return historicState[i];
+            }
+        }
+        return -1.0; // Default to -1.0 if no previous state is known
     }
 
 }

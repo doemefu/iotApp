@@ -52,10 +52,11 @@ public class DataController {
     @GetMapping("/deviceStatus")
     public ResponseEntity<int[]> getStatus(@RequestParam(value = "device", defaultValue = "terra1") String device) {
 
-        log.trace("Getting data from InfluxDB for device: {}", device);
+        log.debug("Getting statusdata from InfluxDB for device: {}", device);
 
         int[] array = influxService.queryStatus(device);
 
+        log.debug("die stati: {}", array);
         return new ResponseEntity<>(array, HttpStatus.OK);
     }
 

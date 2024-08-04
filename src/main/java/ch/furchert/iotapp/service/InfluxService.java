@@ -119,7 +119,7 @@ public class InfluxService {
             int i = 0;
             for (FluxRecord fluxRecord : records) {
                 log.debug(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
-                if (fluxRecord.getValueByKey("_value") instanceof Integer){
+                if (fluxRecord.getValueByKey("_value") instanceof Float){
                     historicState[i++] = (int) fluxRecord.getValueByKey("_value");
                 } else {
                     if(i==0){

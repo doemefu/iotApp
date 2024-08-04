@@ -120,8 +120,10 @@ public class InfluxService {
             for (FluxRecord fluxRecord : records) {
                 log.debug(fluxRecord.getTime() + ": " + fluxRecord.getValueByKey("_value"));
                 if (fluxRecord.getValueByKey("_value") != null) {
-                    log.debug(fluxRecord.getValueByKey("_value").getClass().getSimpleName());
-                    historicState[i++] = (int) fluxRecord.getValueByKey("_value");
+
+                    Double tempDouble = (double) fluxRecord.getValueByKey("_value");
+                    historicState[i++] = tempDouble.intValue();
+
                 } else {
                     if(i==0){
                         historicState[i++] = -1;

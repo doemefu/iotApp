@@ -128,6 +128,7 @@ public class InfluxService {
         Object historyStart = queryApi.query(startHistory).getFirst().getRecords().getFirst().getValueByKey("_value");
         if(historyStart instanceof Double){
             historicState[0] = (double) historyStart;
+            log.debug("First value: {}", historyStart);
         }
 
         //history values
@@ -165,9 +166,10 @@ public class InfluxService {
         Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
         if(lastValue instanceof Double){
             historicState[24] = (double) lastValue;
-        } else {
-            historicState[24] = -1;
+            log.debug("Last value: {}", lastValue);
         }
+
+        log.debug("Historic state: {}", historicState);
 
         return historicState;
     }

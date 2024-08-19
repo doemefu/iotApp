@@ -128,11 +128,15 @@ public class InfluxService {
         log.debug("queryApi buildup done");
 
         //first value
-        Object historyStart = queryApi.query(startHistory).getFirst().getRecords().getFirst().getValueByKey("_value");
-        if(historyStart instanceof Double){
-            historicState[0] = (double) historyStart;
-            log.debug("First value: {}", historyStart);
+        List<FluxTable> startHistoryResult = queryApi.query(startHistory);
+        if (!startHistoryResult.isEmpty() && !startHistoryResult.getFirst().getRecords().isEmpty()) {
+            Object historyStart = startHistoryResult.getFirst().getRecords().getFirst().getValueByKey("_value");
+            if (historyStart instanceof Double) {
+                historicState[0] = (double) historyStart;
+                log.debug("First value: {}", historyStart);
+            }
         }
+
 
         //history values
         List<FluxTable> tables = queryApi.query(history);

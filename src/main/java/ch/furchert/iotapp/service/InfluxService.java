@@ -94,55 +94,53 @@ public class InfluxService {
         return queryApi.query(fluxQuery.toString(), InfluxTerraData.class);
     }
 
-    public double[] queryStatus(String device){
+    public double[] queryStatus(String device) {
 
         log.debug("Querying status for device: {}", device);
 
-        double [] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+        double[] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 
         String startHistory = """
-                from(bucket: "Terrarium")
-                  |> range(start: -7d, stop: -23h)
-                  |> filter(fn: (r) => r["device"] == "terra1")
-                  |> filter(fn: (r) => r["_field"] == "MqttState")
-                  |> last()
-                """;
+            from(bucket: "Terrarium")
+              |> range(start: -30d, stop: -23h)
+              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["_field"] == "MqttState")
+              |> last()
+            """;
 
         String history = """
-                from(bucket: "Terrarium")
-                  |> range(start: -23h, stop: now())
-                  |> filter(fn: (r) => r["device"] == "terra1")
-                  |> filter(fn: (r) => r["_field"] == "MqttState")
-                  |> aggregateWindow(every: 1h, fn: mean, createEmpty: true)
-                """;
+            from(bucket: "Terrarium")
+              |> range(start: -23h, stop: now())
+              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["_field"] == "MqttState")
+            """;
 
         String last = """
-                from(bucket: "Terrarium")
-                  |> range(start: -7d, stop: now())
-                  |> filter(fn: (r) => r["device"] == "terra1")
-                  |> filter(fn: (r) => r["_field"] == "MqttState")
-                  |> last()
-                """;
+            from(bucket: "Terrarium")
+              |> range(start: -7d, stop: now())
+              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["_field"] == "MqttState")
+              |> last()
+            """;
 
         QueryApi queryApi = influxDBClient.getQueryApi();
         log.debug("queryApi buildup done");
 
-        //first value
+        double lastKnownState = -1;
+
+        // First value (long time period)
         List<FluxTable> startHistoryResult = queryApi.query(startHistory);
-        if (!startHistoryResult.isEmpty() && !startHistoryResult.getFirst().getRecords().isEmpty()) {
-            Object historyStart = startHistoryResult.getFirst().getRecords().getFirst().getValueByKey("_value");
+        if (!startHistoryResult.isEmpty() && !startHistoryResult.get(0).getRecords().isEmpty()) {
+            Object historyStart = startHistoryResult.get(0).getRecords().get(0).getValueByKey("_value");
             if (historyStart instanceof Double) {
-                historicState[0] = (double) historyStart;
+                lastKnownState = (double) historyStart;
+                historicState[0] = lastKnownState;
                 log.debug("First value: {}", historyStart);
             }
         }
 
-
-        //history values
+        // History values
         List<FluxTable> tables = queryApi.query(history);
-
-        Map<Integer, Double> hourlyStates = new HashMap<>();
-        Map<Integer, Integer> hourlyCounts = new HashMap<>();
 
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
@@ -155,31 +153,35 @@ public class InfluxService {
                 Double value = (Double) fluxRecord.getValueByKey("_value");
 
                 if (value != null) {
-                    hourlyStates.put(hour, hourlyStates.getOrDefault(hour, 0.0) + value);
-                    hourlyCounts.put(hour, hourlyCounts.getOrDefault(hour, 0) + 1);
+                    lastKnownState = value;  // Update last known state
+                    historicState[hour] = lastKnownState;
                 }
             }
         }
 
+        // Fill in missing hours with the last known state up to that hour
         for (int i = 1; i < 24; i++) {
-            if (hourlyStates.containsKey(i)) {
-                historicState[i] = hourlyStates.get(i) / hourlyCounts.get(i);
-            } else {
-                historicState[i] = getLastKnownState(historicState, i);
+            if (historicState[i] == -1) {  // No data for this hour
+                historicState[i] = historicState[i - 1];  // Use the state from the previous hour
             }
         }
 
-        //live value
-        Object lastValue = queryApi.query(last).getFirst().getRecords().getFirst().getValueByKey("_value");
-        if(lastValue instanceof Double){
-            historicState[24] = (double) lastValue;
-            log.debug("Last value: {}", lastValue);
+        // Live value
+        List<FluxTable> lastResult = queryApi.query(last);
+        if (!lastResult.isEmpty() && !lastResult.get(0).getRecords().isEmpty()) {
+            Object lastValue = lastResult.get(0).getRecords().get(0).getValueByKey("_value");
+            if (lastValue instanceof Double) {
+                lastKnownState = (double) lastValue;
+                historicState[24] = lastKnownState;
+                log.debug("Last value: {}", lastValue);
+            }
         }
 
         log.debug("Historic state: {}", historicState);
 
         return historicState;
     }
+
 
     private static double getLastKnownState(double[] historicState, int currentHour) {
         for (int i = currentHour - 1; i >= 0; i--) {

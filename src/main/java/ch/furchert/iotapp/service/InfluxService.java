@@ -146,7 +146,7 @@ public class InfluxService {
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
             int oldHour = -1;
-            int hourCounter = 0;
+            int hourCounter = 1;
             for (FluxRecord fluxRecord : records) {
                 Instant timestamp = fluxRecord.getTime();
                 ZonedDateTime zonedDateTime = timestamp.atZone(ZoneId.of("UTC")); // Adjust ZoneId as needed
@@ -171,7 +171,7 @@ public class InfluxService {
                 }else{
                     historicState[hour] = historicState[hour] / hourCounter;
                     oldHour = hour;
-                    hourCounter = 0;
+                    hourCounter = 1;
                 }
             }
         }

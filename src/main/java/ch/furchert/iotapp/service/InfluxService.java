@@ -100,28 +100,29 @@ public class InfluxService {
 
         double[] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 
-        String startHistory = """
+        String startHistory = String.format("""
             from(bucket: "Terrarium")
               |> range(start: -30d, stop: -23h)
-              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["device"] == "%s")
               |> filter(fn: (r) => r["_field"] == "MqttState")
               |> last()
-            """;
+            """, device);
 
-        String history = """
+        String history = String.format("""
             from(bucket: "Terrarium")
               |> range(start: -23h, stop: now())
-              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["device"] == "%s")
               |> filter(fn: (r) => r["_field"] == "MqttState")
-            """;
+            """, device);
 
-        String last = """
+
+        String last =  String.format("""
             from(bucket: "Terrarium")
               |> range(start: -7d, stop: now())
-              |> filter(fn: (r) => r["device"] == "terra1")
+              |> filter(fn: (r) => r["device"] == "%s"")
               |> filter(fn: (r) => r["_field"] == "MqttState")
               |> last()
-            """;
+            """, device);
 
         QueryApi queryApi = influxDBClient.getQueryApi();
         log.debug("queryApi buildup done");
@@ -130,8 +131,8 @@ public class InfluxService {
 
         // First value (long time period)
         List<FluxTable> startHistoryResult = queryApi.query(startHistory);
-        if (!startHistoryResult.isEmpty() && !startHistoryResult.get(0).getRecords().isEmpty()) {
-            Object historyStart = startHistoryResult.get(0).getRecords().get(0).getValueByKey("_value");
+        if (!startHistoryResult.isEmpty() && !startHistoryResult.getFirst().getRecords().isEmpty()) {
+            Object historyStart = startHistoryResult.getFirst().getRecords().getFirst().getValueByKey("_value");
             if (historyStart instanceof Double) {
                 lastKnownState = (double) historyStart;
                 historicState[0] = lastKnownState;
@@ -144,7 +145,8 @@ public class InfluxService {
 
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
-
+            int oldHour = -1;
+            int hourCounter = 0;
             for (FluxRecord fluxRecord : records) {
                 Instant timestamp = fluxRecord.getTime();
                 ZonedDateTime zonedDateTime = timestamp.atZone(ZoneId.of("UTC")); // Adjust ZoneId as needed
@@ -154,7 +156,22 @@ public class InfluxService {
 
                 if (value != null) {
                     lastKnownState = value;  // Update last known state
+
+                    if(historicState[hour] == -1) {
+                        historicState[hour] = value;
+                    }else{
+                        historicState[hour] = historicState[hour] + value;
+                    }
+                }else {
                     historicState[hour] = lastKnownState;
+                }
+
+                if(oldHour == hour){
+                    hourCounter++;
+                }else{
+                    historicState[hour] = historicState[hour] / hourCounter;
+                    oldHour = hour;
+                    hourCounter = 0;
                 }
             }
         }
@@ -168,8 +185,8 @@ public class InfluxService {
 
         // Live value
         List<FluxTable> lastResult = queryApi.query(last);
-        if (!lastResult.isEmpty() && !lastResult.get(0).getRecords().isEmpty()) {
-            Object lastValue = lastResult.get(0).getRecords().get(0).getValueByKey("_value");
+        if (!lastResult.isEmpty() && !lastResult.getFirst().getRecords().isEmpty()) {
+            Object lastValue = lastResult.getFirst().getRecords().getFirst().getValueByKey("_value");
             if (lastValue instanceof Double) {
                 lastKnownState = (double) lastValue;
                 historicState[24] = lastKnownState;

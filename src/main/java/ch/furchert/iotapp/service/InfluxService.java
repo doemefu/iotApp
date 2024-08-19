@@ -119,7 +119,7 @@ public class InfluxService {
         String last =  String.format("""
             from(bucket: "Terrarium")
               |> range(start: -7d, stop: now())
-              |> filter(fn: (r) => r["device"] == "%s"")
+              |> filter(fn: (r) => r["device"] == "%s")
               |> filter(fn: (r) => r["_field"] == "MqttState")
               |> last()
             """, device);

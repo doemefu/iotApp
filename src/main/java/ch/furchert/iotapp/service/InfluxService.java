@@ -141,6 +141,8 @@ public class InfluxService {
         // History values
         List<FluxTable> tables = queryApi.query(history);
 
+        int nowHour = ZonedDateTime.now().getHour();
+
         for (FluxTable fluxTable : tables) {
             List<FluxRecord> records = fluxTable.getRecords();
 
@@ -151,16 +153,24 @@ public class InfluxService {
 
                 Double value = (Double) fluxRecord.getValueByKey("_value");
 
-                if (value != null) {
-                    lastState[hour] = value;  // Update last known state
+                int diff;
+                if(hour > nowHour) {
+                    diff = hour - nowHour;
+                }else{
+                    diff = nowHour - hour;
+                }
+                int index = 24 - diff;
 
-                    if(historicState[hour] == -1) {
-                        historicState[hour] = value;
+                if (value != null) {
+                    lastState[index] = value;  // Update last known state
+
+                    if(historicState[index] == -1) {
+                        historicState[index] = value;
                     }else{
-                        historicState[hour] = 0.5;
+                        historicState[index] = 0.5;
                     }
                 }else {
-                    historicState[hour] = lastState[hour-1];
+                    historicState[index] = lastState[hour-1];
                 }
             }
         }

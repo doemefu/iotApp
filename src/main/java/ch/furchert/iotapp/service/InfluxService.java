@@ -99,6 +99,7 @@ public class InfluxService {
         log.debug("Querying status for device: {}", device);
 
         double[] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
+        double[] lastState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 
         String startHistory = String.format("""
             from(bucket: "Terrarium")
@@ -115,7 +116,6 @@ public class InfluxService {
               |> filter(fn: (r) => r["_field"] == "MqttState")
             """, device);
 
-
         String last =  String.format("""
             from(bucket: "Terrarium")
               |> range(start: -7d, stop: now())
@@ -127,15 +127,13 @@ public class InfluxService {
         QueryApi queryApi = influxDBClient.getQueryApi();
         log.debug("queryApi buildup done");
 
-        double lastKnownState = -1;
-
         // First value (long time period)
         List<FluxTable> startHistoryResult = queryApi.query(startHistory);
         if (!startHistoryResult.isEmpty() && !startHistoryResult.getFirst().getRecords().isEmpty()) {
             Object historyStart = startHistoryResult.getFirst().getRecords().getFirst().getValueByKey("_value");
             if (historyStart instanceof Double) {
-                lastKnownState = (double) historyStart;
-                historicState[0] = lastKnownState;
+                lastState[0] = (double) historyStart;
+                historicState[0] = lastState[0];
                 log.debug("First value: {}", historyStart);
             }
         }
@@ -154,7 +152,7 @@ public class InfluxService {
                 Double value = (Double) fluxRecord.getValueByKey("_value");
 
                 if (value != null) {
-                    lastKnownState = value;  // Update last known state
+                    lastState[hour] = value;  // Update last known state
 
                     if(historicState[hour] == -1) {
                         historicState[hour] = value;
@@ -162,15 +160,20 @@ public class InfluxService {
                         historicState[hour] = 0.5;
                     }
                 }else {
-                    historicState[hour] = lastKnownState;
+                    historicState[hour] = lastState[hour-1];
                 }
             }
         }
 
         // Fill in missing hours with the last known state up to that hour
         for (int i = 1; i < 24; i++) {
+            if (lastState[i] == -1) {  // No data for this hour
+                lastState[i] = lastState[i-1];  // Use the state from the previous hour
+            }
+        }
+        for (int i = 1; i < 24; i++) {
             if (historicState[i] == -1) {  // No data for this hour
-                historicState[i] = historicState[i - 1];  // Use the state from the previous hour
+                historicState[i] = lastState[i];  // Use the state from the previous hour
             }
         }
 
@@ -179,8 +182,7 @@ public class InfluxService {
         if (!lastResult.isEmpty() && !lastResult.getFirst().getRecords().isEmpty()) {
             Object lastValue = lastResult.getFirst().getRecords().getFirst().getValueByKey("_value");
             if (lastValue instanceof Double) {
-                lastKnownState = (double) lastValue;
-                historicState[24] = lastKnownState;
+                historicState[24] = (double) lastValue;
                 log.debug("Last value: {}", lastValue);
             }
         }

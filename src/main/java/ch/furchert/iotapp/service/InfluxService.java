@@ -96,6 +96,8 @@ public class InfluxService {
 
     public double[] queryStatus(String device){
 
+        log.debug("Querying status for device: {}", device);
+
         double [] historicState = new double[]{ -1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1,-1 };
 
         String startHistory = """
@@ -123,6 +125,7 @@ public class InfluxService {
                 """;
 
         QueryApi queryApi = influxDBClient.getQueryApi();
+        log.debug("queryApi buildup done");
 
         //first value
         Object historyStart = queryApi.query(startHistory).getFirst().getRecords().getFirst().getValueByKey("_value");

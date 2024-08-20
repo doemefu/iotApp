@@ -153,13 +153,8 @@ public class InfluxService {
 
                 Double value = (Double) fluxRecord.getValueByKey("_value");
 
-                int diff;
-                if(hour > nowHour) {
-                    diff = hour - nowHour;
-                }else{
-                    diff = nowHour - hour;
-                }
-                int index = 24 - diff;
+                int hourDifference = (24 + nowHour - hour) % 24;
+                int index = 24 - hourDifference;
 
                 if (value != null) {
                     lastState[index] = value;  // Update last known state
@@ -174,6 +169,8 @@ public class InfluxService {
                 }
             }
         }
+
+        log.debug("Historic state unfinished: {}", historicState);
 
         // Fill in missing hours with the last known state up to that hour
         for (int i = 1; i < 24; i++) {
@@ -197,7 +194,7 @@ public class InfluxService {
             }
         }
 
-        log.debug("Historic state: {}", historicState);
+        log.debug("Historic state done: {}", historicState);
 
         return historicState;
     }

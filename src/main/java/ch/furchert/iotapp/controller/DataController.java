@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.lang.reflect.Array;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
@@ -47,6 +48,18 @@ public class DataController {
         List<InfluxTerraData> data = influxService.queryMeasurementData(startTime, endTime);
         return new ResponseEntity<>(data, HttpStatus.OK);
     }
+
+    @GetMapping("/deviceStatus")
+    public ResponseEntity<double[]> getStatus(@RequestParam(value = "device", defaultValue = "terra1") String device) {
+
+        log.debug("Getting statusdata from InfluxDB for device: {}", device);
+
+        double[] array = influxService.queryStatus(device);
+
+        log.debug("die stati: {}", array);
+        return new ResponseEntity<>(array, HttpStatus.OK);
+    }
+
 
     private Instant calculateStartTime(Instant endTime, String period) {
         ChronoUnit unit = getChronoUnit(period);

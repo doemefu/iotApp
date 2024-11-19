@@ -1,5 +1,6 @@
 # Stage 2: Create the runtime image
-FROM arm64v8/eclipse-temurin:21-jre-alpine
+#old: FROM arm64v8/eclipse-temurin:21-jre-alpine
+FROM eclipse-temurin:21-jre-alpine
 
 # Label the image
 LABEL authors="dfurchert"

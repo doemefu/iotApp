@@ -26,17 +26,17 @@ public class MqttService implements CommandLineRunner {
             "terra1/mqtt/status",
             "terra1/light",
             "terra1/nightLight",
-            "terra1/light/man",
+            //"terra1/light/man",
             "terra1/rain",
             "terra1/water",
-            "terra1/rain/man",
+            //"terra1/rain/man",
             "terra1/SHT35/data",
             "terra2/mqtt/status",
             "terra2/light",
             "terra2/nightLight",
-            "terra2/light/man",
+           //"terra2/light/man",
             "terra2/rain",
-            "terra2/rain/man",
+            //"terra2/rain/man",
             "terra2/SHT35/data"
     };
     @Autowired

@@ -15,6 +15,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@main
 
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v2
+        with:
+          platforms: all
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
       - name: Set up JDK 21
         uses: actions/setup-java@main
         with:
@@ -26,7 +34,7 @@ jobs:
         run: mvn -Pprod clean package -DskipTests
 
       - name: Build Docker image
-        run: docker build -t iot-app:back .
+        run: docker buildx build --platform linux/arm64 -t iot-app:back --output type=docker .
 
       - name: Save Docker image
         run: docker save -o back-iot-image-automated iot-app:back

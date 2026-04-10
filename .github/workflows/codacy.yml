@@ -16,9 +16,9 @@ name: Codacy Security Scan
 on:
   push:
     branches:
-      - "**"
+#      - "**"
   schedule:
-    - cron: '00 04 * * 4'
+#    - cron: '00 04 * * 4'
 
 permissions:
   contents: read
